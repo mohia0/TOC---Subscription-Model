@@ -55,7 +55,8 @@
       flex-direction: column;
       align-items: center;
       justify-content: flex-start;
-      min-height: 100vh;
+      height: 100vh;
+      overflow: hidden;
       width: 100vw;
       background: var(--bg);
       font-family: 'Inter', 'Segoe UI', 'system-ui', Arial, sans-serif;
@@ -64,6 +65,9 @@
 
     .plugin-ui {
       width: 100%;
+      height: 100vh;
+      flex: 1;
+      box-sizing: border-box;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -74,6 +78,9 @@
 
     .main-col {
       width: 100%;
+      height: 100%;
+      flex: 1;
+      min-height: 0;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -106,11 +113,22 @@
       padding: 16px 20px;
       margin: 0;
       width: 100%;
+      height: 100%;
+      flex: 1;
+      min-height: 0;
       box-sizing: border-box;
       display: flex;
       flex-direction: column;
       gap: 16px;
       transition: none;
+    }
+
+    .card-content {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      height: 100%;
+      min-height: 0;
     }
 
     .card>* {
@@ -156,15 +174,15 @@
     .slides-detect-modes {
       display: flex;
       gap: 12px;
-      margin-bottom: 20px;
+      margin-bottom: 8px;
     }
 
     .detect-btn {
       background: var(--card-bg);
       border: 1px solid var(--border);
       border-radius: 8px;
-      width: 36px;
-      height: 36px;
+      width: 30px;
+      height: 30px;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -201,10 +219,11 @@
       background: rgba(0, 0, 0, 0.2);
       border-radius: 8px;
       border: 1px solid var(--border);
-      min-height: 60px;
-      max-height: 180px;
+      flex: 1;
+      min-height: 100px;
       overflow-y: auto;
       padding: 0;
+      padding-bottom: 8px;
       margin-bottom: 0;
       display: flex;
       flex-direction: column;
@@ -212,13 +231,13 @@
       width: 100%;
       box-sizing: border-box;
       scrollbar-width: thin;
-      scrollbar-color: #353545 #23232b;
+      scrollbar-color: #353545 transparent;
     }
 
     .slides-list::-webkit-scrollbar {
-      width: 6px;
+      width: 4px;
       background: transparent;
-      border-radius: 6px;
+      border-radius: 4px;
     }
 
     .slides-list::-webkit-scrollbar-thumb {
@@ -1010,11 +1029,18 @@
 
     .tab-content-panel {
       display: none;
+      flex-direction: column;
+      flex: 1;
+      min-height: 0;
       animation: fadeIn 0.3s ease;
     }
 
     .tab-content-panel.active {
-      display: block;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
     }
 
     @keyframes fadeIn {
@@ -1123,51 +1149,49 @@
             <button class="tab-btn" id="tab-btn-toc" onclick="switchTab('toc')">2. Generate TOC</button>
           </div>
 
-          <div id="main-status-msg"
-            style="margin: 0 0 8px 0; text-align: left; color: var(--text-main); font-size: 0.9em;"></div>
-
           <!-- TAB PANEL 1: NUMBERING -->
           <div class="tab-content-panel active" id="panel-numbering">
             <div class="settings-group">
               <div class="panel-header"
-                style="font-size: 14px; color: var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom: 12px;">
+                style="font-size: 11px; color: var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom: 6px;">
                 Detection Direction</div>
               <div class="slides-detect-modes"
-                style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:16px;">
+                style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
                 <button class="icon-btn detect-btn selected" id="detect-z"
                   data-tooltip="Z: Left-to-Right, Top-to-Bottom">
-                  <svg width="20" height="20" viewBox="0 0 18 18" fill="none">
+                  <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
                     <path d="M3 3h12v2H5v2h8v2H5v2h10v2H3" stroke="currentColor" stroke-width="1.5"
                       stroke-linecap="round" stroke-linejoin="round" />
                   </svg>
                 </button>
                 <button class="icon-btn detect-btn" id="detect-z-flip"
                   data-tooltip="Z Flipped: Right-to-Left, Top-to-Bottom">
-                  <svg width="20" height="20" viewBox="0 0 18 18" fill="none">
+                  <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
                     <path d="M15 3H3v2h10v2H5v2h8v2H3v2h12" stroke="currentColor" stroke-width="1.5"
                       stroke-linecap="round" stroke-linejoin="round" />
                   </svg>
                 </button>
                 <button class="icon-btn detect-btn" id="detect-vertical" data-tooltip="Vertical: Top-to-Bottom">
-                  <svg width="20" height="20" viewBox="0 0 18 18" fill="none">
+                  <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
                     <path d="M9 3v12M9 3l-2 2M9 3l2 2M9 15l-2-2M9 15l2-2" stroke="currentColor" stroke-width="1.5"
                       stroke-linecap="round" stroke-linejoin="round" />
                   </svg>
                 </button>
                 <button class="icon-btn detect-btn" id="detect-horizontal" data-tooltip="Horizontal: Left-to-Right">
-                  <svg width="20" height="20" viewBox="0 0 18 18" fill="none">
+                  <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
                     <path d="M3 9h12M15 9l-2-2M15 9l-2 2M3 9l2-2M3 9l2 2" stroke="currentColor" stroke-width="1.5"
                       stroke-linecap="round" stroke-linejoin="round" />
                   </svg>
                 </button>
                 <button class="icon-btn detect-btn" id="detect-horizontal-rtl" data-tooltip="Horizontal: Right-to-Left">
-                  <svg width="20" height="20" viewBox="0 0 18 18" fill="none">
+                  <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
                     <path d="M15 9H3M3 9l2-2M3 9l2 2M15 9l-2-2M15 9l-2 2" stroke="currentColor" stroke-width="1.5"
                       stroke-linecap="round" stroke-linejoin="round" />
                   </svg>
                 </button>
-                <button class="icon-btn" id="detect-refresh" data-tooltip="Refresh slides" style="margin-left:auto;">
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <button class="icon-btn" id="detect-refresh" data-tooltip="Refresh slides"
+                  style="margin-left:auto; width: 30px; height: 30px;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polyline points="23 4 23 10 17 10"></polyline>
                     <polyline points="1 20 1 14 7 14"></polyline>
                     <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
@@ -1177,28 +1201,38 @@
             </div>
 
             <div class="slides-list" id="slides-list"></div>
-            <div class="slides-empty" id="slides-empty" style="display:none; padding:32px 0;">No slides detected. Select
-              a page or add frames.</div>
+            <div class="slides-empty" id="slides-empty"
+              style="display:none; padding:24px 0; font-size: 12px; color: #94a3b8;">
+              No slides yet. Add numbers to see them here.
+            </div>
 
-            <div class="slide-controls">
-              <button class="primary-btn" id="add-slide-numbers">
+            <div class="slide-controls" style="align-items: center; margin-top: 12px;">
+              <button class="primary-btn" id="add-slide-numbers"
+                style="height: 32px; font-size: 12px; padding: 0 16px;">
                 Add Slide Numbers
               </button>
-              <button class="icon-btn gear" id="slide-number-settings" data-tooltip="Number style settings">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <button class="icon-btn gear" id="slide-number-settings" data-tooltip="Number style settings"
+                style="width: 32px; height: 32px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <circle cx="12" cy="12" r="3"></circle>
                   <path
                     d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z">
                   </path>
                 </svg>
               </button>
-              <button class="refresh-btn" id="refresh-numbers" data-tooltip="Fix numbering if you removed some slides">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <button class="refresh-btn" id="refresh-numbers" data-tooltip="Fix numbering if you removed some slides"
+                style="width: 32px; height: 32px; padding: 0;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <polyline points="20 6 9 17 4 12"></polyline>
                 </svg>
               </button>
+
+              <div id="main-status-msg"
+                style="flex: 1; text-align: center; color: var(--text-main); font-size: 10px; font-weight: 600; line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin: 0 4px;">
+              </div>
+
               <button class="refresh-btn" id="remove-all-numbers" data-tooltip="Remove all slide numbers"
-                style="margin-left:auto;">
+                style="margin-left:auto; height: 32px; font-size: 12px; padding: 0 12px;">
                 Clear
               </button>
             </div>
