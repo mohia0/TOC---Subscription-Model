@@ -17,12 +17,12 @@ function isSubscriptionActive(purchase) {
   if (purchase.refunded === true || purchase.chargebacked === true) {
     return false;
   }
-  
+
   // Check if subscription was ended, cancelled, or failed
   const hasEnded = purchase.subscription_ended_at !== null && purchase.subscription_ended_at !== undefined;
   const hasCancelled = purchase.subscription_cancelled_at !== null && purchase.subscription_cancelled_at !== undefined;
   const hasFailed = purchase.subscription_failed_at !== null && purchase.subscription_failed_at !== undefined;
-  
+
   return !hasEnded && !hasCancelled && !hasFailed;
 }
 
@@ -35,19 +35,19 @@ async function verifyLicense(licenseKey) {
   try {
     // Only use Gumroad API for real license verification
     const apiResult = await verifyLicenseWithGumroadAPI(licenseKey);
-    
+
     if (apiResult && apiResult.success) {
       return {
         success: true,
         message: 'License is valid'
       };
     }
-    
+
     return {
       success: false,
       message: (apiResult && apiResult.message) || 'That license does not exist for the provided product.'
     };
-    
+
   } catch (error) {
     console.error('License verification error:', error);
     return {
@@ -64,7 +64,7 @@ async function verifyLicense(licenseKey) {
  */
 async function verifyLicenseWithGumroadAPI(licenseKey) {
   console.log('🔍 Making Gumroad API call for license verification');
-  
+
   // This function is no longer used with direct messaging approach
   // The verification is now handled directly in the message handlers
   return {
@@ -131,7 +131,7 @@ async function activatePremiumLicense(licenseKey) {
   try {
     const now = Date.now();
     const thirtyDaysMs = 30 * 24 * 60 * 60 * 1000; // 30 days in milliseconds
-    
+
     // CRITICAL: Validate license key format (basic security)
     if (!licenseKey || licenseKey.length < 10) {
       return {
@@ -139,7 +139,7 @@ async function activatePremiumLicense(licenseKey) {
         message: 'Invalid license key format.'
       };
     }
-    
+
     // CRITICAL: Check for secret hack pattern
     if (licenseKey.includes('🎉')) {
       return {
@@ -147,7 +147,7 @@ async function activatePremiumLicense(licenseKey) {
         message: 'Invalid license key format.'
       };
     }
-    
+
     // Scenario 1: Same License Key - Error (already used)
     if (pluginStorage.usedLicenseKeys.includes(licenseKey)) {
       return {
@@ -155,7 +155,7 @@ async function activatePremiumLicense(licenseKey) {
         message: 'This license has already been used.'
       };
     }
-    
+
     // Scenario 2: Stored License Key - Error (already used)
     if (trialState.licenseKey === licenseKey && trialState.isSubscribed) {
       return {
@@ -163,7 +163,7 @@ async function activatePremiumLicense(licenseKey) {
         message: 'This license was already activated.'
       };
     }
-    
+
     // Scenario 3: New License Key with existing premium time - Extend by 30 days
     if (pluginStorage.isPremium && pluginStorage.expirationTimestamp && now < pluginStorage.expirationTimestamp) {
       // Extend existing premium by 30 days
@@ -171,11 +171,11 @@ async function activatePremiumLicense(licenseKey) {
         pluginStorage.expirationTimestamp,
         now
       ) + thirtyDaysMs;
-      
+
       // Add new license key to used keys
       pluginStorage.usedLicenseKeys.push(licenseKey);
       await savePluginStorage();
-      
+
       // Update trial state
       trialState.isSubscribed = true;
       trialState.isTrialActive = false;
@@ -183,23 +183,23 @@ async function activatePremiumLicense(licenseKey) {
       trialState.licenseActivationDate = new Date().toISOString();
       trialState.subscriptionExpiry = new Date(pluginStorage.expirationTimestamp).toISOString();
       await saveTrialState();
-      
+
       return {
         success: true,
         message: 'Premium extended by 30 days!',
         expirationDate: new Date(pluginStorage.expirationTimestamp)
       };
     }
-    
+
     // Scenario 4: New License Key without premium time - Create new premium with 30 days
     // Create new premium with 30 days
     pluginStorage.expirationTimestamp = now + thirtyDaysMs;
     pluginStorage.isPremium = true;
-    
+
     // Add license key to used keys
     pluginStorage.usedLicenseKeys.push(licenseKey);
     await savePluginStorage();
-    
+
     // Update trial state
     trialState.isSubscribed = true;
     trialState.isTrialActive = false;
@@ -207,13 +207,13 @@ async function activatePremiumLicense(licenseKey) {
     trialState.licenseActivationDate = new Date().toISOString();
     trialState.subscriptionExpiry = new Date(pluginStorage.expirationTimestamp).toISOString();
     await saveTrialState();
-    
+
     return {
       success: true,
       message: 'Premium license activated successfully!',
       expirationDate: new Date(pluginStorage.expirationTimestamp)
     };
-    
+
   } catch (error) {
     console.error('Error activating premium license:', error);
     return {
@@ -228,7 +228,7 @@ async function initializeTrialAndSubscription() {
   try {
     // Load plugin storage first
     await loadPluginStorage();
-    
+
     // Load saved trial state
     const savedTrialState = await figma.clientStorage.getAsync('trialState');
     if (savedTrialState) {
@@ -244,28 +244,28 @@ async function initializeTrialAndSubscription() {
         pluginStorage.isPremium = false;
         pluginStorage.expirationTimestamp = null;
         await savePluginStorage();
-        
+
         // Reset trial state to expired (NOT new trial)
         trialState.isSubscribed = false;
         trialState.isTrialActive = false; // IMPORTANT: Set to false for expired status
         trialState.subscriptionExpiry = null;
         trialState.licenseKey = null;
         await saveTrialState();
-        
+
         // Continue with expired trial initialization
       } else {
         // Premium is still active
         trialState.isSubscribed = true;
         trialState.isTrialActive = false;
         trialState.subscriptionExpiry = new Date(pluginStorage.expirationTimestamp).toISOString();
-        
+
         // Try to get license key from old storage for backward compatibility
         const licenseState = await figma.clientStorage.getAsync('licenseState');
         if (licenseState && licenseState.licenseKey) {
           trialState.licenseKey = licenseState.licenseKey;
           trialState.licenseActivationDate = licenseState.activationDate;
         }
-        
+
         await saveTrialState();
       }
     } else {
@@ -278,7 +278,7 @@ async function initializeTrialAndSubscription() {
         trialState.licenseKey = licenseState.licenseKey;
         trialState.licenseActivationDate = licenseState.activationDate;
         trialState.subscriptionExpiry = licenseState.expiryDate;
-        
+
         // Check if premium subscription has expired
         const now = new Date();
         const expiry = new Date(trialState.subscriptionExpiry);
@@ -287,7 +287,7 @@ async function initializeTrialAndSubscription() {
           trialState.isSubscribed = false;
           trialState.isTrialActive = false; // IMPORTANT: Set to false for expired status
         }
-        
+
         await saveTrialState();
       } else {
         // No premium - DEFAULT TO TRIAL STATUS
@@ -297,7 +297,7 @@ async function initializeTrialAndSubscription() {
           trialState.trialEndDate = new Date(Date.now() + (TRIAL_DAYS * 24 * 60 * 60 * 1000)).toISOString();
           trialState.isTrialActive = true; // DEFAULT TO TRIAL
           await saveTrialState();
-          
+
           // Notify user that trial has started
           figma.notify('🎉 Welcome! Your 7-day free trial has started. Enjoy all premium features!', { timeout: 4000 });
         } else {
@@ -305,15 +305,15 @@ async function initializeTrialAndSubscription() {
           const now = new Date();
           const trialEnd = new Date(trialState.trialEndDate);
           const isExpired = now >= trialEnd;
-          
+
           // Only set trial as inactive if it's actually expired
           trialState.isTrialActive = !isExpired;
-          
+
           // Show warning if trial is ending soon (last 3 days)
           if (trialState.isTrialActive) {
             const remainingMs = trialEnd.getTime() - now.getTime();
             const remainingDays = Math.ceil(remainingMs / (24 * 60 * 60 * 1000));
-            
+
             if (remainingDays <= 3 && remainingDays > 0) {
               figma.notify(`⚠️ Trial ending in ${remainingDays} day${remainingDays > 1 ? 's' : ''}. Upgrade now to keep all features!`, { timeout: 5000 });
             }
@@ -327,7 +327,7 @@ async function initializeTrialAndSubscription() {
 
     // Validate subscription status
     await validateSubscription();
-    
+
     // Set up periodic license validation for premium users
     if (trialState.isSubscribed && trialState.licenseKey) {
       // Check license validity every 24 hours
@@ -335,7 +335,7 @@ async function initializeTrialAndSubscription() {
         await validatePremiumLicense();
       }, 24 * 60 * 60 * 1000); // 24 hours
     }
-    
+
     // CRITICAL: Set up premium expiration check every hour
     setInterval(async () => {
       if (pluginStorage.isPremium && pluginStorage.expirationTimestamp) {
@@ -346,20 +346,20 @@ async function initializeTrialAndSubscription() {
           pluginStorage.isPremium = false;
           pluginStorage.expirationTimestamp = null;
           await savePluginStorage();
-          
+
           // Reset trial state to expired (NOT new trial)
           trialState.isSubscribed = false;
           trialState.isTrialActive = false; // IMPORTANT: Set to false for expired status
           trialState.subscriptionExpiry = null;
           trialState.licenseKey = null;
           await saveTrialState();
-          
+
           // Notify user
           figma.notify('😔 Premium subscription has expired. Please renew to continue using premium features.', { timeout: 5000 });
-          
+
           // Update UI
-          figma.ui.postMessage({ 
-            type: 'trial-status', 
+          figma.ui.postMessage({
+            type: 'trial-status',
             trialState: {
               isTrialActive: false, // IMPORTANT: Set to false for expired status
               isSubscribed: false,
@@ -377,8 +377,8 @@ async function initializeTrialAndSubscription() {
     }, 60 * 60 * 1000); // Check every hour
 
     // Send trial/subscription status to UI
-    figma.ui.postMessage({ 
-      type: 'trial-status', 
+    figma.ui.postMessage({
+      type: 'trial-status',
       trialState: {
         isTrialActive: trialState.isTrialActive,
         isSubscribed: trialState.isSubscribed,
@@ -411,11 +411,11 @@ function updateTrialRemainingTime() {
     trialState.remainingSeconds = 0;
     return;
   }
-  
+
   const now = new Date();
   const trialEnd = new Date(trialState.trialEndDate);
   const remainingMs = trialEnd.getTime() - now.getTime();
-  
+
   if (remainingMs <= 0) {
     trialState.remainingDays = 0;
     trialState.remainingHours = 0;
@@ -440,11 +440,11 @@ async function validateSubscription() {
   try {
     // Get stored subscription data
     const subscriptionData = await figma.clientStorage.getAsync('subscriptionData');
-    
+
     if (subscriptionData && subscriptionData.licenseKey) {
       // Use production-grade license verification
       const result = await verifyLicense(subscriptionData.licenseKey);
-      
+
       if (result.success) {
         trialState.isSubscribed = true;
         // Set expiry for monthly product (30 days)
@@ -466,7 +466,7 @@ async function validatePremiumLicense() {
   if (!trialState.isSubscribed || !trialState.licenseKey) {
     return;
   }
-  
+
   try {
     // Send validation request to UI
     figma.ui.postMessage({
@@ -474,7 +474,7 @@ async function validatePremiumLicense() {
       licenseKey: trialState.licenseKey,
       productId: 'bqqYJ_jE-zkEoFiryLblXQ=='
     });
-    
+
   } catch (error) {
     console.error('Error validating premium license:', error);
   }
@@ -491,18 +491,18 @@ function canUsePremiumFeatures() {
       pluginStorage.isPremium = false;
       pluginStorage.expirationTimestamp = null;
       savePluginStorage();
-      
+
       // Reset trial state to expired (NOT new trial)
       trialState.isSubscribed = false;
       trialState.isTrialActive = false; // IMPORTANT: Set to false for expired status
       trialState.subscriptionExpiry = null;
       trialState.licenseKey = null;
       saveTrialState();
-      
+
       return false;
     }
   }
-  
+
   // If subscribed, always allow premium features regardless of trial status
   if (trialState.isSubscribed) {
     return true;
@@ -517,10 +517,10 @@ function checkTrialStatus() {
   if (trialState.isSubscribed) {
     return true;
   }
-  
+
   // Only show trial expired message if not subscribed and trial is not active
   if (!trialState.isTrialActive && !trialState.isSubscribed) {
-            figma.notify('😔 Trial expired. Please upgrade to continue using premium features.', { error: true });
+    figma.notify('😔 Trial expired. Please upgrade to continue using premium features.', { error: true });
     return false;
   }
   return true;
@@ -545,12 +545,12 @@ function getTrialStatus() {
 // Get remaining trial days
 function getRemainingTrialDays() {
   if (!trialState.isTrialActive) return 0;
-  
+
   const now = new Date();
   const trialEnd = new Date(trialState.trialEndDate);
   const remainingMs = trialEnd.getTime() - now.getTime();
   const remainingDays = Math.ceil(remainingMs / (24 * 60 * 60 * 1000));
-  
+
   return Math.max(0, remainingDays);
 }
 
@@ -566,7 +566,7 @@ function scanFrames(node, parentPath = [], results = []) {
       id: node.id,
       name: node.name,
       type: node.type,
-              parentPath: parentPath.slice(),
+      parentPath: parentPath.slice(),
       pageId: figma.currentPage.id
     });
   }
@@ -659,7 +659,7 @@ async function ensureFont(fontWeight) {
 function getFramesOnCurrentPage() {
   // Get only presentation slides on the current page
   const allFrames = [];
-  
+
   function collectFrames(node) {
     // Only collect frames that are likely to be presentation slides
     if (node.type === 'FRAME' && node.name !== '__TOC_AUTO__') {
@@ -669,24 +669,24 @@ function getFramesOnCurrentPage() {
       // 3. Must not be a component or instance
       // 4. Must not be inside a group
       // 5. Must not be a TOC frame or other special frame
-      
+
       const isTopLevel = node.parent && node.parent.type === 'PAGE';
       const hasReasonableSize = node.width >= 200 && node.height >= 200; // Minimum slide size
       const isNotComponent = node.type === 'FRAME' && !node.name.startsWith('_');
       const isNotNested = !node.parent || node.parent.type === 'PAGE';
       const isNotSpecialFrame = node.name !== '__TOC_AUTO__' && !node.name.startsWith('__');
-      
+
       // Additional check: if it's nested, only include if it's a direct child of the page
       const isDirectChild = node.parent === figma.currentPage;
-      
+
       // Additional check: prefer frames with slide-like names (optional, not strict)
       const hasSlideLikeName = /slide|page|frame/i.test(node.name) || node.name.match(/^\d+$/);
-      
+
       if (isTopLevel && hasReasonableSize && isNotComponent && isDirectChild && isNotSpecialFrame) {
         allFrames.push(node);
       }
     }
-    
+
     // Only recurse into children if we're at the page level
     if ('children' in node && (node.type === 'PAGE' || node.type === 'FRAME')) {
       for (const child of node.children) {
@@ -694,10 +694,10 @@ function getFramesOnCurrentPage() {
       }
     }
   }
-  
+
   // Start from the current page
   collectFrames(figma.currentPage);
-  
+
   console.log('Found presentation slides on current page:', allFrames.length);
   if (allFrames.length > 0) {
     console.log('Slide names:', allFrames.map(f => f.name));
@@ -752,7 +752,7 @@ function sendFramesToUI(direction = 'z', filterForTOC = false) {
   const frames = getFramesOnCurrentPage();
   const ordered = orderFrames(frames, direction);
   console.log('sendFramesToUI called with filterForTOC:', filterForTOC, 'frames found:', frames.length);
-  
+
   if (filterForTOC) {
     // Helper: Get slide number from __SLIDE_NUMBER__ node
     function getSlideNumber(frame) {
@@ -766,8 +766,8 @@ function sendFramesToUI(direction = 'z', filterForTOC = false) {
     }
     // Recursive filter: Only include frames (and their children) that have a slide number node
     function filterFramesWithNumber(framesArr) {
-      return framesArr.map(function(frame) {
-        var hasNumber = frame.findOne && frame.findOne(function(n) { return n.type === 'TEXT' && /^__SLIDE_NUMBER__\d+$/.test(n.name); });
+      return framesArr.map(function (frame) {
+        var hasNumber = frame.findOne && frame.findOne(function (n) { return n.type === 'TEXT' && /^__SLIDE_NUMBER__\d+$/.test(n.name); });
         var filteredChildren = [];
         if (frame.children && Array.isArray(frame.children)) {
           filteredChildren = filterFramesWithNumber(frame.children);
@@ -790,7 +790,7 @@ function sendFramesToUI(direction = 'z', filterForTOC = false) {
     figma.ui.postMessage({ type: 'frames-list', frames: frameData });
   } else {
     // Send only presentation slides (already filtered by getFramesOnCurrentPage)
-    const frameData = ordered.map(function(frame, idx) {
+    const frameData = ordered.map(function (frame, idx) {
       return {
         id: frame.id,
         name: frame.name,
@@ -825,17 +825,17 @@ async function sendSavedTOCToUI() {
 // --- Reusable function to generate TOC frame ---
 async function generateTOCFrame(slides, options, startFrameId) {
   console.log('generateTOCFrame called with:', { slides, options, startFrameId });
-  
+
   // Only generate if a frame is selected
   const selection = figma.currentPage.selection;
   console.log('Current selection:', selection);
-  
+
   let parentFrame = null;
   if (selection.length === 1 && selection[0].type === 'FRAME') {
     parentFrame = selection[0];
     console.log('Selected parent frame:', parentFrame.name);
   }
-  
+
   if (!parentFrame) {
     console.log('No frame selected');
     figma.notify('Please select a frame to generate the TOC inside.');
@@ -850,9 +850,9 @@ async function generateTOCFrame(slides, options, startFrameId) {
   }
   // --- [ENFORCED] Use custom structure if provided ---
   let tocSlides = Array.isArray(slides) && slides.length > 0 ? slides : [];
-  
+
   console.log('Initial tocSlides:', tocSlides);
-  
+
   // Ensure all slides have proper structure
   tocSlides = tocSlides.map(slide => ({
     id: slide.id,
@@ -860,19 +860,19 @@ async function generateTOCFrame(slides, options, startFrameId) {
     number: slide.number || 1,
     children: Array.isArray(slide.children) ? slide.children : []
   }));
-  
+
   console.log('Processed tocSlides:', tocSlides);
-  
+
   // If slides is empty, fallback to detected slides with numbers
   if (tocSlides.length === 0) {
     console.log('No slides provided, detecting slides with numbers...');
     const frames = getFramesOnCurrentPage();
     const ordered = orderFrames(frames, 'z');
-    
+
     // Filter frames that have slide numbers
     function filterFramesWithNumber(framesArr) {
-      return framesArr.map(function(frame) {
-        var hasNumber = frame.findOne && frame.findOne(function(n) { return n.type === 'TEXT' && /^__SLIDE_NUMBER__\d+$/.test(n.name); });
+      return framesArr.map(function (frame) {
+        var hasNumber = frame.findOne && frame.findOne(function (n) { return n.type === 'TEXT' && /^__SLIDE_NUMBER__\d+$/.test(n.name); });
         if (hasNumber) {
           const numNode = frame.findOne(n => n.type === 'TEXT' && /^__SLIDE_NUMBER__\d+$/.test(n.name));
           const match = numNode.characters.match(/^\d+/);
@@ -887,7 +887,7 @@ async function generateTOCFrame(slides, options, startFrameId) {
         return null;
       }).filter(Boolean);
     }
-    
+
     tocSlides = filterFramesWithNumber(ordered);
     console.log('Detected slides with numbers:', tocSlides);
   }
@@ -902,12 +902,12 @@ async function generateTOCFrame(slides, options, startFrameId) {
       }
     }
     flatten(tocSlides);
-    var startIdx = flat.findIndex(function(s) { return s.id === startFrameId; });
+    var startIdx = flat.findIndex(function (s) { return s.id === startFrameId; });
     if (startIdx !== -1) {
       var allowedIds = {};
-      flat.slice(startIdx).forEach(function(s) { allowedIds[s.id] = true; });
+      flat.slice(startIdx).forEach(function (s) { allowedIds[s.id] = true; });
       function filterByIds(slides) {
-        return slides.map(function(s) {
+        return slides.map(function (s) {
           var filteredChildren = [];
           if (s.children && Array.isArray(s.children)) {
             filteredChildren = filterByIds(s.children);
@@ -921,7 +921,7 @@ async function generateTOCFrame(slides, options, startFrameId) {
       tocSlides = filterByIds(tocSlides);
     }
   }
-  
+
   // Check if we have any slides to generate TOC from
   if (tocSlides.length === 0) {
     console.log('No slides found for TOC generation');
@@ -929,9 +929,9 @@ async function generateTOCFrame(slides, options, startFrameId) {
     figma.ui.postMessage({ type: 'toc-error', error: 'No slides with numbers found. Please add slide numbers first.' });
     return;
   }
-  
+
   console.log('Generating TOC with', tocSlides.length, 'slides');
-  
+
   let tocStyle = options || { numbered: true, indent: 2 };
   await figma.loadFontAsync({ family: 'Inter', style: 'Regular' });
   let heroFontSize = 18, heroFontWeight = 'Bold', heroFontColor = { r: 0, g: 0, b: 0 };
@@ -956,10 +956,10 @@ async function generateTOCFrame(slides, options, startFrameId) {
       await figma.loadFontAsync({ family: 'Inter', style: mapped });
     } catch (e) {
       if (mapped !== 'Regular') {
-        try { await figma.loadFontAsync({ family: 'Inter', style: 'Regular' }); } catch (e2) {}
+        try { await figma.loadFontAsync({ family: 'Inter', style: 'Regular' }); } catch (e2) { }
       }
       if (mapped !== 'Bold') {
-        try { await figma.loadFontAsync({ family: 'Inter', style: 'Bold' }); } catch (e2) {}
+        try { await figma.loadFontAsync({ family: 'Inter', style: 'Bold' }); } catch (e2) { }
       }
     }
   }
@@ -977,9 +977,9 @@ async function generateTOCFrame(slides, options, startFrameId) {
     // Ensure slides is a nested structure: each top-level slide has .children array
     function ensureHierarchy(slidesArr) {
       // If any slide has a .children array, assume already nested
-      if (slidesArr.some(function(s) { return Array.isArray(s.children) && s.children.length > 0; })) return slidesArr;
+      if (slidesArr.some(function (s) { return Array.isArray(s.children) && s.children.length > 0; })) return slidesArr;
       // Otherwise, treat all as top-level (no grouping)
-      return slidesArr.map(function(s) {
+      return slidesArr.map(function (s) {
         var copy = {};
         for (var k in s) if (Object.prototype.hasOwnProperty.call(s, k)) copy[k] = s[k];
         copy.children = [];
@@ -987,10 +987,10 @@ async function generateTOCFrame(slides, options, startFrameId) {
       });
     }
     slides = ensureHierarchy(slides);
-    
+
     // Preserve original slide order and create groups
     let groupedSlides = [];
-    
+
     // Debug: Log the original slide order and structure
     console.log('Original slides order:', slides.map(s => s.number + ' ' + s.name));
     console.log('Original slides structure:', slides.map(s => ({
@@ -999,7 +999,7 @@ async function generateTOCFrame(slides, options, startFrameId) {
       hasChildren: s.children && s.children.length > 0,
       childrenCount: s.children ? s.children.length : 0
     })));
-    
+
     // Check for missing numbers
     const numbers = slides.map(s => s.number).sort((a, b) => a - b);
     console.log('All slide numbers found:', numbers);
@@ -1009,11 +1009,11 @@ async function generateTOCFrame(slides, options, startFrameId) {
     }
     const missingNumbers = expectedNumbers.filter(n => !numbers.includes(n));
     console.log('Missing slide numbers:', missingNumbers);
-    
+
     // Process slides in their original order
     for (let i = 0; i < slides.length; i++) {
       const slide = slides[i];
-      
+
       if (slide.children && slide.children.length > 0) {
         // This is a title with subtitles - create a group
         groupedSlides.push({
@@ -1031,34 +1031,34 @@ async function generateTOCFrame(slides, options, startFrameId) {
         });
       }
     }
-    
+
     // Debug: Log the grouped slides order
-    console.log('Grouped slides order:', groupedSlides.map(g => 
+    console.log('Grouped slides order:', groupedSlides.map(g =>
       g.type === 'group' ? g.title.number + ' ' + g.title.name : g.slide.number + ' ' + g.slide.name
     ));
-    
+
     // Split groups into multiple columns based on layout mode and preserve order
     const layoutMode = tocStyle.layoutMode || 'auto';
     const maxItemsPerCol = tocStyle.maxItemsPerCol || 6; // Default to 6 items per column
     const maxColumnHeight = tocStyle.maxColumnHeight || 800;
-    
+
     // Calculate how many columns we need based on maxItemsPerCol
     const totalItems = groupedSlides.length;
     const numColumns = Math.max(1, Math.ceil(totalItems / maxItemsPerCol));
-    
+
     let columns = Array.from({ length: numColumns }, () => []);
     let columnHeights = Array.from({ length: numColumns }, () => 0);
-    
+
     // Distribute slides sequentially across columns respecting maxItemsPerCol
     let currentCol = 0;
     let currentColItemCount = 0;
     let actualNumColumns = numColumns;
-    
+
     for (const group of groupedSlides) {
       // Calculate items in this group (title + subtitles)
-      const groupItemCount = group.type === 'group' ? 
+      const groupItemCount = group.type === 'group' ?
         (1 + group.subtitles.length) : 1;
-      
+
       // Check if this group would exceed the column limit
       if (currentColItemCount + groupItemCount > maxItemsPerCol) {
         // Move to next column
@@ -1070,7 +1070,7 @@ async function generateTOCFrame(slides, options, startFrameId) {
           actualNumColumns++;
         }
       }
-      
+
       // Special handling: If the group itself is too large for any column, 
       // create a new column just for this group
       if (groupItemCount > maxItemsPerCol) {
@@ -1098,16 +1098,16 @@ async function generateTOCFrame(slides, options, startFrameId) {
         currentColItemCount += groupItemCount;
       }
     }
-    
+
     // Debug: Log the column distribution
     console.log('Max items per column:', maxItemsPerCol);
     console.log('Number of columns created:', numColumns);
     for (let i = 0; i < columns.length; i++) {
-      console.log(`Column ${i + 1}:`, columns[i].map(g => 
+      console.log(`Column ${i + 1}:`, columns[i].map(g =>
         g.type === 'group' ? g.title.number + ' ' + g.title.name : g.slide.number + ' ' + g.slide.name
       ));
     }
-    
+
     // Debug: Log the distribution logic
     console.log('Distribution details:', {
       totalItems: groupedSlides.length,
@@ -1119,9 +1119,9 @@ async function generateTOCFrame(slides, options, startFrameId) {
         itemCount: g.type === 'group' ? (1 + g.subtitles.length) : 1
       }))
     });
-    
 
-    
+
+
     // Create horizontal frame for columns
     const rowFrame = figma.createFrame();
     rowFrame.layoutMode = 'HORIZONTAL';
@@ -1129,7 +1129,7 @@ async function generateTOCFrame(slides, options, startFrameId) {
     rowFrame.counterAxisSizingMode = 'AUTO';
     rowFrame.itemSpacing = tocStyle.columnSpacing || 48;
     rowFrame.fills = [];
-    
+
     // --- Throttle progress updates ---
     let lastProgressTime = Date.now();
     async function maybeSendProgress(current, total) {
@@ -1139,13 +1139,13 @@ async function generateTOCFrame(slides, options, startFrameId) {
         lastProgressTime = now;
       }
     }
-    
+
     // Helper to add groups to a column
     async function addGroupsToCol(colArr, colFrame, colOffset, totalCount, progressBase) {
-      
+
       for (let idx = 0; idx < colArr.length; idx++) {
         const group = colArr[idx];
-        
+
         if (group.type === 'group') {
           // Create a group frame with title and subtitles
           const groupFrame = figma.createFrame();
@@ -1156,7 +1156,7 @@ async function generateTOCFrame(slides, options, startFrameId) {
           groupFrame.itemSpacing = 12; // Spacing between title and subtitles
           groupFrame.paddingTop = tocStyle.groupPadding || 24; // Space above group
           groupFrame.paddingBottom = tocStyle.groupPadding || 24; // Space below group
-          
+
           // Title row
           const titleRow = figma.createFrame();
           titleRow.layoutMode = 'HORIZONTAL';
@@ -1164,25 +1164,23 @@ async function generateTOCFrame(slides, options, startFrameId) {
           titleRow.counterAxisSizingMode = 'AUTO';
           titleRow.itemSpacing = 16;
           titleRow.fills = [];
-          
+
           // Apply row alignment settings
           if (tocStyle.textAlignHorizontal) {
-            titleRow.counterAxisAlignItems = tocStyle.textAlignHorizontal === 'LEFT' ? 'MIN' : 
-                                           tocStyle.textAlignHorizontal === 'CENTER' ? 'CENTER' : 'MAX';
+            titleRow.counterAxisAlignItems = tocStyle.textAlignHorizontal === 'TOP' ? 'MIN' :
+              tocStyle.textAlignHorizontal === 'BOTTOM' ? 'MAX' : 'CENTER';
           }
-          if (tocStyle.textAlignVertical) {
-            titleRow.primaryAxisAlignItems = tocStyle.textAlignVertical === 'TOP' ? 'MIN' : 
-                                           tocStyle.textAlignVertical === 'CENTER' ? 'CENTER' : 'MAX';
-          }
-          
+          // Default horizontal positioning to Left
+          titleRow.primaryAxisAlignItems = 'MIN';
+
           // Number node for title
           const numFont = tocStyle.titleNumberFont || 'Inter';
           const numFontSize = tocStyle.titleNumberSize || 18;
           const numFontWeight = tocStyle.titleNumberWeight || 'Bold';
-          const numColor = tocStyle.titleNumberColor ? hexToRgb(tocStyle.titleNumberColor) : {r:0,g:0,b:0};
+          const numColor = tocStyle.titleNumberColor ? hexToRgb(tocStyle.titleNumberColor) : { r: 0, g: 0, b: 0 };
           const numPos = tocStyle.titleNumberPos || 'left';
           const numLeadingZero = !!tocStyle.titleNumberLeadingZero;
-          
+
           await loadFontIfNeeded(numFont, numFontWeight);
           const numText = figma.createText();
           // Use the original slide number from the UI
@@ -1192,11 +1190,11 @@ async function generateTOCFrame(slides, options, startFrameId) {
           numText.characters = numStr;
           numText.fontSize = numFontSize;
           numText.fontName = { family: numFont, style: numFontWeight };
-          numText.fills = [ { type: 'SOLID', color: numColor } ];
+          numText.fills = [{ type: 'SOLID', color: numColor }];
           numText.textAutoResize = 'WIDTH_AND_HEIGHT';
           numText.textAlignHorizontal = 'RIGHT';
           numText.setPluginData('tocType', 'hero-number');
-          
+
           // Title text node
           const nameFont = tocStyle.heroFontFamily || 'Inter';
           const nameFontStyle = mapFontWeight(heroFontWeight);
@@ -1205,12 +1203,12 @@ async function generateTOCFrame(slides, options, startFrameId) {
           nameText.characters = group.title.name || '[NO NAME]';
           nameText.fontSize = heroFontSize;
           nameText.fontName = { family: nameFont, style: nameFontStyle };
-          nameText.fills = [ { type: 'SOLID', color: tocStyle.heroFontColor ? hexToRgb(tocStyle.heroFontColor) : { r: 0, g: 0, b: 0 } } ];
+          nameText.fills = [{ type: 'SOLID', color: tocStyle.heroFontColor ? hexToRgb(tocStyle.heroFontColor) : { r: 0, g: 0, b: 0 } }];
           nameText.textAutoResize = 'WIDTH_AND_HEIGHT';
           nameText.textAlignHorizontal = 'LEFT';
           nameText.setPluginData('linkedFrameId', group.title.id);
           nameText.setPluginData('tocType', 'hero');
-          
+
           if (numPos === 'right') {
             titleRow.appendChild(nameText);
             titleRow.appendChild(numText);
@@ -1219,7 +1217,7 @@ async function generateTOCFrame(slides, options, startFrameId) {
             titleRow.appendChild(nameText);
           }
           groupFrame.appendChild(titleRow);
-          
+
           // Subtitle rows
           for (const child of group.subtitles) {
             const subRow = figma.createFrame();
@@ -1229,25 +1227,23 @@ async function generateTOCFrame(slides, options, startFrameId) {
             subRow.itemSpacing = 16;
             subRow.fills = [];
             subRow.paddingLeft = tocStyle.subIndent || 24;
-            
+
             // Apply row alignment settings
             if (tocStyle.textAlignHorizontal) {
-              subRow.counterAxisAlignItems = tocStyle.textAlignHorizontal === 'LEFT' ? 'MIN' : 
-                                           tocStyle.textAlignHorizontal === 'CENTER' ? 'CENTER' : 'MAX';
+              subRow.counterAxisAlignItems = tocStyle.textAlignHorizontal === 'TOP' ? 'MIN' :
+                tocStyle.textAlignHorizontal === 'BOTTOM' ? 'MAX' : 'CENTER';
             }
-            if (tocStyle.textAlignVertical) {
-              subRow.primaryAxisAlignItems = tocStyle.textAlignVertical === 'TOP' ? 'MIN' : 
-                                           tocStyle.textAlignVertical === 'CENTER' ? 'CENTER' : 'MAX';
-            }
-            
+            // Default horizontal positioning to Left
+            subRow.primaryAxisAlignItems = 'MIN';
+
             // Subtitle number
             const subNumFont = tocStyle.subNumberFont || 'Inter';
             const subNumFontSize = tocStyle.subNumberSize || 18;
             const subNumFontWeight = tocStyle.subNumberWeight || 'Regular';
-            const subNumColor = tocStyle.subNumberColor ? hexToRgb(tocStyle.subNumberColor) : {r:0,g:0,b:0};
+            const subNumColor = tocStyle.subNumberColor ? hexToRgb(tocStyle.subNumberColor) : { r: 0, g: 0, b: 0 };
             const subNumPos = tocStyle.subNumberPos || 'left';
             const subNumLeadingZero = !!tocStyle.subNumberLeadingZero;
-            
+
             await loadFontIfNeeded(subNumFont, subNumFontWeight);
             const subNumText = figma.createText();
             // Use the original slide number from the UI
@@ -1257,11 +1253,11 @@ async function generateTOCFrame(slides, options, startFrameId) {
             subNumText.characters = subNumStr;
             subNumText.fontSize = subNumFontSize;
             subNumText.fontName = { family: subNumFont, style: subNumFontWeight };
-            subNumText.fills = [ { type: 'SOLID', color: subNumColor } ];
+            subNumText.fills = [{ type: 'SOLID', color: subNumColor }];
             subNumText.textAutoResize = 'WIDTH_AND_HEIGHT';
             subNumText.textAlignHorizontal = 'RIGHT';
             subNumText.setPluginData('tocType', 'sub-number');
-            
+
             // Subtitle text
             const subNameFont = tocStyle.subTitleFont || 'Inter';
             const subNameFontStyle = mapFontWeight(tocStyle.subTitleWeight || 'Regular');
@@ -1270,12 +1266,12 @@ async function generateTOCFrame(slides, options, startFrameId) {
             subNameText.characters = child.name || '[NO NAME]';
             subNameText.fontSize = tocStyle.subTitleSize || nestedFontSize;
             subNameText.fontName = { family: subNameFont, style: subNameFontStyle };
-            subNameText.fills = [ { type: 'SOLID', color: tocStyle.subTitleColor ? hexToRgb(tocStyle.subTitleColor) : nestedFontColor } ];
+            subNameText.fills = [{ type: 'SOLID', color: tocStyle.subTitleColor ? hexToRgb(tocStyle.subTitleColor) : nestedFontColor }];
             subNameText.textAutoResize = 'WIDTH_AND_HEIGHT';
             subNameText.textAlignHorizontal = 'LEFT';
             subNameText.setPluginData('linkedFrameId', child.id);
             subNameText.setPluginData('tocType', 'sub');
-            
+
             if (subNumPos === 'right') {
               subRow.appendChild(subNameText);
               subRow.appendChild(subNumText);
@@ -1286,7 +1282,7 @@ async function generateTOCFrame(slides, options, startFrameId) {
             groupFrame.appendChild(subRow);
           }
           colFrame.appendChild(groupFrame);
-          
+
         } else {
           // Single slide (no subtitles)
           const row = figma.createFrame();
@@ -1297,24 +1293,22 @@ async function generateTOCFrame(slides, options, startFrameId) {
           row.fills = [];
           row.paddingTop = 12; // Space above single items
           row.paddingBottom = 12; // Space below single items
-          
+
           // Apply row alignment settings
           if (tocStyle.textAlignHorizontal) {
-            row.counterAxisAlignItems = tocStyle.textAlignHorizontal === 'LEFT' ? 'MIN' : 
-                                       tocStyle.textAlignHorizontal === 'CENTER' ? 'CENTER' : 'MAX';
+            row.counterAxisAlignItems = tocStyle.textAlignHorizontal === 'TOP' ? 'MIN' :
+              tocStyle.textAlignHorizontal === 'BOTTOM' ? 'MAX' : 'CENTER';
           }
-          if (tocStyle.textAlignVertical) {
-            row.primaryAxisAlignItems = tocStyle.textAlignVertical === 'TOP' ? 'MIN' : 
-                                       tocStyle.textAlignVertical === 'CENTER' ? 'CENTER' : 'MAX';
-          }
-          
+          // Default horizontal positioning to Left
+          row.primaryAxisAlignItems = 'MIN';
+
           const numFont = tocStyle.titleNumberFont || 'Inter';
           const numFontSize = tocStyle.titleNumberSize || 18;
           const numFontWeight = tocStyle.titleNumberWeight || 'Bold';
-          const numColor = tocStyle.titleNumberColor ? hexToRgb(tocStyle.titleNumberColor) : {r:0,g:0,b:0};
+          const numColor = tocStyle.titleNumberColor ? hexToRgb(tocStyle.titleNumberColor) : { r: 0, g: 0, b: 0 };
           const numPos = tocStyle.titleNumberPos || 'left';
           const numLeadingZero = !!tocStyle.titleNumberLeadingZero;
-          
+
           await loadFontIfNeeded(numFont, numFontWeight);
           const numText = figma.createText();
           // Use the original slide number from the UI
@@ -1324,11 +1318,11 @@ async function generateTOCFrame(slides, options, startFrameId) {
           numText.characters = numStr;
           numText.fontSize = numFontSize;
           numText.fontName = { family: numFont, style: numFontWeight };
-          numText.fills = [ { type: 'SOLID', color: numColor } ];
+          numText.fills = [{ type: 'SOLID', color: numColor }];
           numText.textAutoResize = 'WIDTH_AND_HEIGHT';
           numText.textAlignHorizontal = 'RIGHT';
           numText.setPluginData('tocType', 'hero-number');
-          
+
           const nameFont = tocStyle.heroFontFamily || 'Inter';
           const nameFontStyle = mapFontWeight(heroFontWeight);
           await loadFontIfNeeded(nameFont, nameFontStyle);
@@ -1336,12 +1330,12 @@ async function generateTOCFrame(slides, options, startFrameId) {
           nameText.characters = group.slide.name || '[NO NAME]';
           nameText.fontSize = heroFontSize;
           nameText.fontName = { family: nameFont, style: nameFontStyle };
-          nameText.fills = [ { type: 'SOLID', color: tocStyle.heroFontColor ? hexToRgb(tocStyle.heroFontColor) : { r: 0, g: 0, b: 0 } } ];
+          nameText.fills = [{ type: 'SOLID', color: tocStyle.heroFontColor ? hexToRgb(tocStyle.heroFontColor) : { r: 0, g: 0, b: 0 } }];
           nameText.textAutoResize = 'WIDTH_AND_HEIGHT';
           nameText.textAlignHorizontal = 'LEFT';
           nameText.setPluginData('linkedFrameId', group.slide.id);
           nameText.setPluginData('tocType', 'hero');
-          
+
           if (numPos === 'right') {
             row.appendChild(nameText);
             row.appendChild(numText);
@@ -1351,13 +1345,13 @@ async function generateTOCFrame(slides, options, startFrameId) {
           }
           colFrame.appendChild(row);
         }
-        
+
         // --- Progress update (throttled) ---
         const current = progressBase + idx + 1;
         await maybeSendProgress(current, totalCount);
       }
     }
-    
+
     // Create multiple columns
     const colFrames = [];
     for (let i = 0; i < actualNumColumns; i++) {
@@ -1368,11 +1362,11 @@ async function generateTOCFrame(slides, options, startFrameId) {
       colFrame.resize(tocStyle.columnWidth || 350, tocStyle.maxColumnHeight || 800);
       colFrame.itemSpacing = tocStyle.groupSpacing || 24;
       colFrame.fills = [];
-      
+
       // Calculate offset for progress tracking
       const offset = columns.slice(0, i).reduce((sum, col) => sum + col.length, 0);
       await addGroupsToCol(columns[i], colFrame, offset, groupedSlides.length, offset);
-      
+
       colFrames.push(colFrame);
       rowFrame.appendChild(colFrame);
     }
@@ -1387,10 +1381,10 @@ async function generateTOCFrame(slides, options, startFrameId) {
   tocRoot.counterAxisSizingMode = 'AUTO'; // Changed to AUTO for responsive width
   tocRoot.resize(1200, 800); // Initial size, will adjust based on content
   tocRoot.itemSpacing = tocStyle.groupSpacing || 24;
-  tocRoot.paddingTop = tocStyle.framePaddingTop || 48;
-  tocRoot.paddingBottom = tocStyle.framePaddingBottom || 48;
-  tocRoot.paddingLeft = tocStyle.framePaddingLeft || 64;
-  tocRoot.paddingRight = tocStyle.framePaddingRight || 64;
+  tocRoot.paddingTop = 0;
+  tocRoot.paddingBottom = 0;
+  tocRoot.paddingLeft = 0;
+  tocRoot.paddingRight = 0;
   tocRoot.fills = []; // No background
   // --- Build the selected layout ---
   await buildMultiColTOC(tocSlides, tocRoot);
@@ -1404,7 +1398,7 @@ async function generateTOCFrame(slides, options, startFrameId) {
   // --- Final progress update ---
   figma.ui.postMessage({ type: 'toc-progress', current: 1, total: 1 }); // fallback for empty
   figma.ui.postMessage({ type: 'toc-updated' });
-  
+
   // Save the TOC structure for future use
   await saveTOCStructure(tocSlides);
 }
@@ -1415,95 +1409,95 @@ figma.ui.onmessage = async (msg) => {
   if (msg.type === 'activate-license') {
     try {
       const { licenseKey } = msg;
-      
+
       // Send request to UI for Gumroad API call
-      figma.ui.postMessage({ 
+      figma.ui.postMessage({
         type: 'verify-gumroad-license',
         licenseKey: licenseKey,
         productId: 'bqqYJ_jE-zkEoFiryLblXQ=='
       });
-      
+
     } catch (error) {
       console.error('Error in license activation:', error);
-      figma.ui.postMessage({ 
-        type: 'license-activated', 
-        success: false, 
-        error: 'Network error' 
+      figma.ui.postMessage({
+        type: 'license-activated',
+        success: false,
+        error: 'Network error'
       });
     }
   }
-  
-    if (msg.type === 'gumroad-license-response') {
+
+  if (msg.type === 'gumroad-license-response') {
     // Handle Gumroad API response from UI
-    
+
     // Simple result processing to avoid memory issues
     const result = {
       success: (msg.result && msg.result.success) || false,
       message: (msg.result && msg.result.message) || 'Unknown response'
     };
-    
+
     // Smart license validation with expiry checking
     if (result.success) {
       // Check if we have purchase data for expiry validation
       if (msg.result && msg.result.purchase) {
         const purchase = msg.result.purchase;
-        
+
         // Check Gumroad expiry date
         if (purchase.expires_at) {
           const expiryDate = new Date(purchase.expires_at);
           const now = new Date();
-          
+
           if (expiryDate < now) {
-            figma.ui.postMessage({ 
-              type: 'license-activated', 
-              success: false, 
-              error: 'License has expired. Please purchase a new license.' 
+            figma.ui.postMessage({
+              type: 'license-activated',
+              success: false,
+              error: 'License has expired. Please purchase a new license.'
             });
             return;
           }
         }
-        
+
         // Check if license is disabled
         if (purchase.disabled) {
-          figma.ui.postMessage({ 
-            type: 'license-activated', 
-            success: false, 
-            error: 'License has been disabled. Please contact support.' 
+          figma.ui.postMessage({
+            type: 'license-activated',
+            success: false,
+            error: 'License has been disabled. Please contact support.'
           });
           return;
         }
-        
+
         // Check if license is already in use (single-user protection)
         if (msg.result.uses && msg.result.uses > 1) {
-          figma.ui.postMessage({ 
-            type: 'license-activated', 
-            success: false, 
-            error: 'This license is already in use by another user. Please purchase your own license.' 
+          figma.ui.postMessage({
+            type: 'license-activated',
+            success: false,
+            error: 'This license is already in use by another user. Please purchase your own license.'
           });
           return;
         }
-        
+
         // Check if this is a single-user license
         if (purchase.uses_count && purchase.uses_count > 1) {
-          figma.ui.postMessage({ 
-            type: 'license-activated', 
-            success: false, 
-            error: 'This license has already been activated on another device. Please purchase a new license.' 
+          figma.ui.postMessage({
+            type: 'license-activated',
+            success: false,
+            error: 'This license has already been activated on another device. Please purchase a new license.'
           });
           return;
         }
       }
-      
+
       // Use new safe premium license activation system
       const activationResult = await activatePremiumLicense(msg.licenseKey);
-      
+
       if (activationResult.success) {
         // Update remaining time calculation
         updateTrialRemainingTime();
-        
+
         // Send updated trial status immediately after successful activation
-        figma.ui.postMessage({ 
-          type: 'trial-status', 
+        figma.ui.postMessage({
+          type: 'trial-status',
           trialState: {
             isTrialActive: trialState.isTrialActive,
             isSubscribed: trialState.isSubscribed,
@@ -1517,16 +1511,16 @@ figma.ui.onmessage = async (msg) => {
             remainingSeconds: trialState.remainingSeconds
           }
         });
-        
-        figma.ui.postMessage({ 
-          type: 'license-activated', 
+
+        figma.ui.postMessage({
+          type: 'license-activated',
           success: true,
           message: activationResult.message,
           expirationDate: activationResult.expirationDate
         });
       } else {
-        figma.ui.postMessage({ 
-          type: 'license-activated', 
+        figma.ui.postMessage({
+          type: 'license-activated',
           success: false,
           error: activationResult.message
         });
@@ -1553,37 +1547,37 @@ figma.ui.onmessage = async (msg) => {
           userFriendlyMessage = 'License verification failed. Please try again or contact support.';
         }
       }
-      
-      figma.ui.postMessage({ 
-        type: 'license-activated', 
-        success: false, 
-        error: userFriendlyMessage 
+
+      figma.ui.postMessage({
+        type: 'license-activated',
+        success: false,
+        error: userFriendlyMessage
       });
     }
   }
-  
+
   if (msg.type === 'validate-premium-license-response') {
     // Handle premium license validation response
-    
+
     const result = {
       success: (msg.result && msg.result.success) || false,
       message: (msg.result && msg.result.message) || 'Unknown response'
     };
-    
+
     if (!result.success) {
       // Reset to non-premium status
       trialState.isSubscribed = false;
       trialState.licenseKey = null;
       trialState.licenseActivationDate = null;
       trialState.subscriptionExpiry = null;
-      
+
       await saveTrialState();
-      
+
       // Notify user
       figma.notify('Premium license has expired. Please purchase a new license.', { error: true });
     }
   }
-  
+
   if (msg.type === 'save-license-state') {
     // Save license state to Figma storage
     try {
@@ -1592,7 +1586,7 @@ figma.ui.onmessage = async (msg) => {
       console.error('Error saving license state:', error);
     }
   }
-  
+
   if (msg.type === 'get-license-state') {
     // Get saved license state from Figma storage
     try {
@@ -1607,24 +1601,24 @@ figma.ui.onmessage = async (msg) => {
       console.error('Error getting license state:', error);
     }
   }
-  
+
   if (msg.type === 'remove-license-state') {
     // Remove license state from Figma storage - SIMULATES PREMIUM EXPIRY
     try {
       await figma.clientStorage.deleteAsync('licenseState');
-      
+
       // Reset trial state to EXPIRED status (not new trial)
       trialState.isSubscribed = false;
       trialState.isTrialActive = false; // IMPORTANT: Set to false to simulate expired status
       trialState.licenseKey = null;
       trialState.licenseActivationDate = null;
       trialState.subscriptionExpiry = null;
-      
+
       await saveTrialState();
-      
+
       // Send updated trial status to UI
-      figma.ui.postMessage({ 
-        type: 'trial-status', 
+      figma.ui.postMessage({
+        type: 'trial-status',
         trialState: {
           isTrialActive: false, // IMPORTANT: Set to false for expired status
           isSubscribed: false,
@@ -1638,12 +1632,12 @@ figma.ui.onmessage = async (msg) => {
           remainingSeconds: 0
         }
       });
-      
+
     } catch (error) {
       console.error('Error simulating premium expiry:', error);
     }
   }
-  
+
   if (msg.type === 'clear-all-storage') {
     // Clear ALL storage completely (for reset command)
     try {
@@ -1654,14 +1648,14 @@ figma.ui.onmessage = async (msg) => {
         usedLicenseKeys: []
       };
       await savePluginStorage();
-      
+
       // Clear all Figma client storage
       await figma.clientStorage.deleteAsync('pluginAccess');
       await figma.clientStorage.deleteAsync('trialState');
       await figma.clientStorage.deleteAsync('licenseState');
       await figma.clientStorage.deleteAsync('customTOC');
       await figma.clientStorage.deleteAsync('pendingTOCOptions');
-      
+
       // Reset trial state to default
       trialState = {
         isTrialActive: false,
@@ -1674,14 +1668,14 @@ figma.ui.onmessage = async (msg) => {
         remainingMinutes: 0,
         remainingSeconds: 0
       };
-      
+
       console.log('ALL storage and licenses cleared successfully');
-      
+
     } catch (error) {
       console.error('Error clearing all storage:', error);
     }
   }
-  
+
   if (msg.type === 'clear-plugin-storage') {
     // Clear safe storage system (for reset command)
     try {
@@ -1689,23 +1683,23 @@ figma.ui.onmessage = async (msg) => {
       pluginStorage.expirationTimestamp = null;
       pluginStorage.usedLicenseKeys = [];
       await savePluginStorage();
-      
+
       console.log('Plugin storage cleared successfully');
-      
+
     } catch (error) {
       console.error('Error clearing plugin storage:', error);
     }
   }
-  
+
   if (msg.type === 'save-trial-state') {
     // Save trial state from UI (for admin commands)
     try {
       trialState = Object.assign({}, trialState, msg.trialState);
       await saveTrialState();
-      
+
       // Send updated trial status to UI
-      figma.ui.postMessage({ 
-        type: 'trial-status', 
+      figma.ui.postMessage({
+        type: 'trial-status',
         trialState: {
           isTrialActive: trialState.isTrialActive,
           isSubscribed: trialState.isSubscribed,
@@ -1719,34 +1713,34 @@ figma.ui.onmessage = async (msg) => {
           remainingSeconds: trialState.remainingSeconds
         }
       });
-      
+
     } catch (error) {
       console.error('Error saving trial state:', error);
     }
   }
-  
+
   if (msg.type === 'set-premium-expiration') {
     // Set premium expiration for testing (#end command)
     try {
       const { expirationTimestamp } = msg;
-      
+
       // Set plugin storage with short expiration
       pluginStorage.isPremium = true;
       pluginStorage.expirationTimestamp = expirationTimestamp;
       await savePluginStorage();
-      
+
       // Update trial state to match
       trialState.isSubscribed = true;
       trialState.isTrialActive = false;
       trialState.subscriptionExpiry = new Date(expirationTimestamp).toISOString();
       await saveTrialState();
-      
+
       // Update remaining time calculation
       updateTrialRemainingTime();
-      
+
       // Send updated trial status to UI
-      figma.ui.postMessage({ 
-        type: 'trial-status', 
+      figma.ui.postMessage({
+        type: 'trial-status',
         trialState: {
           isTrialActive: trialState.isTrialActive,
           isSubscribed: trialState.isSubscribed,
@@ -1760,35 +1754,35 @@ figma.ui.onmessage = async (msg) => {
           remainingSeconds: trialState.remainingSeconds
         }
       });
-      
+
       console.log('⚡ Premium expiration set to:', new Date(expirationTimestamp));
-      
+
     } catch (error) {
       console.error('Error setting premium expiration:', error);
     }
   }
-  
+
   if (msg.type === 'validate-premium-license') {
     // Handle premium license validation request
     try {
       const { licenseKey } = msg;
-      
+
       // Send request to UI for Gumroad API call
-      figma.ui.postMessage({ 
+      figma.ui.postMessage({
         type: 'verify-gumroad-license',
         licenseKey: licenseKey,
         productId: 'bqqYJ_jE-zkEoFiryLblXQ=='
       });
-      
+
     } catch (error) {
       console.error('Error in premium license validation:', error);
     }
   }
-  
+
   if (msg.type === 'get-trial-status') {
     updateTrialRemainingTime();
-    figma.ui.postMessage({ 
-      type: 'trial-status', 
+    figma.ui.postMessage({
+      type: 'trial-status',
       trialState: {
         isTrialActive: trialState.isTrialActive,
         isSubscribed: trialState.isSubscribed,
@@ -1801,14 +1795,14 @@ figma.ui.onmessage = async (msg) => {
       }
     });
   }
-  
+
   // Test message handlers removed for production
-  
+
   if (msg.type === 'get-frames') {
     // If msg.forTOC is true, filter for TOC; otherwise, show all slides
     console.log('get-frames called with forTOC:', !!msg.forTOC, 'thenGenerateTOC:', !!msg.thenGenerateTOC);
     sendFramesToUI(msg.direction, !!msg.forTOC);
-    
+
     // If thenGenerateTOC is true, we'll generate TOC after sending frames
     if (msg.thenGenerateTOC) {
       // Store the options for later use
@@ -1899,16 +1893,16 @@ figma.ui.onmessage = async (msg) => {
     // Only use visible and unlocked frames
     const orderedFrames = orderFrames(frames.filter(f => !f.locked && f.visible !== false), msg.direction);
     const style = msg.numberStyle || { font: 'Inter', size: 16, weight: 'Regular', color: '#111111', pos: 'top-left', leadingZero: true };
-    
+
     if (!orderedFrames.length) {
       figma.ui.postMessage({ type: 'slide-numbers-error', error: 'No frames found on this page.' });
       return;
     }
-    
+
     // Remove all old number nodes first
     clearAllSlideNumbers();
     let added = 0;
-    
+
     // Renumber all frames sequentially starting from 1
     for (let i = 0; i < orderedFrames.length; i++) {
       const frame = orderedFrames[i];
@@ -1950,7 +1944,7 @@ figma.ui.onmessage = async (msg) => {
         figma.ui.postMessage({ type: 'slide-numbers-error', error: 'Font load or node creation failed.' });
       }
     }
-    
+
     if (added === 0) {
       figma.ui.postMessage({ type: 'slide-numbers-error', error: 'No numbers fixed. Check if frames are locked or invisible.' });
     } else {
@@ -2051,16 +2045,16 @@ figma.ui.onmessage = async (msg) => {
     console.log('Slides data:', msg.slides);
     console.log('Options:', msg.options);
     console.log('Start frame ID:', msg.startFrameId);
-    
+
     // Check trial status for premium features
     if (!canUsePremiumFeatures()) {
-      figma.ui.postMessage({ 
-        type: 'toc-error', 
-        error: '😔 Trial expired. Please upgrade to continue using premium TOC features.' 
+      figma.ui.postMessage({
+        type: 'toc-error',
+        error: '😔 Trial expired. Please upgrade to continue using premium TOC features.'
       });
       return;
     }
-    
+
     try {
       await generateTOCFrame(msg.slides, msg.options, msg.startFrameId);
     } catch (error) {
@@ -2085,10 +2079,10 @@ figma.ui.onmessage = async (msg) => {
   if (msg.type === 'update-toc-style-targeted') {
     const targetType = msg.targetType || '';
     const options = msg.options || {};
-    
+
     console.log('🎯 DEBUG: Target Type:', targetType);
     console.log('🎯 DEBUG: Options received:', options);
-    
+
     const tocRoot = figma.currentPage.findOne(n => n.type === 'FRAME' && n.name === '__TOC_AUTO__');
     if (!tocRoot) {
       console.log('🎯 No TOC frame found, regenerating...');
@@ -2096,21 +2090,21 @@ figma.ui.onmessage = async (msg) => {
       figma.ui.postMessage({ type: 'regenerate-toc', options, slides: msg.slides });
       return;
     }
-    
+
     // MAGIC: Only update the specific target type
     function mapFontWeight(style) {
       if (style === 'Bold' || style === '700') return 'Bold';
       if (style === 'Semi Bold' || style === '600') return 'Semi Bold';
       return 'Regular';
     }
-    
+
     async function updateSpecificNodes(node, depth = 0) {
       if (node.type === 'TEXT') {
         const tocType = node.getPluginData('tocType');
-        
+
         // DEBUG: Log all text nodes and their tocType
         console.log(`🔍 Node: "${node.characters}" | tocType: "${tocType}" | targetType: "${targetType}" | Match: ${tocType === targetType}`);
-        
+
         // MAGIC: Only process if this node matches our target type AND has the correct tocType
         if (tocType === targetType) {
           switch (targetType) {
@@ -2124,7 +2118,7 @@ figma.ui.onmessage = async (msg) => {
               if (options.heroFontWeight && !options.heroFontFamily) node.fontName = { family: 'Inter', style: mapFontWeight(options.heroFontWeight) };
               node.textAutoResize = 'WIDTH_AND_HEIGHT';
               break;
-              
+
             case 'hero-number':
               if (options.titleNumberFont) node.fontName = { family: options.titleNumberFont, style: mapFontWeight(options.titleNumberWeight) };
               if (options.titleNumberColor) node.fills = [{ type: 'SOLID', color: hexToRgb(options.titleNumberColor) }];
@@ -2140,7 +2134,7 @@ figma.ui.onmessage = async (msg) => {
                 node.characters = String(numVal);
               }
               break;
-              
+
             case 'sub':
               if (options.subTitleFont && options.subTitleWeight) {
                 await figma.loadFontAsync({ family: options.subTitleFont, style: mapFontWeight(options.subTitleWeight) });
@@ -2154,7 +2148,7 @@ figma.ui.onmessage = async (msg) => {
               }
               node.textAutoResize = 'WIDTH_AND_HEIGHT';
               break;
-              
+
             case 'sub-number':
               if (options.subNumberFont) node.fontName = { family: options.subNumberFont, style: mapFontWeight(options.subNumberWeight) };
               if (options.subNumberColor) node.fills = [{ type: 'SOLID', color: hexToRgb(options.subNumberColor) }];
@@ -2181,12 +2175,12 @@ figma.ui.onmessage = async (msg) => {
         await Promise.all(promises);
       }
     }
-    
+
     await updateSpecificNodes(tocRoot, 0);
     figma.notify(`TOC ${targetType} style updated!`);
     return;
   }
-  
+
   if (msg.type === 'update-toc-style-live') {
     const options = msg.options || {};
     console.log('🚨 OLD STYLE HANDLER CALLED - THIS SHOULD NOT HAPPEN! 🚨');
@@ -2206,7 +2200,7 @@ figma.ui.onmessage = async (msg) => {
     if (options.subNumberFont !== undefined || options.subNumberSize !== undefined || options.subNumberWeight !== undefined || options.subNumberColor !== undefined || options.subNumberLeadingZero !== undefined) {
       console.log('  ✓ Subtitle number styles');
     }
-    
+
     const tocRoot = figma.currentPage.findOne(n => n.type === 'FRAME' && n.name === '__TOC_AUTO__');
     if (!tocRoot) {
       // Only regenerate if the frame is missing
@@ -2223,12 +2217,12 @@ figma.ui.onmessage = async (msg) => {
       if (node.type === 'TEXT') {
         let tocType = node.getPluginData('tocType');
         if (!tocType) tocType = (depth === 0 ? 'hero' : 'sub');
-        
+
         // Log which node type is being processed
         if (tocType === 'hero' || tocType === 'hero-number' || tocType === 'sub' || tocType === 'sub-number') {
           console.log(`Processing ${tocType} node: "${node.characters}"`);
         }
-        
+
         // Title text - ONLY process if hero options are present
         if (tocType === 'hero' && (options.heroFontSize !== undefined || options.heroFontWeight !== undefined || options.heroFontColor !== undefined || options.heroFontFamily !== undefined)) {
           console.log('Applying hero styles to:', node.characters);
@@ -2317,7 +2311,7 @@ figma.ui.onmessage = async (msg) => {
             const wantRight = options.titleNumberPos === 'right';
             // Only swap if not already in correct order and both nodes are valid children
             if ((t0 === 'hero-number' && wantRight && child.children[1] !== n0) ||
-                (t1 === 'hero-number' && !wantRight && child.children[0] !== n1)) {
+              (t1 === 'hero-number' && !wantRight && child.children[0] !== n1)) {
               if (child.children.length === 2 && child.children[0] && child.children[1]) {
                 try {
                   child.insertChild(0, child.children[1]);
@@ -2332,7 +2326,7 @@ figma.ui.onmessage = async (msg) => {
           if ((t0 === 'sub-number' && t1 === 'sub') || (t0 === 'sub' && t1 === 'sub-number')) {
             const wantRight = options.subtitleNumberPos === 'right' || options.subNumberPos === 'right';
             if ((t0 === 'sub-number' && wantRight && child.children[1] !== n0) ||
-                (t1 === 'sub-number' && !wantRight && child.children[0] !== n1)) {
+              (t1 === 'sub-number' && !wantRight && child.children[0] !== n1)) {
               if (child.children.length === 2 && child.children[0] && child.children[1]) {
                 try {
                   child.insertChild(0, child.children[1]);
@@ -2385,7 +2379,7 @@ figma.ui.onmessage = async (msg) => {
         node.x = pos.x;
         node.y = pos.y;
       }
-      
+
       // Update leading zero if requested
       if (msg.styleOptions.leadingZero !== undefined) {
         const currentNumber = parseInt(node.characters.replace(/\D/g, ''), 10);
@@ -2434,7 +2428,7 @@ figma.ui.onmessage = async (msg) => {
   if (msg.type === 'update-toc-layout-live') {
     const tocRoot = figma.currentPage.findOne(n => n.type === 'FRAME' && n.name === '__TOC_AUTO__');
     if (!tocRoot) return;
-    
+
     // Helper to map UI alignment to Figma enum
     function mapAlign(val) {
       if (!val) return undefined;
@@ -2444,13 +2438,13 @@ figma.ui.onmessage = async (msg) => {
       if (val === 'space-between') return 'SPACE_BETWEEN';
       return undefined;
     }
-    
+
     // --- Apply root frame padding ---
     if (typeof msg.layoutOptions.paddingTop === 'number') tocRoot.paddingTop = msg.layoutOptions.paddingTop;
     if (typeof msg.layoutOptions.paddingBottom === 'number') tocRoot.paddingBottom = msg.layoutOptions.paddingBottom;
     if (typeof msg.layoutOptions.paddingLeft === 'number') tocRoot.paddingLeft = msg.layoutOptions.paddingLeft;
     if (typeof msg.layoutOptions.paddingRight === 'number') tocRoot.paddingRight = msg.layoutOptions.paddingRight;
-    
+
     // --- Columns frame (horizontal row containing columns) ---
     const rowFrame = tocRoot.children.find(n => n.type === 'FRAME' && n.layoutMode === 'HORIZONTAL');
     if (rowFrame) {
@@ -2458,20 +2452,20 @@ figma.ui.onmessage = async (msg) => {
       if (typeof msg.layoutOptions.columnSpacing === 'number') rowFrame.itemSpacing = msg.layoutOptions.columnSpacing;
       if (msg.layoutOptions.counterAxisAlign) rowFrame.counterAxisAlignItems = mapAlign(msg.layoutOptions.counterAxisAlign);
     }
-    
+
     // --- Update column frames (vertical frames containing groups) ---
     const colFrames = rowFrame ? rowFrame.children.filter(n => n.type === 'FRAME' && n.layoutMode === 'VERTICAL') : [];
     colFrames.forEach(colFrame => {
       // Update group spacing
       if (typeof msg.layoutOptions.groupSpacing === 'number') colFrame.itemSpacing = msg.layoutOptions.groupSpacing;
-      
+
       // Update column width and height
       if (typeof msg.layoutOptions.columnWidth === 'number' || typeof msg.layoutOptions.maxColumnHeight === 'number') {
         const newWidth = msg.layoutOptions.columnWidth || colFrame.width;
         const newHeight = msg.layoutOptions.maxColumnHeight || colFrame.height;
         colFrame.resize(newWidth, newHeight);
       }
-      
+
       // Update group frames (frames containing title + subtitles)
       colFrame.children.forEach(groupFrame => {
         if (groupFrame.type === 'FRAME' && groupFrame.layoutMode === 'VERTICAL') {
@@ -2480,63 +2474,54 @@ figma.ui.onmessage = async (msg) => {
             groupFrame.paddingTop = msg.layoutOptions.groupPadding;
             groupFrame.paddingBottom = msg.layoutOptions.groupPadding;
           }
-          
+
           // Update title row spacing
           const titleRow = groupFrame.children.find(n => n.type === 'FRAME' && n.layoutMode === 'HORIZONTAL');
           if (titleRow && typeof msg.layoutOptions.titleSpacing === 'number') {
             titleRow.itemSpacing = msg.layoutOptions.titleSpacing;
           }
-          
-                      // Update subtitle rows
-            groupFrame.children.forEach(child => {
-              if (child.type === 'FRAME' && child.layoutMode === 'HORIZONTAL' && child !== titleRow) {
-                // This is a subtitle row
-                if (typeof msg.layoutOptions.subtitleSpacing === 'number') {
-                  child.itemSpacing = msg.layoutOptions.subtitleSpacing;
-                }
-                if (typeof msg.layoutOptions.subIndent === 'number') {
-                  child.paddingLeft = msg.layoutOptions.subIndent;
-                }
+
+          // Update subtitle rows
+          groupFrame.children.forEach(child => {
+            if (child.type === 'FRAME' && child.layoutMode === 'HORIZONTAL' && child !== titleRow) {
+              // This is a subtitle row
+              if (typeof msg.layoutOptions.subtitleSpacing === 'number') {
+                child.itemSpacing = msg.layoutOptions.subtitleSpacing;
               }
-            });
-            
-            // Also update the subIndent in tocSettings for style updates
-            if (typeof msg.layoutOptions.subIndent === 'number') {
-              // Send a targeted style update for subtitle indentation
-              parent.postMessage({
-                pluginMessage: {
-                  type: 'update-toc-style-targeted',
-                  targetType: 'sub',
-                  options: { 
-                    subIndent: msg.layoutOptions.subIndent
-                  },
-                  slides: slides
-                }
-              }, '*');
+              if (typeof msg.layoutOptions.subIndent === 'number') {
+                child.paddingLeft = msg.layoutOptions.subIndent;
+              }
             }
+          });
+
+          // Also update the subIndent in tocSettings for style updates
+          if (typeof msg.layoutOptions.subIndent === 'number') {
+            // Send a targeted style update for subtitle indentation
+            parent.postMessage({
+              pluginMessage: {
+                type: 'update-toc-style-targeted',
+                targetType: 'sub',
+                options: {
+                  subIndent: msg.layoutOptions.subIndent
+                },
+                slides: slides
+              }
+            }, '*');
+          }
         }
       });
     });
-    
-    // --- Update frame padding ---
-    if (typeof msg.layoutOptions.framePaddingTop === 'number') tocRoot.paddingTop = msg.layoutOptions.framePaddingTop;
-    if (typeof msg.layoutOptions.framePaddingBottom === 'number') tocRoot.paddingBottom = msg.layoutOptions.framePaddingBottom;
-    if (typeof msg.layoutOptions.framePaddingLeft === 'number') tocRoot.paddingLeft = msg.layoutOptions.framePaddingLeft;
-    if (typeof msg.layoutOptions.framePaddingRight === 'number') tocRoot.paddingRight = msg.layoutOptions.framePaddingRight;
-    
+
     // --- Update row alignment ---
-    if (msg.layoutOptions.textAlignHorizontal || msg.layoutOptions.textAlignVertical) {
+    if (msg.layoutOptions.textAlignHorizontal) {
       // Apply alignment to all row frames (horizontal frames containing number + text)
       function updateRowAlignment(node) {
         if (node.type === 'FRAME' && node.layoutMode === 'HORIZONTAL') {
-          if (msg.layoutOptions.textAlignHorizontal) {
-            node.counterAxisAlignItems = msg.layoutOptions.textAlignHorizontal === 'LEFT' ? 'MIN' : 
-                                       msg.layoutOptions.textAlignHorizontal === 'CENTER' ? 'CENTER' : 'MAX';
-          }
-          if (msg.layoutOptions.textAlignVertical) {
-            node.primaryAxisAlignItems = msg.layoutOptions.textAlignVertical === 'TOP' ? 'MIN' : 
-                                       msg.layoutOptions.textAlignVertical === 'CENTER' ? 'CENTER' : 'MAX';
-          }
+          // New "Row Alignment" controls vertical positioning (counter-axis)
+          node.counterAxisAlignItems = msg.layoutOptions.textAlignHorizontal === 'TOP' ? 'MIN' :
+            msg.layoutOptions.textAlignHorizontal === 'BOTTOM' ? 'MAX' : 'CENTER';
+          // Fixed horizontal positioning (primary-axis)
+          node.primaryAxisAlignItems = 'MIN';
         }
         // Recurse through children
         if (node.children) {
@@ -2545,7 +2530,13 @@ figma.ui.onmessage = async (msg) => {
       }
       updateRowAlignment(tocRoot);
     }
-    
+
+    // Always enforce 0 padding in live updates now
+    tocRoot.paddingTop = 0;
+    tocRoot.paddingBottom = 0;
+    tocRoot.paddingLeft = 0;
+    tocRoot.paddingRight = 0;
+
     // --- Live number positioning: reorder children in title/subtitle rows ---
     function reorderNumberPosition(frame, options) {
       if (!frame || !frame.children) return;
@@ -2556,26 +2547,26 @@ figma.ui.onmessage = async (msg) => {
           const n1 = child.children[1];
           const t0 = n0.getPluginData ? n0.getPluginData('tocType') : '';
           const t1 = n1.getPluginData ? n1.getPluginData('tocType') : '';
-          
+
           // Title row
           if ((t0 === 'hero-number' && t1 === 'hero') || (t0 === 'hero' && t1 === 'hero-number')) {
             const wantRight = options.titleNumberPos === 'right';
             if ((t0 === 'hero-number' && wantRight && child.children[1] !== n0) ||
-                (t1 === 'hero-number' && !wantRight && child.children[0] !== n1)) {
+              (t1 === 'hero-number' && !wantRight && child.children[0] !== n1)) {
               child.insertChild(0, child.children[1]);
             }
           }
-          
+
           // Subtitle row
           if ((t0 === 'sub-number' && t1 === 'sub') || (t0 === 'sub' && t1 === 'sub-number')) {
             const wantRight = options.subtitleNumberPos === 'right' || options.subNumberPos === 'right';
             if ((t0 === 'sub-number' && wantRight && child.children[1] !== n0) ||
-                (t1 === 'sub-number' && !wantRight && child.children[0] !== n1)) {
+              (t1 === 'sub-number' && !wantRight && child.children[0] !== n1)) {
               child.insertChild(0, child.children[1]);
             }
           }
         }
-        
+
         // Recurse (but limit to depth 1 to prevent sub-sub-slides)
         if (!frame.getPluginData || frame.getPluginData('tocType') !== 'sub') {
           reorderNumberPosition(child, options);
@@ -2583,22 +2574,22 @@ figma.ui.onmessage = async (msg) => {
       }
     }
     reorderNumberPosition(tocRoot, msg.layoutOptions);
-    
+
     figma.notify('TOC layout updated!');
     return;
   }
-  
+
   if (msg.type === 'regenerate-toc') {
     // Regenerate the entire TOC with new settings
     const existingTOC = figma.currentPage.findOne(node => node.getPluginData && node.getPluginData('isTOCFrame') === 'true');
     if (existingTOC) {
       existingTOC.remove();
     }
-    
+
     // Get current TOC settings
     const currentSettings = await figma.clientStorage.getAsync('tocSettings');
     const slides = msg.slides || [];
-    
+
     if (slides.length > 0) {
       await generateTOCFrame(slides, currentSettings || {});
       figma.notify('TOC regenerated with new settings!');
@@ -2728,7 +2719,7 @@ function getNumberPosition(pos, frame, numNode, size) {
     y = frame.height - size - pad;
   }
   return { x, y };
-} 
+}
 
 function clearAllSlideNumbers() {
   let removedCount = 0;
@@ -2764,7 +2755,7 @@ function clearAllSlideNumbers() {
   }
   // Optional: log for debugging
   console.log(`Removed ${removedCount} slide number node(s).`);
-} 
+}
 
 // Utility: Safely set font on a text node with fallback and notification
 async function safeSetFont(node, family, style) {
@@ -2821,11 +2812,11 @@ async function updateTextNodesStyle(parentNode, styleOptions = {}) {
 // NEW: Update specific TOC text node types based on style section
 async function updateSpecificTOCStyles(parentNode, styleSection, styleOptions = {}) {
   const textNodes = parentNode.findAll ? parentNode.findAll(n => n.type === 'TEXT') : [];
-  
+
   for (const node of textNodes) {
     const tocType = node.getPluginData ? node.getPluginData('tocType') : '';
     let shouldUpdate = false;
-    
+
     // Determine which nodes to update based on style section
     switch (styleSection) {
       case 'hero':
@@ -2844,7 +2835,7 @@ async function updateSpecificTOCStyles(parentNode, styleSection, styleOptions = 
         // Fallback to old behavior for backward compatibility
         shouldUpdate = true;
     }
-    
+
     if (shouldUpdate) {
       if (styleOptions.fontFamily && styleOptions.fontWeight) {
         await safeSetFont(node, styleOptions.fontFamily, styleOptions.fontWeight);

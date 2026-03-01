@@ -1352,11 +1352,11 @@
 
     <!-- License Activation Modal (Hidden by default, only shown via upgrade button) -->
     <div id="license-modal-bg" class="modal-bg" style="display:none;">
-      <div class="modal">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
-          <div class="modal-title">🔑 Activate License</div>
+      <div class="modal" style="padding: 20px; transition: none;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <div class="modal-title" style="font-size: 1.1em;">🔑 Activate License</div>
           <button class="modal-close-x" id="close-license-modal" aria-label="Close"
-            style="position:static;width:36px;height:36px;">
+            style="position:static;width:30px;height:30px;">
             <svg viewBox="0 0 20 20" fill="none">
               <circle cx="10" cy="10" r="9" fill="#f3f4f6" />
               <path d="M7 7l6 6M13 7l-6 6" stroke="#888" stroke-width="1.6" stroke-linecap="round" />
@@ -1364,31 +1364,32 @@
           </button>
         </div>
         <div id="trial-info-section"
-          style="margin-bottom:20px;padding:16px;background:rgba(37,99,235,0.1);border-radius:12px;border-left:4px solid #2563eb;">
-          <div style="color:#60a5fa;font-weight:600;font-size:14px;margin-bottom:8px;">Current Trial Status</div>
-          <div id="trial-time-display" style="color:#e2e8f0;font-size:16px;font-weight:700;margin-bottom:8px;">😔 Trial
-            Expired</div>
-          <div style="color:#94a3b8;font-size:12px;">Enter your license key below to activate premium features</div>
+          style="margin-bottom:12px;padding:10px 14px;background:rgba(37,99,235,0.08);border-radius:10px;border-left:3px solid #2563eb;">
+          <div
+            style="color:#60a5fa;font-weight:700;font-size:11px;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px;">
+            Trial Status</div>
+          <div id="trial-time-display" style="color:#f8fafc;font-size:14px;font-weight:700;">Trial Expired</div>
         </div>
-        <div style="margin-bottom:20px;color:#b0b3b8;font-size:0.95em;line-height:1.4;">
-          Enter your license key to unlock all features.
-        </div>
-        <div style="margin-bottom:20px;">
-          <label class="modal-label">License Key</label>
+
+        <div style="margin-bottom:12px;">
+          <label class="modal-label" style="font-size: 11px; margin-bottom: 6px; display: block;">License Key</label>
           <input id="license-key-input" class="modal-input" type="text" placeholder="Enter your license key"
-            style="width:100%;margin-top:8px;">
+            style="width:100%; padding: 10px; font-size: 12px;">
         </div>
+
+        <div style="display:flex;gap:10px;margin-bottom:12px;">
+          <button id="activate-license-btn" class="modal-btn"
+            style="flex:1.2; height: 38px; font-size: 12px;">Activate</button>
+          <button id="buy-license-btn" class="modal-btn"
+            style="background:#18A0FB;flex:0.8; height: 38px; font-size: 12px;">Get Key</button>
+        </div>
+
+        <div id="license-status" style="font-size:0.85em;text-align:center; min-height: 1.2em;"></div>
 
         <!-- License Extension Hint -->
-        <div style="color:#3b82f6;font-size:11px;margin-bottom:12px;text-align:center;">
-          💡 You can add multiple licenses to extend premium time (+30 days each)
+        <div style="color:#64748b;font-size:10px;margin-top:8px;text-align:center;opacity:0.8;">
+          💡 Multiple licenses extend time (+30 days each)
         </div>
-        <div style="display:flex;gap:12px;">
-          <button id="activate-license-btn" class="modal-btn" style="flex:1;">Activate License</button>
-          <button id="buy-license-btn" class="modal-btn" style="background:#18A0FB;flex:1;">Buy License</button>
-        </div>
-
-        <div id="license-status" style="margin-top:12px;font-size:0.9em;text-align:center;"></div>
       </div>
     </div>
 
@@ -1581,64 +1582,57 @@
 
   <!-- Premium Subscription Modal -->
   <div id="premium-modal" class="modal-bg" style="z-index:99999;">
-    <div class="modal" style="text-align:center;">
-      <div style="font-size:48px;margin-bottom:20px;">⭐</div>
-      <h2 style="color:#f8fafc;font-size:24px;font-weight:700;margin-bottom:10px;">Premium Subscription</h2>
+    <div class="modal" style="text-align:center; padding: 24px;">
+      <div style="font-size:40px;margin-bottom:12px;">⭐</div>
+      <h2 style="color:#f8fafc;font-size:20px;font-weight:800;margin-bottom:16px;letter-spacing:-0.02em;">Premium
+        Subscription</h2>
 
       <!-- Subscription Status -->
       <div
-        style="background:rgba(251,191,36,0.1);border-radius:12px;padding:16px;margin-bottom:24px;border-left:4px solid #fbbf24;">
-        <div style="color:#fbbf24;font-size:16px;font-weight:700;margin-bottom:8px;">Active Subscription</div>
-        <div id="subscription-countdown" style="color:#e2e8f0;font-size:14px;margin-bottom:8px;">365 days remaining
-        </div>
-        <div style="color:#94a3b8;font-size:12px;">Full access to all TOC features</div>
+        style="background:rgba(251,191,36,0.08);border-radius:12px;padding:12px;margin-bottom:16px;border-left:3px solid #fbbf24;text-align:left;">
+        <div
+          style="color:#fbbf24;font-size:11px;font-weight:800;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px;">
+          Active Status</div>
+        <div id="subscription-countdown" style="color:#fff;font-size:14px;font-weight:700;">365 days remaining</div>
       </div>
 
       <!-- License Information -->
-      <div style="margin-bottom:24px;">
-        <h3 style="color:#f8fafc;font-size:18px;font-weight:600;margin-bottom:16px;">License Details</h3>
-        <div style="background:rgba(255,255,255,0.05);border-radius:12px;padding:16px;text-align:left;">
-          <div style="margin-bottom:12px;">
-            <span style="color:#94a3b8;font-size:12px;">License Key:</span>
-            <div style="margin-top:4px;">
-              <input id="license-key-display" type="text" readonly
-                style="background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:8px;padding:8px 12px;color:#f8fafc;font-family:'Monaco','Menlo','Ubuntu Mono',monospace;font-size:12px;width:100%;box-sizing:border-box;"
-                placeholder="No license key">
-            </div>
+      <div
+        style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:14px;text-align:left;margin-bottom:20px;">
+        <div style="margin-bottom:10px;">
+          <span
+            style="color:#94a3b8;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.3px;">License
+            Key</span>
+          <div style="margin-top:4px;">
+            <input id="license-key-display" type="text" readonly
+              style="background:rgba(0,0,0,0.2);border:1px solid rgba(255,255,255,0.1);border-radius:6px;padding:8px 10px;color:#cbd5e1;font-family:monospace;font-size:11px;width:100%;box-sizing:border-box;"
+              placeholder="No license key">
           </div>
-          <div style="margin-bottom:8px;">
-            <span style="color:#94a3b8;font-size:12px;">License Type:</span>
-            <span id="license-type-display" style="color:#f8fafc;font-weight:600;margin-left:8px;">One Month
-              Premium</span>
-          </div>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center;">
           <div>
-            <span style="color:#94a3b8;font-size:12px;">Support:</span>
-            <a href="mailto:info@mohihassan.com"
-              style="color:#3b82f6;font-weight:600;margin-left:8px;text-decoration:none;cursor:pointer;">info@mohihassan.com</a>
+            <span id="license-type-display" style="color:#f8fafc;font-weight:700;font-size:12px;">Premium Member</span>
           </div>
+          <a href="mailto:info@mohihassan.com"
+            style="color:#3b82f6;font-size:11px;font-weight:600;text-decoration:none;">Support</a>
         </div>
       </div>
 
-      <!-- License Extension Hint -->
-      <div style="color:#3b82f6;font-size:12px;margin-bottom:20px;text-align:center;">
-        💡 You can add multiple licenses to extend premium time (+30 days each)
-      </div>
-
       <!-- Action Buttons -->
-      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
-        <button id="buy-new-license"
-          style="background:linear-gradient(135deg,#3b82f6,#1d4ed8);color:#fff;border:none;border-radius:12px;padding:12px 20px;font-size:14px;font-weight:700;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 12px rgba(59,130,246,0.3);">
-          Buy New License
-        </button>
+      <div style="display:flex;gap:10px;justify-content:center;">
         <button id="upgrade-premium-btn"
-          style="background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#000;border:none;border-radius:12px;padding:12px 20px;font-size:14px;font-weight:700;cursor:pointer;transition:all 0.2s;box-shadow:0 4px 12px rgba(251,191,36,0.3);">
-          Upgrade Now
+          style="background:#fbbf24;color:#000;border:none;border-radius:8px;height:38px;padding:0 20px;font-size:12px;font-weight:700;cursor:pointer;flex:1;">
+          Extend
         </button>
         <button id="close-premium"
-          style="background:rgba(255,255,255,0.1);color:#cbd5e1;border:1px solid rgba(203,213,225,0.2);border-radius:12px;padding:12px 20px;font-size:14px;font-weight:600;cursor:pointer;transition:all 0.2s;">
+          style="background:rgba(255,255,255,0.08);color:#cbd5e1;border:none;border-radius:8px;height:38px;padding:0 20px;font-size:12px;font-weight:600;cursor:pointer;flex:1;">
           Close
         </button>
       </div>
+
+      <button id="buy-new-license"
+        style="background:none;border:none;color:#3b82f6;font-size:11px;font-weight:600;margin-top:16px;cursor:pointer;text-decoration:underline;padding:4px;">Buy
+        New License</button>
     </div>
   </div>
   </div>
@@ -1862,10 +1856,10 @@
       columnWidth: 350,
       textAlignHorizontal: 'CENTER',
       textAlignVertical: 'TOP',
-      framePaddingTop: 32,
-      framePaddingBottom: 32,
-      framePaddingLeft: 48,
-      framePaddingRight: 48
+      framePaddingTop: 0,
+      framePaddingBottom: 0,
+      framePaddingLeft: 0,
+      framePaddingRight: 0
     };
     document.addEventListener('DOMContentLoaded', function () {
       // Plugin UI loaded - initializing trial system
@@ -4291,27 +4285,12 @@
               <div class="modal-row" style="font-weight:700;margin-bottom:6px;">Column Layout</div>
                                <div class="modal-row"><label class="modal-label" data-tooltip="Maximum number of items before creating a new column">Max Items per Column <input id="max-items-per-col" class="modal-input" type="number" min="1" max="20" value="6" style="width:80px;"></label></div>
               
-              <div class="modal-row" style="font-weight:700;margin-top:14px;margin-bottom:4px;">Frame Padding</div>
-              <div class="modal-row"><label class="modal-label" data-tooltip="Padding from the top edge of the TOC frame">Top <input id="frame-padding-top" class="modal-input" type="number" min="16" max="120" value="32" style="width:80px;"> px</label></div>
-              <div class="modal-row"><label class="modal-label" data-tooltip="Padding from the bottom edge of the TOC frame">Bottom <input id="frame-padding-bottom" class="modal-input" type="number" min="16" max="120" value="32" style="width:80px;"> px</label></div>
-              <div class="modal-row"><label class="modal-label" data-tooltip="Padding from the left edge of the TOC frame">Left <input id="frame-padding-left" class="modal-input" type="number" min="16" max="120" value="48" style="width:80px;"> px</label></div>
-              <div class="modal-row"><label class="modal-label" data-tooltip="Padding from the right edge of the TOC frame">Right <input id="frame-padding-right" class="modal-input" type="number" min="16" max="120" value="48" style="width:80px;"> px</label></div>
-              
-
-              
               <div class="modal-row" style="font-weight:700;margin-top:14px;margin-bottom:4px;">Row Alignment</div>
               <div class="modal-row">
-                <label class="modal-label" data-tooltip="Horizontal alignment of text within each row">Horizontal <select id="text-align-horizontal" class="modal-select">
-                  <option value="LEFT">Left</option>
-                  <option value="CENTER" selected>Center</option>
-                  <option value="RIGHT">Right</option>
-                </select></label>
-          </div>
-              <div class="modal-row">
-                <label class="modal-label" data-tooltip="Vertical alignment of text within each row">Vertical <select id="text-align-vertical" class="modal-select">
-                  <option value="TOP">Top</option>
-                  <option value="CENTER">Middle</option>
-                  <option value="BOTTOM">Bottom</option>
+                <label class="modal-label" data-tooltip="Vertical alignment of content within each row">Row Alignment <select id="text-align-horizontal" class="modal-select">
+                  <option value="TOP">Up</option>
+                  <option value="CENTER" selected>Middle</option>
+                  <option value="BOTTOM">Down</option>
                 </select></label>
               </div>
             </div>
@@ -4336,12 +4315,7 @@
           layoutPanel.querySelector('#column-width'),
           layoutPanel.querySelector('#layout-mode'),
           layoutPanel.querySelector('#max-items-per-col'),
-          layoutPanel.querySelector('#frame-padding-top'),
-          layoutPanel.querySelector('#frame-padding-bottom'),
-          layoutPanel.querySelector('#frame-padding-left'),
-          layoutPanel.querySelector('#frame-padding-right'),
-          layoutPanel.querySelector('#text-align-horizontal'),
-          layoutPanel.querySelector('#text-align-vertical')
+          layoutPanel.querySelector('#text-align-horizontal')
         ];
         function sendLiveLayoutUpdateInstant() {
           const layoutOptions = {
@@ -4353,12 +4327,12 @@
             maxColumnHeight: parseInt(layoutPanel.querySelector('#max-column-height').value, 10),
             columnWidth: parseInt(layoutPanel.querySelector('#column-width').value, 10),
             maxItemsPerCol: parseInt(layoutPanel.querySelector('#max-items-per-col').value, 10),
-            framePaddingTop: parseInt(layoutPanel.querySelector('#frame-padding-top').value, 10),
-            framePaddingBottom: parseInt(layoutPanel.querySelector('#frame-padding-bottom').value, 10),
-            framePaddingLeft: parseInt(layoutPanel.querySelector('#frame-padding-left').value, 10),
-            framePaddingRight: parseInt(layoutPanel.querySelector('#frame-padding-right').value, 10),
+            framePaddingTop: 0,
+            framePaddingBottom: 0,
+            framePaddingLeft: 0,
+            framePaddingRight: 0,
             textAlignHorizontal: layoutPanel.querySelector('#text-align-horizontal').value,
-            textAlignVertical: layoutPanel.querySelector('#text-align-vertical').value
+            textAlignVertical: 'CENTER'
           };
 
           // Update tocSettings with layout options
@@ -4429,12 +4403,12 @@
             maxColumnHeight: 800,
             columnWidth: 350,
             textAlignHorizontal: 'CENTER',
-            textAlignVertical: 'TOP',
+            textAlignVertical: 'CENTER',
             maxItemsPerCol: 6,
-            framePaddingTop: 32,
-            framePaddingBottom: 32,
-            framePaddingLeft: 48,
-            framePaddingRight: 48
+            framePaddingTop: 0,
+            framePaddingBottom: 0,
+            framePaddingLeft: 0,
+            framePaddingRight: 0
           };
 
           // Reset UI controls to defaults
@@ -4446,13 +4420,8 @@
           layoutPanel.querySelector('#max-column-height').value = defaultLayoutSettings.maxColumnHeight;
           layoutPanel.querySelector('#column-width').value = defaultLayoutSettings.columnWidth;
           layoutPanel.querySelector('#text-align-horizontal').value = defaultLayoutSettings.textAlignHorizontal;
-          layoutPanel.querySelector('#text-align-vertical').value = defaultLayoutSettings.textAlignVertical;
 
           layoutPanel.querySelector('#max-items-per-col').value = defaultLayoutSettings.maxItemsPerCol;
-          layoutPanel.querySelector('#frame-padding-top').value = defaultLayoutSettings.framePaddingTop;
-          layoutPanel.querySelector('#frame-padding-bottom').value = defaultLayoutSettings.framePaddingBottom;
-          layoutPanel.querySelector('#frame-padding-left').value = defaultLayoutSettings.framePaddingLeft;
-          layoutPanel.querySelector('#frame-padding-right').value = defaultLayoutSettings.framePaddingRight;
           layoutPanel.querySelector('#enable-grouping').checked = defaultLayoutSettings.enableGrouping;
           layoutPanel.querySelector('#group-standalone').checked = defaultLayoutSettings.groupStandalone;
 
