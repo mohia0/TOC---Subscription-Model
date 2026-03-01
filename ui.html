@@ -558,6 +558,7 @@
 
     input[type="number"] {
       -moz-appearance: textfield;
+      appearance: textfield;
     }
 
     .modal-input,
@@ -2880,6 +2881,10 @@
             copySupportEmailBtn.textContent = 'Copied!';
             copySupportEmailBtn.style.background = 'rgba(16, 185, 129, 0.1)';
             copySupportEmailBtn.style.color = '#10b981';
+
+            // Inform the user via native Figma notification
+            parent.postMessage({ pluginMessage: { type: 'notify', message: 'Email copied to clipboard! ✨' } }, '*');
+
             setTimeout(() => {
               copySupportEmailBtn.textContent = originalText;
               copySupportEmailBtn.style.background = 'rgba(59, 130, 246, 0.1)';
@@ -3992,14 +3997,32 @@
 
             // PREVENT SUB-SUB-SLIDES: Only allow nesting if current slide is at depth 0 (main level)
             if (depth > 0) {
-              console.log('Cannot nest slides beyond one level. Current depth:', depth);
-              // Show user feedback
-              showTOCStatus('Cannot create sub-sub-slides. Only one level of nesting allowed.', '#ff6b6b', true);
-              setTimeout(() => showTOCStatus('', '', false), 3000); // Clear after 3 seconds
-              return; // Block the drop operation
+              // Tiny feedback message
+              showTOCStatus('Nesting limited to 1 level! 💡', '#fbbf24');
+
+              let draggedSlide = null;
+              function removeSlide(arr, id) {
+                for (let i = 0; i < arr.length; i++) {
+                  if (arr[i].id === id) {
+                    draggedSlide = arr.splice(i, 1)[0];
+                    return true;
+                  }
+                  if (arr[i].children && removeSlide(arr[i].children, id)) return true;
+                }
+                return false;
+              }
+              removeSlide(slides, draggedSlideId);
+
+              if (draggedSlide) {
+                // Place beside the target slide at the same level
+                slidesArr.splice(idx + 1, 0, draggedSlide);
+                renderTOCControls();
+                onSlidesChanged();
+              }
+              return;
             }
 
-            // Remove dragged slide from tree
+            // Normal nesting behavior (for depth 0 parents)
             let draggedSlide = null;
             function removeSlide(arr, id) {
               for (let i = 0; i < arr.length; i++) {

@@ -1825,6 +1825,9 @@ figma.ui.onmessage = async (msg) => {
     const structure = getDocumentStructure();
     figma.ui.postMessage({ type: 'structure', structure });
   }
+  if (msg.type === 'notify') {
+    figma.notify(msg.message, msg.options || {});
+  }
   if (msg.type === 'close') {
     figma.closePlugin();
   }
