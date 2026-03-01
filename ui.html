@@ -576,15 +576,48 @@
     }
 
     .modal-pos-grid {
-      background: #181a20 !important;
-      border: 2px solid #353545 !important;
+      width: 100%;
+      height: 120px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 16px;
+      padding: 16px;
+      background: rgba(0, 0, 0, 0.2) !important;
+      border: 1px solid rgba(255, 255, 255, 0.05) !important;
+      border-radius: 12px;
+      box-sizing: border-box;
     }
 
     .modal-pos-cell {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
       background: #23232b !important;
       color: #b0b3b8 !important;
-      border: 2px solid transparent !important;
-      transition: border 0.13s, background 0.13s;
+      border: 1px solid rgba(255, 255, 255, 0.1) !important;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .modal-pos-cell[data-pos="top-left"] {
+      justify-self: start;
+      align-self: start;
+    }
+
+    .modal-pos-cell[data-pos="top-right"] {
+      justify-self: end;
+      align-self: start;
+    }
+
+    .modal-pos-cell[data-pos="bottom-left"] {
+      justify-self: start;
+      align-self: end;
+    }
+
+    .modal-pos-cell[data-pos="bottom-right"] {
+      justify-self: end;
+      align-self: end;
     }
 
     .modal-pos-cell.active {
@@ -985,6 +1018,46 @@
       padding: 16px;
       margin-bottom: 16px;
     }
+
+    /* Custom Beautiful Tooltips */
+    [data-tooltip] {
+      position: relative;
+    }
+
+    [data-tooltip]:hover::after {
+      content: attr(data-tooltip);
+      position: absolute;
+      bottom: 110%;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(30, 30, 36, 0.95);
+      color: #f3f4f8;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 500;
+      white-space: nowrap;
+      pointer-events: none;
+      z-index: 999999;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      opacity: 1;
+      animation: tooltipFadeIn 0.2s ease forwards;
+    }
+
+    @keyframes tooltipFadeIn {
+      from {
+        opacity: 0;
+        transform: translate(-50%, 4px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+      }
+    }
   </style>
 </head>
 
@@ -1000,12 +1073,12 @@
             <div style="display:flex;align-items:center;gap:8px;">
               <div id="premium-badge"
                 style="background:rgba(2fbbf24,0.1);color:#fbbf24;border:1px solid rgba(251,191,36,0.3);border-radius:8px;padding:4px 8px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;display:none;cursor:pointer;transition:all 0.2s;"
-                title="Click to view subscription details">
+                data-tooltip="Click to view subscription details">
                 ⭐ PREMIUM
               </div>
               <button id="hint-btn"
                 style="background:rgba(255,255,255,0.05);color:var(--text-muted);border:1px solid rgba(255,255,255,0.1);border-radius:8px;width:32px;height:32px;font-size:14px;cursor:pointer;transition:all 0.2s;display:flex;align-items:center;justify-content:center;"
-                title="Quick Guide">
+                data-tooltip="Quick Guide">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <circle cx="12" cy="12" r="10"></circle>
                   <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path>
@@ -1034,37 +1107,39 @@
                 Detection Direction</div>
               <div class="slides-detect-modes"
                 style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:16px;">
-                <button class="icon-btn detect-btn selected" id="detect-z" title="Z: Left-to-Right, Top-to-Bottom">
+                <button class="icon-btn detect-btn selected" id="detect-z"
+                  data-tooltip="Z: Left-to-Right, Top-to-Bottom">
                   <svg width="20" height="20" viewBox="0 0 18 18" fill="none">
                     <path d="M3 3h12v2H5v2h8v2H5v2h10v2H3" stroke="currentColor" stroke-width="1.5"
                       stroke-linecap="round" stroke-linejoin="round" />
                   </svg>
                 </button>
-                <button class="icon-btn detect-btn" id="detect-z-flip" title="Z Flipped: Right-to-Left, Top-to-Bottom">
+                <button class="icon-btn detect-btn" id="detect-z-flip"
+                  data-tooltip="Z Flipped: Right-to-Left, Top-to-Bottom">
                   <svg width="20" height="20" viewBox="0 0 18 18" fill="none">
                     <path d="M15 3H3v2h10v2H5v2h8v2H3v2h12" stroke="currentColor" stroke-width="1.5"
                       stroke-linecap="round" stroke-linejoin="round" />
                   </svg>
                 </button>
-                <button class="icon-btn detect-btn" id="detect-vertical" title="Vertical: Top-to-Bottom">
+                <button class="icon-btn detect-btn" id="detect-vertical" data-tooltip="Vertical: Top-to-Bottom">
                   <svg width="20" height="20" viewBox="0 0 18 18" fill="none">
                     <path d="M9 3v12M9 3l-2 2M9 3l2 2M9 15l-2-2M9 15l2-2" stroke="currentColor" stroke-width="1.5"
                       stroke-linecap="round" stroke-linejoin="round" />
                   </svg>
                 </button>
-                <button class="icon-btn detect-btn" id="detect-horizontal" title="Horizontal: Left-to-Right">
+                <button class="icon-btn detect-btn" id="detect-horizontal" data-tooltip="Horizontal: Left-to-Right">
                   <svg width="20" height="20" viewBox="0 0 18 18" fill="none">
                     <path d="M3 9h12M15 9l-2-2M15 9l-2 2M3 9l2-2M3 9l2 2" stroke="currentColor" stroke-width="1.5"
                       stroke-linecap="round" stroke-linejoin="round" />
                   </svg>
                 </button>
-                <button class="icon-btn detect-btn" id="detect-horizontal-rtl" title="Horizontal: Right-to-Left">
+                <button class="icon-btn detect-btn" id="detect-horizontal-rtl" data-tooltip="Horizontal: Right-to-Left">
                   <svg width="20" height="20" viewBox="0 0 18 18" fill="none">
                     <path d="M15 9H3M3 9l2-2M3 9l2 2M15 9l-2-2M15 9l-2 2" stroke="currentColor" stroke-width="1.5"
                       stroke-linecap="round" stroke-linejoin="round" />
                   </svg>
                 </button>
-                <button class="icon-btn" id="detect-refresh" title="Refresh slides" style="margin-left:auto;">
+                <button class="icon-btn" id="detect-refresh" data-tooltip="Refresh slides" style="margin-left:auto;">
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <polyline points="23 4 23 10 17 10"></polyline>
                     <polyline points="1 20 1 14 7 14"></polyline>
@@ -1082,7 +1157,7 @@
               <button class="primary-btn" id="add-slide-numbers">
                 Add Slide Numbers
               </button>
-              <button class="icon-btn gear" id="slide-number-settings" title="Number style settings">
+              <button class="icon-btn gear" id="slide-number-settings" data-tooltip="Number style settings">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <circle cx="12" cy="12" r="3"></circle>
                   <path
@@ -1090,12 +1165,12 @@
                   </path>
                 </svg>
               </button>
-              <button class="refresh-btn" id="refresh-numbers" title="Fix numbering if you removed some slides">
+              <button class="refresh-btn" id="refresh-numbers" data-tooltip="Fix numbering if you removed some slides">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <polyline points="20 6 9 17 4 12"></polyline>
                 </svg>
               </button>
-              <button class="refresh-btn" id="remove-all-numbers" title="Remove all slide numbers"
+              <button class="refresh-btn" id="remove-all-numbers" data-tooltip="Remove all slide numbers"
                 style="margin-left:auto;">
                 Clear
               </button>
@@ -1129,64 +1204,72 @@
       </div>
     </div>
     <div class="modal-bg" id="number-modal-bg">
-      <div class="modal" id="number-modal">
-        <button class="modal-close-x" id="number-modal-close" aria-label="Close">
-          <svg viewBox="0 0 20 20" fill="none">
-            <circle cx="10" cy="10" r="9" fill="#f3f4f6" />
-            <path d="M7 7l6 6M13 7l-6 6" stroke="#888" stroke-width="1.6" stroke-linecap="round" />
-          </svg>
-        </button>
-        <div class="modal-title">Slide Number Style</div>
-        <div class="modal-row-cols">
-          <div class="modal-content-col">
+      <div class="modal" id="number-modal" style="max-width: 480px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+          <div class="modal-title">Slide Number Style</div>
+          <button class="modal-close-x" id="number-modal-close" aria-label="Close" style="position:static;">
+            <svg viewBox="0 0 20 20" fill="none">
+              <circle cx="10" cy="10" r="9" fill="#f3f4f6" />
+              <path d="M7 7l6 6M13 7l-6 6" stroke="#888" stroke-width="1.6" stroke-linecap="round" />
+            </svg>
+          </button>
+        </div>
+        <div class="modal-row-cols" style="display:flex;gap:24px;flex-wrap:wrap;">
+          <div class="modal-content-col" style="flex:1;min-width:200px;">
             <div class="modal-row">
-              <span class="modal-label">Font</span>
-              <select class="modal-select" id="num-font">
-                <option value="Inter">Inter</option>
-                <option value="Arial">Arial</option>
-                <option value="Segoe UI">Segoe UI</option>
-                <option value="Fira Mono">Fira Mono</option>
-              </select>
+              <label class="modal-label">Font
+                <select class="modal-select" id="num-font" style="width:110px;">
+                  <option value="Inter">Inter</option>
+                  <option value="Arial">Arial</option>
+                  <option value="Segoe UI">Segoe UI</option>
+                  <option value="Fira Mono">Fira Mono</option>
+                </select>
+              </label>
             </div>
             <div class="modal-row">
-              <span class="modal-label">Size</span>
-              <input class="modal-input" id="num-size" type="number" min="8" max="64" value="24" />
+              <label class="modal-label">Size
+                <input class="modal-input" id="num-size" type="number" min="8" max="64" value="24"
+                  style="width:70px;" />
+              </label>
             </div>
             <div class="modal-row">
-              <span class="modal-label">Weight</span>
-              <select class="modal-select" id="num-weight">
-                <option value="Regular">Regular</option>
-                <option value="Bold">Bold</option>
-              </select>
+              <label class="modal-label">Weight
+                <select class="modal-select" id="num-weight" style="width:100px;">
+                  <option value="Regular">Regular</option>
+                  <option value="Bold">Bold</option>
+                </select>
+              </label>
             </div>
             <div class="modal-row">
-              <span class="modal-label">Color</span>
-              <input class="modal-input" id="num-color" type="color" value="#111111" />
-            </div>
-            <div class="modal-row">
-              <label style="display:flex;align-items:center;gap:8px;font-size:1em;"><input type="checkbox"
-                  id="num-leading-zero" style="width:18px;height:18px;"><span>Leading zero (01, 02, ...)</span></label>
+              <label class="modal-label">Color
+                <input class="modal-input" id="num-color" type="color" value="#111111" />
+              </label>
             </div>
           </div>
-          <div class="modal-pos-col">
-            <span class="modal-label" style="align-self:flex-start;">Position</span>
-            <div class="modal-pos-grid" id="num-pos-grid"
-              style="width: 220px; height: 120px; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 18px; background: #f8fafc; border-radius: 16px; position: relative; box-shadow: 0 0 0 2px #e6e8eb; margin: 0 auto 12px auto;">
-              <button class="modal-pos-cell" data-pos="top-left"
-                style="justify-self: start; align-self: start; width: 44px; height: 44px; border-radius: 10px; border: 2px solid transparent; background: #fff; cursor: pointer; font-size: 1.1em; transition: border 0.13s, background 0.13s;"></button>
-              <button class="modal-pos-cell" data-pos="top-right"
-                style="justify-self: end; align-self: start; width: 44px; height: 44px; border-radius: 10px; border: 2px solid transparent; background: #fff; cursor: pointer; font-size: 1.1em; transition: border 0.13s, background 0.13s;"></button>
-              <button class="modal-pos-cell" data-pos="bottom-left"
-                style="justify-self: start; align-self: end; width: 44px; height: 44px; border-radius: 10px; border: 2px solid transparent; background: #fff; cursor: pointer; font-size: 1.1em; transition: border 0.13s, background 0.13s;"></button>
-              <button class="modal-pos-cell" data-pos="bottom-right"
-                style="justify-self: end; align-self: end; width: 44px; height: 44px; border-radius: 10px; border: 2px solid transparent; background: #fff; cursor: pointer; font-size: 1.1em; transition: border 0.13s, background 0.13s;"></button>
+          <div class="modal-pos-col" style="flex:1;min-width:180px;">
+            <div class="modal-row" style="font-weight:700;margin-bottom:12px;color:var(--text-muted);font-size:0.85em;">
+              Position</div>
+            <div class="modal-pos-grid" id="num-pos-grid">
+              <button class="modal-pos-cell" data-pos="top-left"></button>
+              <button class="modal-pos-cell" data-pos="top-right"></button>
+              <button class="modal-pos-cell" data-pos="bottom-left"></button>
+              <button class="modal-pos-cell" data-pos="bottom-right"></button>
+            </div>
+            <div class="modal-row" style="margin-top:20px;">
+              <label
+                style="display:flex;align-items:center;gap:8px;font-size:0.9em;color:var(--text-main);cursor:pointer;">
+                <input type="checkbox" id="num-leading-zero"
+                  style="width:16px;height:16px;accent-color:var(--primary);">
+                <span>Remove leading zero</span>
+              </label>
             </div>
           </div>
         </div>
-        <div class="modal-preview-col">
-          <div class="modal-preview" id="num-preview">1</div>
-          <div class="modal-actions">
-            <button class="modal-btn" id="num-apply" style="width:100%;font-weight:700;">Apply</button>
+        <div class="modal-preview-col" style="margin-top:16px;">
+          <div class="modal-preview" id="num-preview"
+            style="font-size:24px;min-height:90px;background:rgba(0,0,0,0.3);border-radius:12px;">1</div>
+          <div class="modal-actions" style="margin-top:16px;">
+            <button class="modal-btn" id="num-apply" style="width:100%;">Apply Settings</button>
           </div>
         </div>
       </div>
@@ -4122,7 +4205,7 @@
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
             <div class="modal-title"><span style="font-size:1.3em;line-height:1;margin-right:2px;">📐</span>TOC Layout Controls</div>
             <div style="display:flex;gap:8px;">
-              <button class="modal-close-x" id="reset-toc-layout" aria-label="Reset" style="position:static;width:auto;height:36px;border-radius:18px;background:#353545;color:#b0b3b8;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.15s,color 0.15s;padding:0 12px;font-size:12px;font-weight:600;" title="Reset to Default" onmouseover="this.style.background='#23232b';this.style.color='#fff'" onmouseout="this.style.background='#353545';this.style.color='#b0b3b8'">
+              <button class="modal-close-x" id="reset-toc-layout" aria-label="Reset" style="position:static;width:auto;height:36px;border-radius:18px;background:#353545;color:#b0b3b8;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.15s,color 0.15s;padding:0 12px;font-size:12px;font-weight:600;" data-tooltip="Reset to Default" onmouseover="this.style.background='#23232b';this.style.color='#fff'" onmouseout="this.style.background='#353545';this.style.color='#b0b3b8'">
                 Reset
               </button>
               <button class="modal-close-x" id="close-toc-layout" aria-label="Close" style="position:static;width:36px;height:36px;">
@@ -4133,38 +4216,38 @@
           <div class="modal-row-cols" style="display:flex;gap:20px;flex-wrap:wrap;">
             <div class="modal-content-col" style="flex:1;min-width:200px;">
               <div class="modal-row" style="font-weight:700;margin-bottom:6px;">Number Position</div>
-              <div class="modal-row"><label class="modal-label" title="Choose where slide numbers appear relative to slide titles">Title Number Position <select id="title-number-pos-layout" class="modal-select" style="width:90px;margin-left:8px;"><option value="left">Left</option><option value="right">Right</option></select></label></div>
-              <div class="modal-row"><label class="modal-label" title="Choose where slide numbers appear relative to subtitle text">Subtitle Number Position <select id="subtitle-number-pos-layout" class="modal-select" style="width:90px;margin-left:8px;"><option value="left">Left</option><option value="right">Right</option></select></label></div>
+              <div class="modal-row"><label class="modal-label" data-tooltip="Choose where slide numbers appear relative to slide titles">Title Number Position <select id="title-number-pos-layout" class="modal-select" style="width:90px;margin-left:8px;"><option value="left">Left</option><option value="right">Right</option></select></label></div>
+              <div class="modal-row"><label class="modal-label" data-tooltip="Choose where slide numbers appear relative to subtitle text">Subtitle Number Position <select id="subtitle-number-pos-layout" class="modal-select" style="width:90px;margin-left:8px;"><option value="left">Left</option><option value="right">Right</option></select></label></div>
               
               <div class="modal-row" style="font-weight:700;margin-top:14px;margin-bottom:4px;">Spacing & Layout</div>
-              <div class="modal-row"><label class="modal-label" title="Space between different slide groups in the TOC">Group Spacing <input id="group-spacing" class="modal-input" type="number" min="8" max="80" value="16" style="width:80px;margin-left:8px;display:inline-block;"> px</label></div>
-              <div class="modal-row"><label class="modal-label" title="Space between columns in multi-column layouts">Columns Gaps <input id="column-spacing" class="modal-input" type="number" min="16" max="120" value="48" style="width:80px;margin-left:8px;display:inline-block;"> px</label></div>
-              <div class="modal-row"><label class="modal-label" title="Internal padding within each section of the TOC">Section Padding <input id="group-padding" class="modal-input" type="number" min="8" max="60" value="12" style="width:80px;margin-left:8px;display:inline-block;"> px</label></div>
-              <div class="modal-row"><label class="modal-label" title="Maximum height before creating a new column">Column Height <input id="max-column-height" class="modal-input" type="number" min="400" max="1200" value="800" style="width:80px;margin-left:8px;display:inline-block;"> px</label></div>
-              <div class="modal-row"><label class="modal-label" title="Width of each column in the TOC layout">Column Width <input id="column-width" class="modal-input" type="number" min="200" max="800" value="350" style="width:80px;margin-left:8px;display:inline-block;"> px</label></div>
+              <div class="modal-row"><label class="modal-label" data-tooltip="Space between different slide groups in the TOC">Group Spacing <input id="group-spacing" class="modal-input" type="number" min="8" max="80" value="16" style="width:80px;margin-left:8px;display:inline-block;"> px</label></div>
+              <div class="modal-row"><label class="modal-label" data-tooltip="Space between columns in multi-column layouts">Columns Gaps <input id="column-spacing" class="modal-input" type="number" min="16" max="120" value="48" style="width:80px;margin-left:8px;display:inline-block;"> px</label></div>
+              <div class="modal-row"><label class="modal-label" data-tooltip="Internal padding within each section of the TOC">Section Padding <input id="group-padding" class="modal-input" type="number" min="8" max="60" value="12" style="width:80px;margin-left:8px;display:inline-block;"> px</label></div>
+              <div class="modal-row"><label class="modal-label" data-tooltip="Maximum height before creating a new column">Column Height <input id="max-column-height" class="modal-input" type="number" min="400" max="1200" value="800" style="width:80px;margin-left:8px;display:inline-block;"> px</label></div>
+              <div class="modal-row"><label class="modal-label" data-tooltip="Width of each column in the TOC layout">Column Width <input id="column-width" class="modal-input" type="number" min="200" max="800" value="350" style="width:80px;margin-left:8px;display:inline-block;"> px</label></div>
             </div>
             <div class="modal-content-col" style="flex:1;min-width:200px;">
               <div class="modal-row" style="font-weight:700;margin-bottom:6px;">Column Layout</div>
-                              <div class="modal-row"><label class="modal-label" title="Maximum number of items before creating a new column">Max Items per Column <input id="max-items-per-col" class="modal-input" type="number" min="1" max="20" value="6" style="width:80px;margin-left:8px;"></label></div>
+                              <div class="modal-row"><label class="modal-label" data-tooltip="Maximum number of items before creating a new column">Max Items per Column <input id="max-items-per-col" class="modal-input" type="number" min="1" max="20" value="6" style="width:80px;margin-left:8px;"></label></div>
               
               <div class="modal-row" style="font-weight:700;margin-top:14px;margin-bottom:4px;">Frame Padding</div>
-              <div class="modal-row"><label class="modal-label" title="Padding from the top edge of the TOC frame">Top <input id="frame-padding-top" class="modal-input" type="number" min="16" max="120" value="32" style="width:80px;margin-left:8px;display:inline-block;"> px</label></div>
-              <div class="modal-row"><label class="modal-label" title="Padding from the bottom edge of the TOC frame">Bottom <input id="frame-padding-bottom" class="modal-input" type="number" min="16" max="120" value="32" style="width:80px;margin-left:8px;display:inline-block;"> px</label></div>
-              <div class="modal-row"><label class="modal-label" title="Padding from the left edge of the TOC frame">Left <input id="frame-padding-left" class="modal-input" type="number" min="16" max="120" value="48" style="width:80px;margin-left:8px;display:inline-block;"> px</label></div>
-              <div class="modal-row"><label class="modal-label" title="Padding from the right edge of the TOC frame">Right <input id="frame-padding-right" class="modal-input" type="number" min="16" max="120" value="48" style="width:80px;margin-left:8px;display:inline-block;"> px</label></div>
+              <div class="modal-row"><label class="modal-label" data-tooltip="Padding from the top edge of the TOC frame">Top <input id="frame-padding-top" class="modal-input" type="number" min="16" max="120" value="32" style="width:80px;margin-left:8px;display:inline-block;"> px</label></div>
+              <div class="modal-row"><label class="modal-label" data-tooltip="Padding from the bottom edge of the TOC frame">Bottom <input id="frame-padding-bottom" class="modal-input" type="number" min="16" max="120" value="32" style="width:80px;margin-left:8px;display:inline-block;"> px</label></div>
+              <div class="modal-row"><label class="modal-label" data-tooltip="Padding from the left edge of the TOC frame">Left <input id="frame-padding-left" class="modal-input" type="number" min="16" max="120" value="48" style="width:80px;margin-left:8px;display:inline-block;"> px</label></div>
+              <div class="modal-row"><label class="modal-label" data-tooltip="Padding from the right edge of the TOC frame">Right <input id="frame-padding-right" class="modal-input" type="number" min="16" max="120" value="48" style="width:80px;margin-left:8px;display:inline-block;"> px</label></div>
               
 
               
               <div class="modal-row" style="font-weight:700;margin-top:14px;margin-bottom:4px;">Row Alignment</div>
               <div class="modal-row">
-                <label class="modal-label" title="Horizontal alignment of text within each row">Horizontal <select id="text-align-horizontal" class="modal-select" style="width:100px;margin-left:8px;">
+                <label class="modal-label" data-tooltip="Horizontal alignment of text within each row">Horizontal <select id="text-align-horizontal" class="modal-select" style="width:100px;margin-left:8px;">
                   <option value="LEFT">Left</option>
                   <option value="CENTER" selected>Center</option>
                   <option value="RIGHT">Right</option>
                 </select></label>
           </div>
               <div class="modal-row">
-                <label class="modal-label" title="Vertical alignment of text within each row">Vertical <select id="text-align-vertical" class="modal-select" style="width:100px;margin-left:8px;">
+                <label class="modal-label" data-tooltip="Vertical alignment of text within each row">Vertical <select id="text-align-vertical" class="modal-select" style="width:100px;margin-left:8px;">
                   <option value="TOP">Top</option>
                   <option value="CENTER">Middle</option>
                   <option value="BOTTOM">Bottom</option>
@@ -4359,7 +4442,7 @@
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
             <div class="modal-title"><span style="font-size:1.3em;line-height:1;margin-right:8px;">⚙️</span>TOC Style</div>
             <div style="display:flex;gap:8px;">
-              <button class="modal-close-x" id="reset-toc-style" aria-label="Reset" style="position:static;width:auto;height:36px;border-radius:18px;background:#353545;color:#b0b3b8;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.15s,color 0.15s;padding:0 12px;font-size:12px;font-weight:600;" title="Reset to Default" onmouseover="this.style.background='#23232b';this.style.color='#fff'" onmouseout="this.style.background='#353545';this.style.color='#b0b3b8'">
+              <button class="modal-close-x" id="reset-toc-style" aria-label="Reset" style="position:static;width:auto;height:36px;border-radius:18px;background:#353545;color:#b0b3b8;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.15s,color 0.15s;padding:0 12px;font-size:12px;font-weight:600;" data-tooltip="Reset to Default" onmouseover="this.style.background='#23232b';this.style.color='#fff'" onmouseout="this.style.background='#353545';this.style.color='#b0b3b8'">
                 Reset
               </button>
               <button class="modal-close-x" id="close-adv-toc-style" aria-label="Close" style="position:static;width:36px;height:36px;">
@@ -4370,40 +4453,40 @@
           <div class="modal-row-cols" style="display:flex;gap:20px;flex-wrap:wrap;">
             <div class="modal-content-col" style="flex:1;min-width:200px;">
               <div class="modal-row" style="font-weight:700;margin-bottom:6px;">Hero Section</div>
-              <div class="modal-row"><label class="modal-label" title="Font family for main slide titles">Font <select id="hero-font-family" class="modal-select" style="width:110px;margin-left:8px;"><option value="Inter">Inter</option><option value="Arial">Arial</option><option value="Segoe UI">Segoe UI</option><option value="Fira Mono">Fira Mono</option><option value="Roboto">Roboto</option><option value="Times New Roman">Times New Roman</option></select></label></div>
-              <div class="modal-row"><label class="modal-label" title="Font size for main slide titles">Font Size <input id="hero-font-size" class="modal-input" type="number" min="10" max="64" value="32" style="width:80px;margin-left:8px;"></label></div>
-              <div class="modal-row"><label class="modal-label" title="Font weight for main slide titles">Font Weight <select id="hero-font-weight" class="modal-select" style="width:90px;margin-left:8px;">
+              <div class="modal-row"><label class="modal-label" data-tooltip="Font family for main slide titles">Font <select id="hero-font-family" class="modal-select" style="width:110px;margin-left:8px;"><option value="Inter">Inter</option><option value="Arial">Arial</option><option value="Segoe UI">Segoe UI</option><option value="Fira Mono">Fira Mono</option><option value="Roboto">Roboto</option><option value="Times New Roman">Times New Roman</option></select></label></div>
+              <div class="modal-row"><label class="modal-label" data-tooltip="Font size for main slide titles">Font Size <input id="hero-font-size" class="modal-input" type="number" min="10" max="64" value="32" style="width:80px;margin-left:8px;"></label></div>
+              <div class="modal-row"><label class="modal-label" data-tooltip="Font weight for main slide titles">Font Weight <select id="hero-font-weight" class="modal-select" style="width:90px;margin-left:8px;">
                 <option value="Bold">Bold</option>
                 <option value="Semi Bold">Semi Bold</option>
                 <option value="Regular">Regular</option>
               </select></label></div>
-              <div class="modal-row"><label class="modal-label" title="Text color for main slide titles">Color <input id="hero-font-color" class="modal-input" type="color" value="#000000" style="margin-left:8px;"></label></div>
+              <div class="modal-row"><label class="modal-label" data-tooltip="Text color for main slide titles">Color <input id="hero-font-color" class="modal-input" type="color" value="#000000" style="margin-left:8px;"></label></div>
               <!-- Title Slide Number Controls -->
               <div class="modal-row" style="font-weight:700;margin-top:14px;">Title Slide Number</div>
-              <div class="modal-row"><label class="modal-label" title="Font family for slide numbers next to titles">Font <select id="title-number-font" class="modal-select" style="width:110px;margin-left:8px;"><option value="Inter">Inter</option><option value="Arial">Arial</option><option value="Segoe UI">Segoe UI</option><option value="Fira Mono">Fira Mono</option><option value="Roboto">Roboto</option><option value="Times New Roman">Times New Roman</option></select></label></div>
-              <div class="modal-row"><label class="modal-label" title="Font size for slide numbers next to titles">Font Size <input id="title-number-size" class="modal-input" type="number" min="8" max="64" value="32" style="width:80px;margin-left:8px;"></label></div>
-              <div class="modal-row"><label class="modal-label" title="Font weight for slide numbers next to titles">Font Weight <select id="title-number-weight" class="modal-select" style="width:90px;margin-left:8px;"><option value="Bold">Bold</option><option value="Regular">Regular</option></select></label></div>
-              <div class="modal-row"><label class="modal-label" title="Text color for slide numbers next to titles">Color <input id="title-number-color" class="modal-input" type="color" value="#000000" style="margin-left:8px;"></label></div>
-              <div class="modal-row"><label class="modal-label" title="Remove leading zeros from slide numbers (e.g., 01 becomes 1)"><input id="title-number-leading-zero" type="checkbox" style="margin-right:8px;" checked> Remove leading zero</label></div>
+              <div class="modal-row"><label class="modal-label" data-tooltip="Font family for slide numbers next to titles">Font <select id="title-number-font" class="modal-select" style="width:110px;margin-left:8px;"><option value="Inter">Inter</option><option value="Arial">Arial</option><option value="Segoe UI">Segoe UI</option><option value="Fira Mono">Fira Mono</option><option value="Roboto">Roboto</option><option value="Times New Roman">Times New Roman</option></select></label></div>
+              <div class="modal-row"><label class="modal-label" data-tooltip="Font size for slide numbers next to titles">Font Size <input id="title-number-size" class="modal-input" type="number" min="8" max="64" value="32" style="width:80px;margin-left:8px;"></label></div>
+              <div class="modal-row"><label class="modal-label" data-tooltip="Font weight for slide numbers next to titles">Font Weight <select id="title-number-weight" class="modal-select" style="width:90px;margin-left:8px;"><option value="Bold">Bold</option><option value="Regular">Regular</option></select></label></div>
+              <div class="modal-row"><label class="modal-label" data-tooltip="Text color for slide numbers next to titles">Color <input id="title-number-color" class="modal-input" type="color" value="#000000" style="margin-left:8px;"></label></div>
+              <div class="modal-row"><label class="modal-label" data-tooltip="Remove leading zeros from slide numbers (e.g., 01 becomes 1)"><input id="title-number-leading-zero" type="checkbox" style="margin-right:8px;" checked> Remove leading zero</label></div>
             </div>
             <div class="modal-content-col" style="flex:1;min-width:200px;">
               <div class="modal-row" style="font-weight:700;margin-bottom:6px;">Subtitle</div>
-              <div class="modal-row"><label class="modal-label" title="Font family for subtitle text">Font <select id="sub-title-font" class="modal-select" style="width:110px;margin-left:8px;"><option value="Inter">Inter</option><option value="Arial">Arial</option><option value="Segoe UI">Segoe UI</option><option value="Fira Mono">Fira Mono</option><option value="Roboto">Roboto</option><option value="Times New Roman">Times New Roman</option></select></label></div>
-              <div class="modal-row"><label class="modal-label" title="Font size for subtitle text">Font Size <input id="sub-title-size" class="modal-input" type="number" min="8" max="32" value="25" style="width:80px;margin-left:8px;"></label></div>
-              <div class="modal-row"><label class="modal-label" title="Font weight for subtitle text">Font Weight <select id="sub-title-weight" class="modal-select" style="width:90px;margin-left:8px;">
+              <div class="modal-row"><label class="modal-label" data-tooltip="Font family for subtitle text">Font <select id="sub-title-font" class="modal-select" style="width:110px;margin-left:8px;"><option value="Inter">Inter</option><option value="Arial">Arial</option><option value="Segoe UI">Segoe UI</option><option value="Fira Mono">Fira Mono</option><option value="Roboto">Roboto</option><option value="Times New Roman">Times New Roman</option></select></label></div>
+              <div class="modal-row"><label class="modal-label" data-tooltip="Font size for subtitle text">Font Size <input id="sub-title-size" class="modal-input" type="number" min="8" max="32" value="25" style="width:80px;margin-left:8px;"></label></div>
+              <div class="modal-row"><label class="modal-label" data-tooltip="Font weight for subtitle text">Font Weight <select id="sub-title-weight" class="modal-select" style="width:90px;margin-left:8px;">
                 <option value="Regular">Regular</option>
                 <option value="Bold">Bold</option>
                 <option value="Semi Bold">Semi Bold</option>
               </select></label></div>
-              <div class="modal-row"><label class="modal-label" title="Text color for subtitle text">Color <input id="sub-title-color" class="modal-input" type="color" value="#000000" style="margin-left:8px;"></label></div>
-              <div class="modal-row"><label class="modal-label" title="Indentation for subtitle text from the left edge">Indent <input id="sub-indent" class="modal-input" type="number" min="0" max="80" value="24" style="width:80px;margin-left:8px;"> px</label></div>
+              <div class="modal-row"><label class="modal-label" data-tooltip="Text color for subtitle text">Color <input id="sub-title-color" class="modal-input" type="color" value="#000000" style="margin-left:8px;"></label></div>
+              <div class="modal-row"><label class="modal-label" data-tooltip="Indentation for subtitle text from the left edge">Indent <input id="sub-indent" class="modal-input" type="number" min="0" max="80" value="24" style="width:80px;margin-left:8px;"> px</label></div>
               <!-- Subtitle Slide Number Controls -->
               <div class="modal-row" style="font-weight:700;margin-top:14px;">Subtitle Slide Number</div>
-              <div class="modal-row"><label class="modal-label" title="Font family for slide numbers next to subtitles">Font <select id="sub-number-font" class="modal-select" style="width:110px;margin-left:8px;"><option value="Inter">Inter</option><option value="Arial">Arial</option><option value="Segoe UI">Segoe UI</option><option value="Fira Mono">Fira Mono</option><option value="Roboto">Roboto</option><option value="Times New Roman">Times New Roman</option></select></label></div>
-              <div class="modal-row"><label class="modal-label" title="Font size for slide numbers next to subtitles">Font Size <input id="sub-number-size" class="modal-input" type="number" min="8" max="64" value="18" style="width:80px;margin-left:8px;"></label></div>
-              <div class="modal-row"><label class="modal-label" title="Font weight for slide numbers next to subtitles">Font Weight <select id="sub-number-weight" class="modal-select" style="width:90px;margin-left:8px;"><option value="Bold">Bold</option><option value="Regular">Regular</option></select></label></div>
-              <div class="modal-row"><label class="modal-label" title="Text color for slide numbers next to subtitles">Color <input id="sub-number-color" class="modal-input" type="color" value="#000000" style="margin-left:8px;"></label></div>
-              <div class="modal-row"><label class="modal-label" title="Remove leading zeros from subtitle slide numbers (e.g., 01 becomes 1)"><input id="sub-number-leading-zero" type="checkbox" style="margin-right:8px;" checked> Remove leading zero</label></div>
+              <div class="modal-row"><label class="modal-label" data-tooltip="Font family for slide numbers next to subtitles">Font <select id="sub-number-font" class="modal-select" style="width:110px;margin-left:8px;"><option value="Inter">Inter</option><option value="Arial">Arial</option><option value="Segoe UI">Segoe UI</option><option value="Fira Mono">Fira Mono</option><option value="Roboto">Roboto</option><option value="Times New Roman">Times New Roman</option></select></label></div>
+              <div class="modal-row"><label class="modal-label" data-tooltip="Font size for slide numbers next to subtitles">Font Size <input id="sub-number-size" class="modal-input" type="number" min="8" max="64" value="18" style="width:80px;margin-left:8px;"></label></div>
+              <div class="modal-row"><label class="modal-label" data-tooltip="Font weight for slide numbers next to subtitles">Font Weight <select id="sub-number-weight" class="modal-select" style="width:90px;margin-left:8px;"><option value="Bold">Bold</option><option value="Regular">Regular</option></select></label></div>
+              <div class="modal-row"><label class="modal-label" data-tooltip="Text color for slide numbers next to subtitles">Color <input id="sub-number-color" class="modal-input" type="color" value="#000000" style="margin-left:8px;"></label></div>
+              <div class="modal-row"><label class="modal-label" data-tooltip="Remove leading zeros from subtitle slide numbers (e.g., 01 becomes 1)"><input id="sub-number-leading-zero" type="checkbox" style="margin-right:8px;" checked> Remove leading zero</label></div>
             </div>
           </div>
 
