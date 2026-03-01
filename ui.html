@@ -63,25 +63,22 @@
     }
 
     .plugin-ui {
-      width: 100vw;
-      min-height: 100vh;
+      width: 100%;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: flex-start;
       background: var(--bg);
+      overflow-x: hidden;
     }
 
     .main-col {
       width: 100%;
-      max-width: 520px;
-      margin: 48px auto 0 auto;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: var(--gap);
-      padding-left: 24px;
-      padding-right: 24px;
+      gap: 0;
+      padding: 0;
       box-sizing: border-box;
     }
 
@@ -103,17 +100,17 @@
 
     .card {
       background: var(--card-bg);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      border: 1.5px solid var(--border);
-      padding: var(--section-padding);
+      border-radius: 0;
+      box-shadow: none;
+      border: none;
+      padding: 16px 20px;
       margin: 0;
       width: 100%;
       box-sizing: border-box;
       display: flex;
       flex-direction: column;
-      gap: 22px;
-      transition: box-shadow 0.18s;
+      gap: 16px;
+      transition: none;
     }
 
     .card>* {
@@ -497,13 +494,13 @@
       border-radius: 16px;
       box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.08);
       border: 1px solid rgba(255, 255, 255, 0.05);
-      padding: 24px;
+      padding: 20px;
       width: 100%;
       max-width: 440px;
       max-height: 85vh;
       display: flex;
       flex-direction: column;
-      gap: 16px;
+      gap: 12px;
       position: relative;
       font-family: var(--font-family);
       overflow-y: auto;
@@ -544,7 +541,19 @@
       color: var(--text-main);
       border: 1px solid rgba(255, 255, 255, 0.08);
       transition: all 0.2s ease;
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%23b0b3b8' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 8px center;
+      padding-right: 28px !important;
+    }
+
+    .modal-input {
       cursor: text;
+      background-image: none;
+      padding-right: 8px !important;
     }
 
     .modal-input:focus,
@@ -762,15 +771,29 @@
 
     /* Hide scrollbars globally */
     ::-webkit-scrollbar {
-      width: 0 !important;
-      height: 0 !important;
-      background: transparent !important;
-      display: none !important;
+      width: 4px;
+      height: 4px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+      border-radius: 10px;
+      border: 1px solid transparent;
+      background-clip: content-box;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(255, 255, 255, 0.25);
+      background-clip: content-box;
     }
 
     * {
-      scrollbar-width: none !important;
-      -ms-overflow-style: none !important;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
     }
 
     /* Show custom scrollbar only in .slides-list */
@@ -948,9 +971,14 @@
     .tabs-container {
       display: flex;
       gap: 16px;
-      margin-bottom: 24px;
+      margin-bottom: 12px;
       border-bottom: 1px solid var(--border);
       padding-bottom: 2px;
+    }
+
+    #main-status-msg:empty,
+    #toc-status-msg:empty {
+      display: none !important;
     }
 
     .tab-btn {
@@ -1066,7 +1094,7 @@
     <div class="main-col">
       <div class="card">
         <div class="card-content">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
             <div class="plugin-title"
               style="margin-bottom:0; font-size:1.6em; letter-spacing:-0.02em; text-transform:none;">Table of Contents
             </div>
@@ -1096,8 +1124,7 @@
           </div>
 
           <div id="main-status-msg"
-            style="margin: 0 0 16px 0; text-align: left; color: var(--text-main); font-size: 0.9em; min-height: 1.5em;">
-          </div>
+            style="margin: 0 0 8px 0; text-align: left; color: var(--text-main); font-size: 0.9em;"></div>
 
           <!-- TAB PANEL 1: NUMBERING -->
           <div class="tab-content-panel active" id="panel-numbering">
@@ -1179,8 +1206,7 @@
 
           <!-- TAB PANEL 2: TOC GENERATION -->
           <div class="tab-content-panel" id="panel-toc">
-            <div id="toc-status-msg" style="margin-bottom: 12px;font-size:0.9em;color:var(--primary);min-height:1.2em;">
-            </div>
+            <div id="toc-status-msg" style="margin-bottom: 8px;font-size:0.9em;color:var(--primary);"></div>
             <div
               style="font-size:0.85em;color:var(--text-muted);margin-bottom:16px;line-height:1.4;background:rgba(255,255,255,0.05);padding:12px;border-radius:8px;">
               💡 <strong>Tip:</strong> Select an empty frame in your document, then click "Generate TOC" to create the
@@ -4216,38 +4242,38 @@
           <div class="modal-row-cols" style="display:flex;gap:20px;flex-wrap:wrap;">
             <div class="modal-content-col" style="flex:1;min-width:200px;">
               <div class="modal-row" style="font-weight:700;margin-bottom:6px;">Number Position</div>
-              <div class="modal-row"><label class="modal-label" data-tooltip="Choose where slide numbers appear relative to slide titles">Title Number Position <select id="title-number-pos-layout" class="modal-select" style="width:90px;margin-left:8px;"><option value="left">Left</option><option value="right">Right</option></select></label></div>
-              <div class="modal-row"><label class="modal-label" data-tooltip="Choose where slide numbers appear relative to subtitle text">Subtitle Number Position <select id="subtitle-number-pos-layout" class="modal-select" style="width:90px;margin-left:8px;"><option value="left">Left</option><option value="right">Right</option></select></label></div>
+              <div class="modal-row"><label class="modal-label" data-tooltip="Choose where slide numbers appear relative to slide titles">Title Number Position <select id="title-number-pos-layout" class="modal-select"><option value="left">Left</option><option value="right">Right</option></select></label></div>
+              <div class="modal-row"><label class="modal-label" data-tooltip="Choose where slide numbers appear relative to subtitle text">Subtitle Number Position <select id="subtitle-number-pos-layout" class="modal-select"><option value="left">Left</option><option value="right">Right</option></select></label></div>
               
               <div class="modal-row" style="font-weight:700;margin-top:14px;margin-bottom:4px;">Spacing & Layout</div>
-              <div class="modal-row"><label class="modal-label" data-tooltip="Space between different slide groups in the TOC">Group Spacing <input id="group-spacing" class="modal-input" type="number" min="8" max="80" value="16" style="width:80px;margin-left:8px;display:inline-block;"> px</label></div>
-              <div class="modal-row"><label class="modal-label" data-tooltip="Space between columns in multi-column layouts">Columns Gaps <input id="column-spacing" class="modal-input" type="number" min="16" max="120" value="48" style="width:80px;margin-left:8px;display:inline-block;"> px</label></div>
-              <div class="modal-row"><label class="modal-label" data-tooltip="Internal padding within each section of the TOC">Section Padding <input id="group-padding" class="modal-input" type="number" min="8" max="60" value="12" style="width:80px;margin-left:8px;display:inline-block;"> px</label></div>
-              <div class="modal-row"><label class="modal-label" data-tooltip="Maximum height before creating a new column">Column Height <input id="max-column-height" class="modal-input" type="number" min="400" max="1200" value="800" style="width:80px;margin-left:8px;display:inline-block;"> px</label></div>
-              <div class="modal-row"><label class="modal-label" data-tooltip="Width of each column in the TOC layout">Column Width <input id="column-width" class="modal-input" type="number" min="200" max="800" value="350" style="width:80px;margin-left:8px;display:inline-block;"> px</label></div>
+              <div class="modal-row"><label class="modal-label" data-tooltip="Space between different slide groups in the TOC">Group Spacing <input id="group-spacing" class="modal-input" type="number" min="8" max="80" value="16" style="width:80px;"> px</label></div>
+              <div class="modal-row"><label class="modal-label" data-tooltip="Space between columns in multi-column layouts">Columns Gaps <input id="column-spacing" class="modal-input" type="number" min="16" max="120" value="48" style="width:80px;"> px</label></div>
+              <div class="modal-row"><label class="modal-label" data-tooltip="Internal padding within each section of the TOC">Section Padding <input id="group-padding" class="modal-input" type="number" min="8" max="60" value="12" style="width:80px;"> px</label></div>
+              <div class="modal-row"><label class="modal-label" data-tooltip="Maximum height before creating a new column">Column Height <input id="max-column-height" class="modal-input" type="number" min="400" max="1200" value="800" style="width:80px;"> px</label></div>
+              <div class="modal-row"><label class="modal-label" data-tooltip="Width of each column in the TOC layout">Column Width <input id="column-width" class="modal-input" type="number" min="200" max="800" value="350" style="width:80px;"> px</label></div>
             </div>
             <div class="modal-content-col" style="flex:1;min-width:200px;">
               <div class="modal-row" style="font-weight:700;margin-bottom:6px;">Column Layout</div>
-                              <div class="modal-row"><label class="modal-label" data-tooltip="Maximum number of items before creating a new column">Max Items per Column <input id="max-items-per-col" class="modal-input" type="number" min="1" max="20" value="6" style="width:80px;margin-left:8px;"></label></div>
+                               <div class="modal-row"><label class="modal-label" data-tooltip="Maximum number of items before creating a new column">Max Items per Column <input id="max-items-per-col" class="modal-input" type="number" min="1" max="20" value="6" style="width:80px;"></label></div>
               
               <div class="modal-row" style="font-weight:700;margin-top:14px;margin-bottom:4px;">Frame Padding</div>
-              <div class="modal-row"><label class="modal-label" data-tooltip="Padding from the top edge of the TOC frame">Top <input id="frame-padding-top" class="modal-input" type="number" min="16" max="120" value="32" style="width:80px;margin-left:8px;display:inline-block;"> px</label></div>
-              <div class="modal-row"><label class="modal-label" data-tooltip="Padding from the bottom edge of the TOC frame">Bottom <input id="frame-padding-bottom" class="modal-input" type="number" min="16" max="120" value="32" style="width:80px;margin-left:8px;display:inline-block;"> px</label></div>
-              <div class="modal-row"><label class="modal-label" data-tooltip="Padding from the left edge of the TOC frame">Left <input id="frame-padding-left" class="modal-input" type="number" min="16" max="120" value="48" style="width:80px;margin-left:8px;display:inline-block;"> px</label></div>
-              <div class="modal-row"><label class="modal-label" data-tooltip="Padding from the right edge of the TOC frame">Right <input id="frame-padding-right" class="modal-input" type="number" min="16" max="120" value="48" style="width:80px;margin-left:8px;display:inline-block;"> px</label></div>
+              <div class="modal-row"><label class="modal-label" data-tooltip="Padding from the top edge of the TOC frame">Top <input id="frame-padding-top" class="modal-input" type="number" min="16" max="120" value="32" style="width:80px;"> px</label></div>
+              <div class="modal-row"><label class="modal-label" data-tooltip="Padding from the bottom edge of the TOC frame">Bottom <input id="frame-padding-bottom" class="modal-input" type="number" min="16" max="120" value="32" style="width:80px;"> px</label></div>
+              <div class="modal-row"><label class="modal-label" data-tooltip="Padding from the left edge of the TOC frame">Left <input id="frame-padding-left" class="modal-input" type="number" min="16" max="120" value="48" style="width:80px;"> px</label></div>
+              <div class="modal-row"><label class="modal-label" data-tooltip="Padding from the right edge of the TOC frame">Right <input id="frame-padding-right" class="modal-input" type="number" min="16" max="120" value="48" style="width:80px;"> px</label></div>
               
 
               
               <div class="modal-row" style="font-weight:700;margin-top:14px;margin-bottom:4px;">Row Alignment</div>
               <div class="modal-row">
-                <label class="modal-label" data-tooltip="Horizontal alignment of text within each row">Horizontal <select id="text-align-horizontal" class="modal-select" style="width:100px;margin-left:8px;">
+                <label class="modal-label" data-tooltip="Horizontal alignment of text within each row">Horizontal <select id="text-align-horizontal" class="modal-select">
                   <option value="LEFT">Left</option>
                   <option value="CENTER" selected>Center</option>
                   <option value="RIGHT">Right</option>
                 </select></label>
           </div>
               <div class="modal-row">
-                <label class="modal-label" data-tooltip="Vertical alignment of text within each row">Vertical <select id="text-align-vertical" class="modal-select" style="width:100px;margin-left:8px;">
+                <label class="modal-label" data-tooltip="Vertical alignment of text within each row">Vertical <select id="text-align-vertical" class="modal-select">
                   <option value="TOP">Top</option>
                   <option value="CENTER">Middle</option>
                   <option value="BOTTOM">Bottom</option>
@@ -4453,40 +4479,40 @@
           <div class="modal-row-cols" style="display:flex;gap:20px;flex-wrap:wrap;">
             <div class="modal-content-col" style="flex:1;min-width:200px;">
               <div class="modal-row" style="font-weight:700;margin-bottom:6px;">Hero Section</div>
-              <div class="modal-row"><label class="modal-label" data-tooltip="Font family for main slide titles">Font <select id="hero-font-family" class="modal-select" style="width:110px;margin-left:8px;"><option value="Inter">Inter</option><option value="Arial">Arial</option><option value="Segoe UI">Segoe UI</option><option value="Fira Mono">Fira Mono</option><option value="Roboto">Roboto</option><option value="Times New Roman">Times New Roman</option></select></label></div>
-              <div class="modal-row"><label class="modal-label" data-tooltip="Font size for main slide titles">Font Size <input id="hero-font-size" class="modal-input" type="number" min="10" max="64" value="32" style="width:80px;margin-left:8px;"></label></div>
-              <div class="modal-row"><label class="modal-label" data-tooltip="Font weight for main slide titles">Font Weight <select id="hero-font-weight" class="modal-select" style="width:90px;margin-left:8px;">
+              <div class="modal-row"><label class="modal-label" data-tooltip="Font family for main slide titles">Font <select id="hero-font-family" class="modal-select"><option value="Inter">Inter</option><option value="Arial">Arial</option><option value="Segoe UI">Segoe UI</option><option value="Fira Mono">Fira Mono</option><option value="Roboto">Roboto</option><option value="Times New Roman">Times New Roman</option></select></label></div>
+              <div class="modal-row"><label class="modal-label" data-tooltip="Font size for main slide titles">Font Size <input id="hero-font-size" class="modal-input" type="number" min="10" max="64" value="32" style="width:80px;"></label></div>
+              <div class="modal-row"><label class="modal-label" data-tooltip="Font weight for main slide titles">Font Weight <select id="hero-font-weight" class="modal-select">
                 <option value="Bold">Bold</option>
                 <option value="Semi Bold">Semi Bold</option>
                 <option value="Regular">Regular</option>
               </select></label></div>
-              <div class="modal-row"><label class="modal-label" data-tooltip="Text color for main slide titles">Color <input id="hero-font-color" class="modal-input" type="color" value="#000000" style="margin-left:8px;"></label></div>
+              <div class="modal-row"><label class="modal-label" data-tooltip="Text color for main slide titles">Color <input id="hero-font-color" class="modal-input" type="color" value="#000000"></label></div>
               <!-- Title Slide Number Controls -->
               <div class="modal-row" style="font-weight:700;margin-top:14px;">Title Slide Number</div>
-              <div class="modal-row"><label class="modal-label" data-tooltip="Font family for slide numbers next to titles">Font <select id="title-number-font" class="modal-select" style="width:110px;margin-left:8px;"><option value="Inter">Inter</option><option value="Arial">Arial</option><option value="Segoe UI">Segoe UI</option><option value="Fira Mono">Fira Mono</option><option value="Roboto">Roboto</option><option value="Times New Roman">Times New Roman</option></select></label></div>
-              <div class="modal-row"><label class="modal-label" data-tooltip="Font size for slide numbers next to titles">Font Size <input id="title-number-size" class="modal-input" type="number" min="8" max="64" value="32" style="width:80px;margin-left:8px;"></label></div>
-              <div class="modal-row"><label class="modal-label" data-tooltip="Font weight for slide numbers next to titles">Font Weight <select id="title-number-weight" class="modal-select" style="width:90px;margin-left:8px;"><option value="Bold">Bold</option><option value="Regular">Regular</option></select></label></div>
-              <div class="modal-row"><label class="modal-label" data-tooltip="Text color for slide numbers next to titles">Color <input id="title-number-color" class="modal-input" type="color" value="#000000" style="margin-left:8px;"></label></div>
-              <div class="modal-row"><label class="modal-label" data-tooltip="Remove leading zeros from slide numbers (e.g., 01 becomes 1)"><input id="title-number-leading-zero" type="checkbox" style="margin-right:8px;" checked> Remove leading zero</label></div>
+              <div class="modal-row"><label class="modal-label" data-tooltip="Font family for slide numbers next to titles">Font <select id="title-number-font" class="modal-select"><option value="Inter">Inter</option><option value="Arial">Arial</option><option value="Segoe UI">Segoe UI</option><option value="Fira Mono">Fira Mono</option><option value="Roboto">Roboto</option><option value="Times New Roman">Times New Roman</option></select></label></div>
+              <div class="modal-row"><label class="modal-label" data-tooltip="Font size for slide numbers next to titles">Font Size <input id="title-number-size" class="modal-input" type="number" min="8" max="64" value="32" style="width:80px;"></label></div>
+              <div class="modal-row"><label class="modal-label" data-tooltip="Font weight for slide numbers next to titles">Font Weight <select id="title-number-weight" class="modal-select"><option value="Bold">Bold</option><option value="Regular">Regular</option></select></label></div>
+              <div class="modal-row"><label class="modal-label" data-tooltip="Text color for slide numbers next to titles">Color <input id="title-number-color" class="modal-input" type="color" value="#000000"></label></div>
+              <div class="modal-row"><label class="modal-label" data-tooltip="Remove leading zeros from slide numbers (e.g., 01 becomes 1)"><input id="title-number-leading-zero" type="checkbox" style="margin-right:8px;accent-color:var(--primary);" checked> Remove leading zero</label></div>
             </div>
             <div class="modal-content-col" style="flex:1;min-width:200px;">
               <div class="modal-row" style="font-weight:700;margin-bottom:6px;">Subtitle</div>
-              <div class="modal-row"><label class="modal-label" data-tooltip="Font family for subtitle text">Font <select id="sub-title-font" class="modal-select" style="width:110px;margin-left:8px;"><option value="Inter">Inter</option><option value="Arial">Arial</option><option value="Segoe UI">Segoe UI</option><option value="Fira Mono">Fira Mono</option><option value="Roboto">Roboto</option><option value="Times New Roman">Times New Roman</option></select></label></div>
-              <div class="modal-row"><label class="modal-label" data-tooltip="Font size for subtitle text">Font Size <input id="sub-title-size" class="modal-input" type="number" min="8" max="32" value="25" style="width:80px;margin-left:8px;"></label></div>
-              <div class="modal-row"><label class="modal-label" data-tooltip="Font weight for subtitle text">Font Weight <select id="sub-title-weight" class="modal-select" style="width:90px;margin-left:8px;">
+              <div class="modal-row"><label class="modal-label" data-tooltip="Font family for subtitle text">Font <select id="sub-title-font" class="modal-select"><option value="Inter">Inter</option><option value="Arial">Arial</option><option value="Segoe UI">Segoe UI</option><option value="Fira Mono">Fira Mono</option><option value="Roboto">Roboto</option><option value="Times New Roman">Times New Roman</option></select></label></div>
+              <div class="modal-row"><label class="modal-label" data-tooltip="Font size for subtitle text">Font Size <input id="sub-title-size" class="modal-input" type="number" min="8" max="32" value="25" style="width:80px;"></label></div>
+              <div class="modal-row"><label class="modal-label" data-tooltip="Font weight for subtitle text">Font Weight <select id="sub-title-weight" class="modal-select">
                 <option value="Regular">Regular</option>
                 <option value="Bold">Bold</option>
                 <option value="Semi Bold">Semi Bold</option>
               </select></label></div>
-              <div class="modal-row"><label class="modal-label" data-tooltip="Text color for subtitle text">Color <input id="sub-title-color" class="modal-input" type="color" value="#000000" style="margin-left:8px;"></label></div>
-              <div class="modal-row"><label class="modal-label" data-tooltip="Indentation for subtitle text from the left edge">Indent <input id="sub-indent" class="modal-input" type="number" min="0" max="80" value="24" style="width:80px;margin-left:8px;"> px</label></div>
+              <div class="modal-row"><label class="modal-label" data-tooltip="Text color for subtitle text">Color <input id="sub-title-color" class="modal-input" type="color" value="#000000"></label></div>
+              <div class="modal-row"><label class="modal-label" data-tooltip="Indentation for subtitle text from the left edge">Indent <input id="sub-indent" class="modal-input" type="number" min="0" max="80" value="24" style="width:80px;"> px</label></div>
               <!-- Subtitle Slide Number Controls -->
               <div class="modal-row" style="font-weight:700;margin-top:14px;">Subtitle Slide Number</div>
-              <div class="modal-row"><label class="modal-label" data-tooltip="Font family for slide numbers next to subtitles">Font <select id="sub-number-font" class="modal-select" style="width:110px;margin-left:8px;"><option value="Inter">Inter</option><option value="Arial">Arial</option><option value="Segoe UI">Segoe UI</option><option value="Fira Mono">Fira Mono</option><option value="Roboto">Roboto</option><option value="Times New Roman">Times New Roman</option></select></label></div>
-              <div class="modal-row"><label class="modal-label" data-tooltip="Font size for slide numbers next to subtitles">Font Size <input id="sub-number-size" class="modal-input" type="number" min="8" max="64" value="18" style="width:80px;margin-left:8px;"></label></div>
-              <div class="modal-row"><label class="modal-label" data-tooltip="Font weight for slide numbers next to subtitles">Font Weight <select id="sub-number-weight" class="modal-select" style="width:90px;margin-left:8px;"><option value="Bold">Bold</option><option value="Regular">Regular</option></select></label></div>
-              <div class="modal-row"><label class="modal-label" data-tooltip="Text color for slide numbers next to subtitles">Color <input id="sub-number-color" class="modal-input" type="color" value="#000000" style="margin-left:8px;"></label></div>
-              <div class="modal-row"><label class="modal-label" data-tooltip="Remove leading zeros from subtitle slide numbers (e.g., 01 becomes 1)"><input id="sub-number-leading-zero" type="checkbox" style="margin-right:8px;" checked> Remove leading zero</label></div>
+              <div class="modal-row"><label class="modal-label" data-tooltip="Font family for slide numbers next to subtitles">Font <select id="sub-number-font" class="modal-select"><option value="Inter">Inter</option><option value="Arial">Arial</option><option value="Segoe UI">Segoe UI</option><option value="Fira Mono">Fira Mono</option><option value="Roboto">Roboto</option><option value="Times New Roman">Times New Roman</option></select></label></div>
+              <div class="modal-row"><label class="modal-label" data-tooltip="Font size for slide numbers next to subtitles">Font Size <input id="sub-number-size" class="modal-input" type="number" min="8" max="64" value="18" style="width:80px;"></label></div>
+              <div class="modal-row"><label class="modal-label" data-tooltip="Font weight for slide numbers next to subtitles">Font Weight <select id="sub-number-weight" class="modal-select"><option value="Bold">Bold</option><option value="Regular">Regular</option></select></label></div>
+              <div class="modal-row"><label class="modal-label" data-tooltip="Text color for slide numbers next to subtitles">Color <input id="sub-number-color" class="modal-input" type="color" value="#000000"></label></div>
+              <div class="modal-row"><label class="modal-label" data-tooltip="Remove leading zeros from subtitle slide numbers (e.g., 01 becomes 1)"><input id="sub-number-leading-zero" type="checkbox" style="margin-right:8px;accent-color:var(--primary);" checked> Remove leading zero</label></div>
             </div>
           </div>
 
