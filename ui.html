@@ -1043,6 +1043,17 @@
       flex: 1;
       min-height: 0;
       overflow: hidden;
+      /* Keep hidden to allow internal components to scroll independently */
+    }
+
+    #toc-editor {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      /* Ensure the TOC listing itself is scrollable */
+      padding-bottom: 20px;
     }
 
     @keyframes fadeIn {
@@ -1381,24 +1392,17 @@
       </div>
     </div>
 
-    <!-- Professional Trial Status Bar -->
+    <!-- Compact Trial Status Bar -->
     <div id="trial-status-bar"
-      style="position:fixed;bottom:0;left:0;right:0;background:linear-gradient(135deg,#2563eb,#1d4ed8);color:#fff;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;z-index:99999;font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;font-size:13px;font-weight:600;border-top:2px solid rgba(255,255,255,0.1);min-height:40px;max-height:40px;backdrop-filter:blur(10px);box-shadow:0 -4px 12px rgba(37,99,235,0.3);">
-      <div style="display:flex;align-items:center;gap:8px;">
-        <span id="trial-status-text" style="color:#fff;font-weight:700;font-size:13px;">Free Trial Active</span>
-        <span id="trial-countdown" style="color:#fbbf24;margin-left:8px;font-weight:600;font-size:12px;">30d 0h 0m 0s
-          left</span>
+      style="position:fixed;bottom:0;left:0;right:0;background:rgba(30,30,36,0.95);color:#94a3b8;padding:4px 12px;display:flex;justify-content:space-between;align-items:center;z-index:99999;font-family:'Inter',sans-serif;font-size:10px;font-weight:600;border-top:1px solid rgba(255,255,255,0.1);height:24px;backdrop-filter:blur(8px);">
+      <div style="display:flex;align-items:center;gap:6px;">
+        <span id="trial-status-text" style="color:#e2e8f0;font-weight:700;">TRIAL ACTIVE</span>
+        <span id="trial-countdown" style="color:#fbbf24;font-weight:600;">--d --h --m --s</span>
       </div>
-      <div style="display:flex;align-items:center;gap:8px;">
-        <button id="upgrade-now-btn"
-          style="background:#fff;color:#2563eb;border:none;border-radius:20px;padding:6px 16px;font-size:11px;font-weight:700;cursor:pointer;transition:all 0.2s;box-shadow:0 2px 8px rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.5px;z-index:100000;"
-          onclick="console.log('Direct onclick test');">
-          Upgrade Now
-        </button>
-        <!-- Help button removed as requested -->
-        <!-- Test buttons removed for production -->
-
-      </div>
+      <button id="upgrade-now-btn"
+        style="background:#2563eb;color:#fff;border:none;border-radius:4px;padding:2px 8px;font-size:9px;font-weight:700;cursor:pointer;text-transform:uppercase;letter-spacing:0.5px;">
+        UPGRADE
+      </button>
     </div>
 
     <!-- Gumroad Integration -->
@@ -1655,10 +1659,11 @@
 
     /* Adjust main content to account for fixed trial bar */
     .plugin-ui {
-      padding-bottom: 60px;
+      padding-bottom: 30px;
+      /* Reduced to match compact trial bar */
     }
 
-    /* Super Minimal Modern Trial Status Bar */
+    /* Compact Modern Trial Status Bar */
     #trial-status-bar {
       display: flex !important;
       position: fixed !important;
@@ -1668,16 +1673,19 @@
       z-index: 9999 !important;
       visibility: visible !important;
       opacity: 1 !important;
-      background: rgba(255, 255, 255, 0.02) !important;
-      border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
-      padding: 8px 16px !important;
-      min-height: 30px !important;
-      max-height: 30px !important;
-      box-shadow: none !important;
-      font-size: 13px !important;
+      background: rgba(17, 17, 21, 0.98) !important;
+      border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+      padding: 0 12px !important;
+      height: 24px !important;
+      min-height: 24px !important;
+      max-height: 24px !important;
+      box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3) !important;
+      font-size: 10px !important;
       font-weight: 600 !important;
       color: #94a3b8 !important;
-      backdrop-filter: blur(10px) !important;
+      backdrop-filter: blur(12px) !important;
+      align-items: center !important;
+      justify-content: space-between !important;
     }
 
     /* Hide trial bar completely for premium users */
@@ -2069,7 +2077,7 @@
         if (remaining.days === 0 && remaining.hours === 0 && remaining.minutes === 0 && remaining.seconds === 0) {
           // Trial just expired
           trialState.isTrialActive = false;
-          if (trialStatusText) trialStatusText.textContent = '😔 Trial Expired';
+          if (trialStatusText) trialStatusText.textContent = 'EXPIRED';
           updateTrialStatusBar();
           return;
         }
@@ -2077,26 +2085,26 @@
         // Update status text and styling based on remaining time
         if (remaining.days <= 3 && remaining.days > 0) {
           // Trial ending soon - show warning styling
-          if (trialStatusText) trialStatusText.textContent = 'Trial Ending Soon';
+          if (trialStatusText) trialStatusText.textContent = 'ENDING SOON';
           if (trialStatusBar) {
-            trialStatusBar.style.background = 'linear-gradient(135deg,#f59e0b,#d97706)';
-            trialStatusBar.style.boxShadow = '0 -4px 12px rgba(245,158,11,0.3)';
+            trialStatusBar.style.background = 'rgba(245,158,11,0.95)';
+            trialStatusBar.style.boxShadow = 'none';
           }
           if (trialCountdown) trialCountdown.style.color = '#fff';
         } else if (remaining.days <= 1) {
           // Last day - urgent warning
-          if (trialStatusText) trialStatusText.textContent = 'Trial Ending Today';
+          if (trialStatusText) trialStatusText.textContent = 'LAST DAY';
           if (trialStatusBar) {
-            trialStatusBar.style.background = 'linear-gradient(135deg,#f59e0b,#d97706)';
-            trialStatusBar.style.boxShadow = '0 -4px 12px rgba(245,158,11,0.4)';
+            trialStatusBar.style.background = 'rgba(239,68,68,0.95)';
+            trialStatusBar.style.boxShadow = 'none';
           }
           if (trialCountdown) trialCountdown.style.color = '#fff';
         } else {
-          // Normal trial - show active styling with celebration emoji
-          if (trialStatusText) trialStatusText.textContent = '🎉 Free Trial Active';
+          // Normal trial - show active styling
+          if (trialStatusText) trialStatusText.textContent = 'TRIAL ACTIVE';
           if (trialStatusBar) {
-            trialStatusBar.style.background = 'linear-gradient(135deg,#2563eb,#1d4ed8)';
-            trialStatusBar.style.boxShadow = '0 -4px 12px rgba(37,99,235,0.3)';
+            trialStatusBar.style.background = 'rgba(37,99,235,0.95)';
+            trialStatusBar.style.boxShadow = 'none';
           }
           if (trialCountdown) trialCountdown.style.color = '#fbbf24';
         }
@@ -3434,32 +3442,17 @@
           trialStatusBar.style.left = '0';
           trialStatusBar.style.right = '0';
           trialStatusBar.style.zIndex = '99999';
-          trialStatusBar.style.background = '#2563eb';
-          trialStatusBar.style.color = '#fff';
-          trialStatusBar.style.padding = '0px 8px';
-          trialStatusBar.style.fontFamily = "'Inter', -apple-system, BlinkMacSystemFont, sans-serif";
-          trialStatusBar.style.fontSize = '9px';
-          trialStatusBar.style.fontWeight = '500';
-          trialStatusBar.style.background = 'rgba(59, 130, 246, 0.08)';
-          trialStatusBar.style.color = '#64748b';
-          trialStatusBar.style.borderTop = '1px solid rgba(100, 116, 139, 0.2)';
-          trialStatusBar.style.minHeight = '6px';
-          trialStatusBar.style.maxHeight = '6px';
+          trialStatusBar.style.height = '24px';
+          trialStatusBar.style.minHeight = '24px';
+          trialStatusBar.style.maxHeight = '24px';
+          trialStatusBar.style.padding = '0 12px';
+          trialStatusBar.style.background = 'rgba(17, 17, 21, 0.98)';
+          trialStatusBar.style.borderTop = '1px solid rgba(255, 255, 255, 0.1)';
 
           // Set default trial content
           if (trialStatusText) {
-            trialStatusText.textContent = 'FREE TRIAL ACTIVE';
+            trialStatusText.textContent = 'TRIAL ACTIVE';
           }
-          if (trialCountdown) {
-            trialCountdown.textContent = '30d 0h 0m 0s left';
-          }
-
-          // Force it to be visible even if CSS is overridden
-          setTimeout(() => {
-            trialStatusBar.style.display = 'flex !important';
-            trialStatusBar.style.visibility = 'visible !important';
-            trialStatusBar.style.opacity = '1 !important';
-          }, 100);
         }
       }
 
@@ -4123,6 +4116,11 @@
 
       function renderTOCControls() {
         tocEditor.innerHTML = '';
+        tocEditor.style.display = 'flex';
+        tocEditor.style.flexDirection = 'column';
+        tocEditor.style.height = '100%';
+        tocEditor.style.minHeight = '0';
+
         // --- TOC Controls Layout ---
         const buttonRow = document.createElement('div');
         buttonRow.style.display = 'flex';
@@ -4471,6 +4469,10 @@
         listDiv.style.display = 'flex';
         listDiv.style.flexDirection = 'column';
         listDiv.style.gap = '2px'; // Make slides closer
+        listDiv.style.flex = '1';
+        listDiv.style.minHeight = '0';
+        listDiv.style.overflowY = 'auto';
+        listDiv.style.paddingRight = '4px'; // Space for scrollbar
         renderTOCTree(slides, listDiv, 0);
         if (slides.length === 0) {
           const emptyDiv = document.createElement('div');
