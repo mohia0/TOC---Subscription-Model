@@ -490,23 +490,24 @@
 
     /* Modal Styles - Super Modern Dark Mode */
     .modal {
-      background: rgba(30, 30, 36, 0.85);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
+      background: rgba(26, 26, 30, 0.95);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
       color: var(--text-main);
-      border-radius: 20px;
-      box-shadow: 0 24px 48px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      padding: 32px;
-      min-width: 600px;
-      max-width: 90vw;
+      border-radius: 16px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 24px;
+      width: 100%;
+      max-width: 440px;
       max-height: 85vh;
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 16px;
       position: relative;
       font-family: var(--font-family);
       overflow-y: auto;
+      box-sizing: border-box;
     }
 
     .modal-title {
@@ -545,7 +546,7 @@
     .modal-select:focus {
       border: 1px solid var(--primary);
       background: rgba(0, 0, 0, 0.3);
-      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.2);
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
       outline: none;
     }
 
@@ -698,7 +699,7 @@
       .modal-preview-col {
         min-width: 0;
         width: 100%;
-        flex: 1 1 0;
+        flex: 1 1 100%;
       }
 
       .modal-preview {
@@ -820,7 +821,7 @@
     @media (max-width: 1100px) {
       .modal {
         min-width: 0;
-        padding: 24px 8vw 24px 8vw;
+        padding: 24px 20px;
       }
     }
 
@@ -1189,7 +1190,7 @@
 
     <!-- License Activation Modal (Hidden by default, only shown via upgrade button) -->
     <div id="license-modal-bg" class="modal-bg" style="display:none;">
-      <div class="modal" style="min-width:400px;">
+      <div class="modal">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
           <div class="modal-title">🔑 Activate License</div>
           <button class="modal-close-x" id="close-license-modal" aria-label="Close"
@@ -1260,10 +1261,8 @@
   </div>
 
   <!-- Help Popup Modal -->
-  <div id="help-modal"
-    style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);z-index:99999;display:none;justify-content:center;align-items:center;font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;overflow:hidden;">
-    <div
-      style="background:linear-gradient(135deg,#1e293b,#334155);border-radius:20px;padding:40px;text-align:center;width:500px;max-height:600px;box-shadow:0 20px 40px rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.1);overflow-y:auto;">
+  <div id="help-modal" class="modal-bg" style="z-index:99999;">
+    <div class="modal" style="text-align:center;">
       <div style="font-size:48px;margin-bottom:20px;">💡</div>
       <h2 style="color:#f8fafc;font-size:24px;font-weight:700;margin-bottom:10px;">TOC Plugin Guide</h2>
 
@@ -1426,10 +1425,8 @@
   </div>
 
   <!-- Premium Subscription Modal -->
-  <div id="premium-modal"
-    style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);z-index:99999;display:none;justify-content:center;align-items:center;font-family:'Inter',-apple-system,BlinkMacSystemFont,sans-serif;overflow:hidden;">
-    <div
-      style="background:linear-gradient(135deg,#1e293b,#334155);border-radius:20px;padding:40px;text-align:center;width:450px;max-height:500px;box-shadow:0 20px 40px rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.1);overflow-y:auto;">
+  <div id="premium-modal" class="modal-bg" style="z-index:99999;">
+    <div class="modal" style="text-align:center;">
       <div style="font-size:48px;margin-bottom:20px;">⭐</div>
       <h2 style="color:#f8fafc;font-size:24px;font-weight:700;margin-bottom:10px;">Premium Subscription</h2>
 
@@ -4113,9 +4110,6 @@
         layoutPanel = document.createElement('div');
         layoutPanel.id = 'toc-layout-popup';
         layoutPanel.className = 'modal';
-        layoutPanel.style.minWidth = '480px';
-        layoutPanel.style.maxWidth = '75vw';
-        layoutPanel.style.width = '100%';
         layoutPanel.style.maxHeight = '80vh';
         layoutPanel.style.overflowY = 'auto';
         layoutPanel.style.margin = '0 20px';
@@ -4353,9 +4347,6 @@
         advPanel = document.createElement('div');
         advPanel.id = 'advanced-toc-style-popup';
         advPanel.className = 'modal';
-        advPanel.style.minWidth = '480px';
-        advPanel.style.maxWidth = '75vw';
-        advPanel.style.width = '100%';
         advPanel.style.maxHeight = '80vh';
         advPanel.style.overflowY = 'auto';
         advPanel.style.margin = '0 20px';
