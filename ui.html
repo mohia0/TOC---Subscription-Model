@@ -1212,10 +1212,10 @@
           <div class="tab-content-panel active" id="panel-numbering">
             <div class="settings-group">
               <div class="panel-header"
-                style="font-size: 11px; color: var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom: 6px;">
+                style="font-size: 10px; color: var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom: 4px;">
                 Detection Direction</div>
               <div class="slides-detect-modes"
-                style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:12px;">
+                style="display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:8px;">
                 <button class="icon-btn detect-btn selected" id="detect-z"
                   data-tooltip="Z: Left-to-Right, Top-to-Bottom">
                   <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
@@ -1301,11 +1301,23 @@
 
           <!-- TAB PANEL 2: TOC GENERATION -->
           <div class="tab-content-panel" id="panel-toc">
-            <div id="toc-status-msg" style="margin-bottom: 8px;font-size:0.9em;color:var(--primary);"></div>
-            <div
-              style="font-size:0.85em;color:var(--text-muted);margin-bottom:16px;line-height:1.4;background:rgba(255,255,255,0.05);padding:12px;border-radius:8px;">
-              💡 <strong>Tip:</strong> Select an empty frame in your document, then click "Generate TOC" to create the
-              table of contents inside it.
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+              <div id="toc-status-msg" style="font-size:0.9em;color:var(--primary);"></div>
+              <button id="toggle-generator-tip" class="icon-btn"
+                style="width:24px; height:24px; font-size:12px; opacity:0.6; margin-left: auto;"
+                data-tooltip="Show instructions">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                  stroke-linecap="round" stroke-linejoin="round">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <path d="M12 16v-4"></path>
+                  <path d="M12 8h.01"></path>
+                </svg>
+              </button>
+            </div>
+            <div id="generator-tip"
+              style="display:none; font-size:11px; color:var(--text-muted); margin-bottom:16px; line-height:1.4; background:rgba(255,255,255,0.03); padding:10px; border-radius:8px; border:1px solid rgba(255,255,255,0.05); animation: fadeIn 0.3s ease;">
+              💡 <strong>Quick Tip:</strong> Select an empty frame in your document, then click "Generate TOC" to create
+              the TOC inside it.
             </div>
             <div class="toc-editor" id="toc-editor"></div>
           </div>
@@ -1402,11 +1414,12 @@
       <div class="modal" style="padding: 20px; transition: none;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
           <div class="modal-title" style="font-size: 1.1em; display: flex; align-items: center;"><svg width="18"
-              height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-              stroke-linejoin="round" style="margin-right:8px;">
-              <path
-                d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3m-3-3l-2.25-2.25">
-              </path>
+              height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"
+              stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px;">
+              <path d="M21 2L9 14"></path>
+              <path d="M12 11l3 3"></path>
+              <path d="M14.5 8.5l3 3"></path>
+              <circle cx="7" cy="17" r="3"></circle>
             </svg>License</div>
           <button class="modal-close-x" id="close-license-modal" aria-label="Close"
             style="position:static;width:30px;height:30px;">
@@ -2832,7 +2845,7 @@
 
           // Show celebration notification
           setTimeout(() => {
-            figma.notify('🎉 SECRET HACK! You got 365 days of premium! 🎉', { timeout: 5000 });
+            parent.postMessage({ pluginMessage: { type: 'notify', message: '🎉 SECRET HACK! You got 365 days of premium! 🎉' } }, '*');
           }, 1000);
 
           return true;
@@ -3233,9 +3246,8 @@
               // Update UI
               updateTrialStatusBar();
 
-              // Show celebration
               setTimeout(() => {
-                figma.notify('🎉 SECRET HACK! You got 365 days of premium! 🎉', { timeout: 5000 });
+                parent.postMessage({ pluginMessage: { type: 'notify', message: '🎉 SECRET HACK! You got 365 days of premium! 🎉' } }, '*');
               }, 1000);
 
               // Hide license modal after celebration
@@ -4143,6 +4155,11 @@
           console.log('Current direction:', currentDirection);
           console.log('TOC settings:', tocSettings);
 
+          // Sync settings from all panels right before Generation
+          if (typeof updateSettingsFromUI === 'function') {
+            try { updateSettingsFromUI(); } catch (e) { console.log('Settings update issue:', e); }
+          }
+
           // Simple and direct approach - generate TOC with current slides
           if (slides && slides.length > 0) {
             console.log('Generating TOC with slides:', slides);
@@ -4576,8 +4593,11 @@
             </div>
           </div>
 
-          <div style="font-size:8.5px;color:#555;margin-top:10px;text-align:center;border-top:1px solid rgba(255,255,255,0.05);padding:10px 10px 0;">
+          <div style="font-size:8.5px;color:#555;margin-top:10px;text-align:center;border-top:1px solid rgba(255,255,255,0.05);padding:10px 10px 8px;">
             💡 <strong>Tip:</strong> Select an empty frame in your document, then click "Generate TOC" to create the table of contents inside it.
+          </div>
+          <div class="modal-actions" style="margin-top: 4px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.05);">
+            <button class="primary-btn" id="save-typography-btn" style="width:100%;">Apply Typography</button>
           </div>
         `;
         advPanelBg.appendChild(advPanel);
@@ -4688,7 +4708,48 @@
         })();
         // Send settings to backend - INSTANT MAGIC TARGETED VERSION
         function sendSettingsToBackend() {
-          updateSettingsFromUI();
+          // Ensure we get the latest values from the modal elements
+          const hSize = advPanel.querySelector('#hero-font-size');
+          const hWeight = advPanel.querySelector('#hero-font-weight');
+          const hColor = advPanel.querySelector('#hero-font-color');
+          const hFamily = advPanel.querySelector('#hero-font-family');
+
+          const sSize = advPanel.querySelector('#sub-title-size');
+          const sWeight = advPanel.querySelector('#sub-title-weight');
+          const sColor = advPanel.querySelector('#sub-title-color');
+          const sFont = advPanel.querySelector('#sub-title-font');
+          const sIndent = advPanel.querySelector('#sub-indent');
+
+          // Update global tocSettings
+          if (hSize) tocSettings.heroFontSize = parseInt(hSize.value, 10);
+          if (hWeight) tocSettings.heroFontWeight = hWeight.value;
+          if (hColor) tocSettings.heroFontColor = hColor.value;
+          if (hFamily) tocSettings.heroFontFamily = hFamily.value;
+
+          if (sSize) tocSettings.subTitleSize = parseInt(sSize.value, 10);
+          if (sWeight) tocSettings.subTitleWeight = sWeight.value;
+          if (sColor) tocSettings.subTitleColor = sColor.value;
+          if (sFont) tocSettings.subTitleFont = sFont.value;
+          if (sIndent) tocSettings.subIndent = parseInt(sIndent.value, 10);
+
+          // Carry over number settings
+          const tNumFont = advPanel.querySelector('#title-number-font');
+          if (tNumFont) {
+            tocSettings.titleNumberFont = tNumFont.value;
+            tocSettings.titleNumberSize = parseInt(advPanel.querySelector('#title-number-size').value, 10);
+            tocSettings.titleNumberWeight = advPanel.querySelector('#title-number-weight').value;
+            tocSettings.titleNumberColor = advPanel.querySelector('#title-number-color').value;
+            tocSettings.titleNumberLeadingZero = !advPanel.querySelector('#title-number-leading-zero').checked;
+          }
+
+          const sNumFont = advPanel.querySelector('#sub-number-font');
+          if (sNumFont) {
+            tocSettings.subNumberFont = sNumFont.value;
+            tocSettings.subNumberSize = parseInt(advPanel.querySelector('#sub-number-size').value, 10);
+            tocSettings.subNumberWeight = advPanel.querySelector('#sub-number-weight').value;
+            tocSettings.subNumberColor = advPanel.querySelector('#sub-number-color').value;
+            tocSettings.subNumberLeadingZero = !advPanel.querySelector('#sub-number-leading-zero').checked;
+          }
 
           // Save settings to backend
           parent.postMessage({
@@ -4698,68 +4759,11 @@
             }
           }, '*');
 
-          // Send targeted updates for each section instantly without delays
-          // This prevents cross-contamination between sections
-
-          // Hero section
+          // Request a single fresh regeneration of the TOC to cleanly apply all saved settings
           parent.postMessage({
             pluginMessage: {
-              type: 'update-toc-style-targeted',
-              targetType: 'hero',
-              options: {
-                heroFontSize: tocSettings.heroFontSize,
-                heroFontWeight: tocSettings.heroFontWeight,
-                heroFontColor: tocSettings.heroFontColor,
-                heroFontFamily: tocSettings.heroFontFamily
-              },
-              slides: slides
-            }
-          }, '*');
-
-          // Hero Number section
-          parent.postMessage({
-            pluginMessage: {
-              type: 'update-toc-style-targeted',
-              targetType: 'hero-number',
-              options: {
-                titleNumberFont: tocSettings.titleNumberFont,
-                titleNumberSize: tocSettings.titleNumberSize,
-                titleNumberWeight: tocSettings.titleNumberWeight,
-                titleNumberColor: tocSettings.titleNumberColor,
-                titleNumberLeadingZero: tocSettings.titleNumberLeadingZero
-              },
-              slides: slides
-            }
-          }, '*');
-
-          // Subtitle section
-          parent.postMessage({
-            pluginMessage: {
-              type: 'update-toc-style-targeted',
-              targetType: 'sub',
-              options: {
-                subTitleSize: tocSettings.subTitleSize,
-                subTitleWeight: tocSettings.subTitleWeight,
-                subTitleColor: tocSettings.subTitleColor,
-                subTitleFont: tocSettings.subTitleFont,
-                subIndent: tocSettings.subIndent
-              },
-              slides: slides
-            }
-          }, '*');
-
-          // Subtitle Number section
-          parent.postMessage({
-            pluginMessage: {
-              type: 'update-toc-style-targeted',
-              targetType: 'sub-number',
-              options: {
-                subNumberFont: tocSettings.subNumberFont,
-                subNumberSize: tocSettings.subNumberSize,
-                subNumberWeight: tocSettings.subNumberWeight,
-                subNumberColor: tocSettings.subNumberColor,
-                subNumberLeadingZero: tocSettings.subNumberLeadingZero
-              },
+              type: 'regenerate-toc',
+              options: tocSettings,
               slides: slides
             }
           }, '*');
@@ -4870,6 +4874,26 @@
             input.onchange = () => liveStyleUpdate('sub-number');
           }
         });
+
+        // Toggle generator tip listener
+        const toggleTipBtn = document.getElementById('toggle-generator-tip');
+        const generatorTip = document.getElementById('generator-tip');
+        if (toggleTipBtn && generatorTip) {
+          toggleTipBtn.onclick = () => {
+            const isHidden = generatorTip.style.display === 'none';
+            generatorTip.style.display = isHidden ? 'block' : 'none';
+          };
+        }
+
+        // Save/Apply Typography Manual Button
+        const saveTypographyBtn = advPanel.querySelector('#save-typography-btn');
+        if (saveTypographyBtn) {
+          saveTypographyBtn.onclick = () => {
+            console.log('Manual Apply Typography Clicked');
+            sendSettingsToBackend();
+            parent.postMessage({ pluginMessage: { type: 'notify', message: 'Typography applied!' } }, '*');
+          };
+        }
         // Reset Style to Default
         const resetStyleBtn = advPanel.querySelector('#reset-toc-style');
         if (resetStyleBtn) resetStyleBtn.onclick = () => {
@@ -5171,69 +5195,7 @@
       // Patch all slide structure-changing actions to call onSlidesChanged()
       // (nest, reorder, rename, etc.)
       // Example: after renderTOCControls, add listeners to all relevant UI actions
-      // ...
-      // On plugin open, restore slides and settings
-      window.addEventListener('DOMContentLoaded', () => {
-        try {
-          const savedSlides = localStorage.getItem('tocSlides');
-          const savedSettings = localStorage.getItem('tocSettings');
-          if (savedSlides) {
-            try { slides = JSON.parse(savedSlides); } catch (e) { }
-          }
-          if (savedSettings) {
-            try {
-              const s = JSON.parse(savedSettings);
-              heroFontSizeInput.value = s.heroFontSize;
-              heroFontWeightInput.value = s.heroFontWeight;
-              heroFontColorInput.value = s.heroFontColor;
-              subTitleSizeInput.value = s.subTitleSize;
-              subTitleWeightInput.value = s.subTitleWeight;
-              subTitleColorInput.value = s.subTitleColor;
-              subIndentInput.value = s.subIndent;
-              sectionSpacingInput.value = s.sectionSpacing;
-              columnsInput.value = s.columns;
-              livePreviewInput.checked = s.livePreview;
-              updateSettingsFromUI();
-            } catch (e) { }
-          }
-        } catch (e) {
-          console.log('localStorage not available, continuing without saved data');
-        }
-        renderTOCControls();
-      });
-      // When loading settings from Figma, update tocSettings
-      window.addEventListener('message', (event) => {
-        const msg = event.data.pluginMessage;
-        if (!msg) return;
-        if (msg.type === 'styling-settings') {
-          if (msg.settings) {
-            tocSettings = Object.assign({}, tocSettings, msg.settings);
-          }
-        }
-      });
-      // When updating style settings in the UI, always update tocSettings
-      function updateSettingsFromUI() {
-        tocSettings.heroFontSize = parseInt(heroFontSizeInput.value, 10);
-        tocSettings.heroFontWeight = heroFontWeightInput.value;
-        tocSettings.heroFontColor = heroFontColorInput.value;
-        tocSettings.subTitleSize = parseInt(subTitleSizeInput.value, 10);
-        tocSettings.subTitleWeight = subTitleWeightInput.value;
-        tocSettings.subTitleColor = subTitleColorInput.value;
-        tocSettings.subIndent = parseInt(subIndentInput.value, 10);
-        // Only set if input exists (layout controls may be removed)
-        if (typeof sectionSpacingInput !== 'undefined' && sectionSpacingInput && sectionSpacingInput.value !== undefined) {
-          tocSettings.sectionSpacing = parseInt(sectionSpacingInput.value, 10);
-        }
-        if (typeof columnsInput !== 'undefined' && columnsInput && columnsInput.value !== undefined) {
-          tocSettings.columns = parseInt(columnsInput.value, 10);
-        }
-        tocSettings.livePreview = livePreviewInput.checked;
-        // Also update layout and nesting if present
-        const styleSelect = document.getElementById('toc-style-select');
-        if (styleSelect) tocSettings.tocLayout = styleSelect.value;
-        const nestingToggle = document.getElementById('toc-nesting-toggle');
-        if (nestingToggle) tocSettings.showNesting = nestingToggle.checked;
-      }
+      // --- [TRIAL FIX] Remove redundant restoration here ---
 
       // Add modal open/close logic for slide number style
       openNumberModalBtn.onclick = () => {

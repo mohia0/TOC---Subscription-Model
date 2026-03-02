@@ -968,9 +968,20 @@ async function generateTOCFrame(slides, options, startFrameId) {
   async function loadFontIfNeeded(family, style) {
     const key = family + '__' + style;
     if (!loadedFonts.has(key)) {
-      await figma.loadFontAsync({ family: family, style: style });
-      loadedFonts.add(key);
+      try {
+        await figma.loadFontAsync({ family: family, style: style });
+        loadedFonts.add(key);
+        return { family, style };
+      } catch (e) {
+        console.warn(`Could not load font ${family} ${style}, falling back to Inter Regular`);
+        try {
+          await figma.loadFontAsync({ family: 'Inter', style: 'Regular' });
+          loadedFonts.add('Inter__Regular');
+        } catch (e2) { } // Should be safe
+        return { family: 'Inter', style: 'Regular' };
+      }
     }
+    return { family, style };
   }
   // --- Only Layout: Two-Column Grid ---
   async function buildMultiColTOC(slides, parentFrame) {
@@ -1181,15 +1192,15 @@ async function generateTOCFrame(slides, options, startFrameId) {
           const numPos = tocStyle.titleNumberPos || 'left';
           const numLeadingZero = !!tocStyle.titleNumberLeadingZero;
 
-          await loadFontIfNeeded(numFont, numFontWeight);
+          const safeNumFont = await loadFontIfNeeded(numFont, numFontWeight);
           const numText = figma.createText();
           // Use the original slide number from the UI
           let slideNumber = group.title.number;
           let numStr = numLeadingZero && slideNumber < 10 ? ('0' + slideNumber) : String(slideNumber);
           if (!numLeadingZero) numStr = String(slideNumber);
           numText.characters = numStr;
-          numText.fontSize = numFontSize;
-          numText.fontName = { family: numFont, style: numFontWeight };
+          numText.fontSize = numFontSize || 18;
+          numText.fontName = safeNumFont;
           numText.fills = [{ type: 'SOLID', color: numColor }];
           numText.textAutoResize = 'WIDTH_AND_HEIGHT';
           numText.textAlignHorizontal = 'RIGHT';
@@ -1198,11 +1209,11 @@ async function generateTOCFrame(slides, options, startFrameId) {
           // Title text node
           const nameFont = tocStyle.heroFontFamily || 'Inter';
           const nameFontStyle = mapFontWeight(heroFontWeight);
-          await loadFontIfNeeded(nameFont, nameFontStyle);
+          const safeNameFont = await loadFontIfNeeded(nameFont, nameFontStyle);
           const nameText = figma.createText();
           nameText.characters = group.title.name || '[NO NAME]';
-          nameText.fontSize = heroFontSize;
-          nameText.fontName = { family: nameFont, style: nameFontStyle };
+          nameText.fontSize = heroFontSize || 18;
+          nameText.fontName = safeNameFont;
           nameText.fills = [{ type: 'SOLID', color: tocStyle.heroFontColor ? hexToRgb(tocStyle.heroFontColor) : { r: 0, g: 0, b: 0 } }];
           nameText.textAutoResize = 'WIDTH_AND_HEIGHT';
           nameText.textAlignHorizontal = 'LEFT';
@@ -1244,15 +1255,15 @@ async function generateTOCFrame(slides, options, startFrameId) {
             const subNumPos = tocStyle.subNumberPos || 'left';
             const subNumLeadingZero = !!tocStyle.subNumberLeadingZero;
 
-            await loadFontIfNeeded(subNumFont, subNumFontWeight);
+            const safeSubNumFont = await loadFontIfNeeded(subNumFont, subNumFontWeight);
             const subNumText = figma.createText();
             // Use the original slide number from the UI
             let subSlideNumber = child.number;
             let subNumStr = subNumLeadingZero && subSlideNumber < 10 ? ('0' + subSlideNumber) : String(subSlideNumber);
             if (!subNumLeadingZero) subNumStr = String(subSlideNumber);
             subNumText.characters = subNumStr;
-            subNumText.fontSize = subNumFontSize;
-            subNumText.fontName = { family: subNumFont, style: subNumFontWeight };
+            subNumText.fontSize = subNumFontSize || 18;
+            subNumText.fontName = safeSubNumFont;
             subNumText.fills = [{ type: 'SOLID', color: subNumColor }];
             subNumText.textAutoResize = 'WIDTH_AND_HEIGHT';
             subNumText.textAlignHorizontal = 'RIGHT';
@@ -1261,11 +1272,11 @@ async function generateTOCFrame(slides, options, startFrameId) {
             // Subtitle text
             const subNameFont = tocStyle.subTitleFont || 'Inter';
             const subNameFontStyle = mapFontWeight(tocStyle.subTitleWeight || 'Regular');
-            await loadFontIfNeeded(subNameFont, subNameFontStyle);
+            const safeSubNameFont = await loadFontIfNeeded(subNameFont, subNameFontStyle);
             const subNameText = figma.createText();
             subNameText.characters = child.name || '[NO NAME]';
-            subNameText.fontSize = tocStyle.subTitleSize || nestedFontSize;
-            subNameText.fontName = { family: subNameFont, style: subNameFontStyle };
+            subNameText.fontSize = tocStyle.subTitleSize || nestedFontSize || 18;
+            subNameText.fontName = safeSubNameFont;
             subNameText.fills = [{ type: 'SOLID', color: tocStyle.subTitleColor ? hexToRgb(tocStyle.subTitleColor) : nestedFontColor }];
             subNameText.textAutoResize = 'WIDTH_AND_HEIGHT';
             subNameText.textAlignHorizontal = 'LEFT';
@@ -1309,15 +1320,15 @@ async function generateTOCFrame(slides, options, startFrameId) {
           const numPos = tocStyle.titleNumberPos || 'left';
           const numLeadingZero = !!tocStyle.titleNumberLeadingZero;
 
-          await loadFontIfNeeded(numFont, numFontWeight);
+          const safeNumFont = await loadFontIfNeeded(numFont, numFontWeight);
           const numText = figma.createText();
           // Use the original slide number from the UI
           let slideNumber = group.slide.number;
           let numStr = numLeadingZero && slideNumber < 10 ? ('0' + slideNumber) : String(slideNumber);
           if (!numLeadingZero) numStr = String(slideNumber);
           numText.characters = numStr;
-          numText.fontSize = numFontSize;
-          numText.fontName = { family: numFont, style: numFontWeight };
+          numText.fontSize = numFontSize || 18;
+          numText.fontName = safeNumFont;
           numText.fills = [{ type: 'SOLID', color: numColor }];
           numText.textAutoResize = 'WIDTH_AND_HEIGHT';
           numText.textAlignHorizontal = 'RIGHT';
@@ -1325,11 +1336,11 @@ async function generateTOCFrame(slides, options, startFrameId) {
 
           const nameFont = tocStyle.heroFontFamily || 'Inter';
           const nameFontStyle = mapFontWeight(heroFontWeight);
-          await loadFontIfNeeded(nameFont, nameFontStyle);
+          const safeNameFont = await loadFontIfNeeded(nameFont, nameFontStyle);
           const nameText = figma.createText();
           nameText.characters = group.slide.name || '[NO NAME]';
-          nameText.fontSize = heroFontSize;
-          nameText.fontName = { family: nameFont, style: nameFontStyle };
+          nameText.fontSize = heroFontSize || 18;
+          nameText.fontName = safeNameFont;
           nameText.fills = [{ type: 'SOLID', color: tocStyle.heroFontColor ? hexToRgb(tocStyle.heroFontColor) : { r: 0, g: 0, b: 0 } }];
           nameText.textAutoResize = 'WIDTH_AND_HEIGHT';
           nameText.textAlignHorizontal = 'LEFT';
@@ -1390,8 +1401,14 @@ async function generateTOCFrame(slides, options, startFrameId) {
   await buildMultiColTOC(tocSlides, tocRoot);
   // --- Placement logic ---
   parentFrame.appendChild(tocRoot);
-  tocRoot.x = (parentFrame.width - tocRoot.width) / 2;
-  tocRoot.y = (parentFrame.height - tocRoot.height) / 2;
+  try {
+    if (parentFrame.layoutMode === 'NONE') {
+      tocRoot.x = (parentFrame.width - tocRoot.width) / 2;
+      tocRoot.y = (parentFrame.height - tocRoot.height) / 2;
+    }
+  } catch (e) {
+    console.log('Could not set x/y on parent frame', e);
+  }
   figma.viewport.scrollAndZoomIntoView([tocRoot]);
   figma.notify('TOC generated inside selected frame!');
   await saveTOCStructure(tocSlides);
@@ -1799,6 +1816,10 @@ figma.ui.onmessage = async (msg) => {
   // Test message handlers removed for production
 
   if (msg.type === 'get-frames') {
+    if (!canUsePremiumFeatures()) {
+      figma.ui.postMessage({ type: 'slide-numbers-error', error: 'Trial expired.' });
+      return;
+    }
     // If msg.forTOC is true, filter for TOC; otherwise, show all slides
     console.log('get-frames called with forTOC:', !!msg.forTOC, 'thenGenerateTOC:', !!msg.thenGenerateTOC);
     sendFramesToUI(msg.direction, !!msg.forTOC);
@@ -1815,6 +1836,10 @@ figma.ui.onmessage = async (msg) => {
     figma.ui.postMessage({ type: 'toc-data-cleared' });
   }
   if (msg.type === 'generate-toc') {
+    if (!canUsePremiumFeatures()) {
+      figma.ui.postMessage({ type: 'toc-error', error: 'Trial expired.' });
+      return;
+    }
     const structure = getDocumentStructure();
     const tocText = generateTOC(structure, msg.options);
     await ensureFont(msg.options.fontWeight);
@@ -1832,6 +1857,11 @@ figma.ui.onmessage = async (msg) => {
     figma.closePlugin();
   }
   if (msg.type === 'add-slide-numbers') {
+    // Check trial status
+    if (!canUsePremiumFeatures()) {
+      figma.ui.postMessage({ type: 'slide-numbers-error', error: 'Trial expired. Please upgrade.' });
+      return;
+    }
     // Use direction and numberStyle from UI
     const frames = getFramesOnCurrentPage();
     // Only use visible and unlocked frames
@@ -1891,6 +1921,11 @@ figma.ui.onmessage = async (msg) => {
     }
   }
   if (msg.type === 'fix-slide-numbers') {
+    // Check trial status
+    if (!canUsePremiumFeatures()) {
+      figma.ui.postMessage({ type: 'slide-numbers-error', error: 'Trial expired. Please upgrade.' });
+      return;
+    }
     // Fix numbering by renumbering all slides sequentially (removes gaps)
     const frames = getFramesOnCurrentPage();
     // Only use visible and unlocked frames
@@ -1955,10 +1990,20 @@ figma.ui.onmessage = async (msg) => {
     }
   }
   if (msg.type === 'remove-all-numbers') {
+    // Check trial status
+    if (!canUsePremiumFeatures()) {
+      figma.ui.postMessage({ type: 'slide-numbers-error', error: 'Trial expired.' });
+      return;
+    }
     clearAllSlideNumbers();
     figma.ui.postMessage({ type: 'slide-numbers-removed' });
   }
   if (msg.type === 'start-numbering-from') {
+    // Check trial status
+    if (!canUsePremiumFeatures()) {
+      figma.ui.postMessage({ type: 'slide-numbers-error', error: 'Trial expired.' });
+      return;
+    }
     // New: Start numbering from the selected frameId
     const frames = getFramesOnCurrentPage();
     // Only use visible and unlocked frames
@@ -2080,6 +2125,9 @@ figma.ui.onmessage = async (msg) => {
     figma.ui.postMessage({ type: 'toc-settings', settings });
   }
   if (msg.type === 'update-toc-style-targeted') {
+    // Check trial status
+    if (!canUsePremiumFeatures()) return;
+
     const targetType = msg.targetType || '';
     const options = msg.options || {};
 
@@ -2087,8 +2135,9 @@ figma.ui.onmessage = async (msg) => {
     console.log('🎯 DEBUG: Options received:', options);
 
     const tocRoot = figma.currentPage.findOne(n => n.type === 'FRAME' && n.name === '__TOC_AUTO__');
+    console.log('🎯 DEBUG: tocRoot found?', !!tocRoot);
     if (!tocRoot) {
-      console.log('🎯 No TOC frame found, regenerating...');
+      console.log('🎯 No TOC frame found on current page:', figma.currentPage.name);
       // Only regenerate if the frame is missing
       figma.ui.postMessage({ type: 'regenerate-toc', options, slides: msg.slides });
       return;
@@ -2105,63 +2154,87 @@ figma.ui.onmessage = async (msg) => {
       if (node.type === 'TEXT') {
         const tocType = node.getPluginData('tocType');
 
-        // MAGIC: Only process if this node matches our target type AND has the correct tocType
+        // Match logging
         if (tocType === targetType) {
+          console.log(`✅ MATCH: Updating ${targetType} node: "${node.characters}"`);
           switch (targetType) {
             case 'hero':
-              if (options.heroFontFamily && options.heroFontWeight) {
-                await figma.loadFontAsync({ family: options.heroFontFamily, style: mapFontWeight(options.heroFontWeight) });
-                node.fontName = { family: options.heroFontFamily, style: mapFontWeight(options.heroFontWeight) };
+              try {
+                if (options.heroFontFamily && options.heroFontWeight) {
+                  const style = mapFontWeight(options.heroFontWeight);
+                  const safeNameFont = await loadFontIfNeeded(options.heroFontFamily, style);
+                  node.fontName = safeNameFont;
+                }
+              } catch (e) {
+                console.log(`⚠️ Failed to load font ${options.heroFontFamily}:`, e);
               }
               if (options.heroFontColor) node.fills = [{ type: 'SOLID', color: hexToRgb(options.heroFontColor) }];
               if (options.heroFontSize) node.fontSize = options.heroFontSize;
-              if (options.heroFontWeight && !options.heroFontFamily) node.fontName = { family: 'Inter', style: mapFontWeight(options.heroFontWeight) };
               node.textAutoResize = 'WIDTH_AND_HEIGHT';
+              console.log(`✨ Applied hero style to: "${node.characters}"`);
               break;
 
             case 'hero-number':
-              if (options.titleNumberFont) node.fontName = { family: options.titleNumberFont, style: mapFontWeight(options.titleNumberWeight) };
+              try {
+                if (options.titleNumberFont && options.titleNumberWeight) {
+                  const style = mapFontWeight(options.titleNumberWeight);
+                  const safeNumFont = await loadFontIfNeeded(options.titleNumberFont, style);
+                  node.fontName = safeNumFont;
+                }
+              } catch (e) {
+                console.log('⚠️ Failed to load hero-number font:', e);
+              }
               if (options.titleNumberColor) node.fills = [{ type: 'SOLID', color: hexToRgb(options.titleNumberColor) }];
               if (options.titleNumberSize) node.fontSize = options.titleNumberSize;
-              if (options.titleNumberWeight) node.fontName = { family: options.titleNumberFont || 'Inter', style: mapFontWeight(options.titleNumberWeight) };
               node.textAutoResize = 'WIDTH_AND_HEIGHT';
+
               // Update number text for leading zero
               var num = node.characters.replace(/^(0?\d+)$/, '$1');
               var numVal = parseInt(num, 10);
               if (!!options.titleNumberLeadingZero && numVal < 10) {
-                node.characters = numVal < 10 ? ('0' + numVal) : String(numVal);
+                node.characters = (numVal < 10 ? ('0' + numVal) : String(numVal));
               } else {
                 node.characters = String(numVal);
               }
               break;
 
             case 'sub':
-              if (options.subTitleFont && options.subTitleWeight) {
-                await figma.loadFontAsync({ family: options.subTitleFont, style: mapFontWeight(options.subTitleWeight) });
-                node.fontName = { family: options.subTitleFont, style: mapFontWeight(options.subTitleWeight) };
+              try {
+                if (options.subTitleFont && options.subTitleWeight) {
+                  const style = mapFontWeight(options.subTitleWeight);
+                  const safeSubNameFont = await loadFontIfNeeded(options.subTitleFont, style);
+                  node.fontName = safeSubNameFont;
+                }
+              } catch (e) {
+                console.log('⚠️ Failed to load subtitle font:', e);
               }
               if (options.subTitleColor) node.fills = [{ type: 'SOLID', color: hexToRgb(options.subTitleColor) }];
               if (options.subTitleSize) node.fontSize = options.subTitleSize;
-              if (options.subTitleWeight && !options.subTitleFont) node.fontName = { family: 'Inter', style: mapFontWeight(options.subTitleWeight) };
               if (typeof options.subIndent === 'number' && node.parent && node.parent.type === 'FRAME') {
-                node.parent.paddingLeft = options.subIndent * depth;
+                node.parent.paddingLeft = options.subIndent; // Fixed: No depth multiplier needed for this layout
               }
-              node.textAutoResize = 'WIDTH_AND_HEIGHT';
               break;
 
             case 'sub-number':
-              if (options.subNumberFont) node.fontName = { family: options.subNumberFont, style: mapFontWeight(options.subNumberWeight) };
+              try {
+                if (options.subNumberFont && options.subNumberWeight) {
+                  const style = mapFontWeight(options.subNumberWeight);
+                  const safeSubNumFont = await loadFontIfNeeded(options.subNumberFont, style);
+                  node.fontName = safeSubNumFont;
+                }
+              } catch (e) {
+                console.log('⚠️ Failed to load sub-number font:', e);
+              }
               if (options.subNumberColor) node.fills = [{ type: 'SOLID', color: hexToRgb(options.subNumberColor) }];
               if (options.subNumberSize) node.fontSize = options.subNumberSize;
-              if (options.subNumberWeight) node.fontName = { family: options.subNumberFont || 'Inter', style: mapFontWeight(options.subNumberWeight) };
-              node.textAutoResize = 'WIDTH_AND_HEIGHT';
+
               // Update number text for leading zero
-              var num = node.characters.replace(/^(0?\d+)$/, '$1');
-              var numVal = parseInt(num, 10);
-              if (!!options.subNumberLeadingZero && numVal < 10) {
-                node.characters = numVal < 10 ? ('0' + numVal) : String(numVal);
+              var sNum = node.characters.replace(/^(0?\d+)$/, '$1');
+              var sNumVal = parseInt(sNum, 10);
+              if (!!options.subNumberLeadingZero && sNumVal < 10) {
+                node.characters = (sNumVal < 10 ? ('0' + sNumVal) : String(sNumVal));
               } else {
-                node.characters = String(numVal);
+                node.characters = String(sNumVal);
               }
               break;
           }
@@ -2410,15 +2483,23 @@ figma.ui.onmessage = async (msg) => {
     // Regenerate the entire TOC with new settings
     const existingTOC = figma.currentPage.findOne(node => node.getPluginData && node.getPluginData('isTOCFrame') === 'true');
     if (existingTOC) {
+      const parentNode = existingTOC.parent;
       existingTOC.remove();
+      if (parentNode && parentNode.type === 'FRAME') {
+        figma.currentPage.selection = [parentNode];
+      }
     }
 
-    // Get current TOC settings
-    const currentSettings = await figma.clientStorage.getAsync('tocSettings');
+    // Get current TOC settings, prioritizing freshly sent UI options over stored settings to avoid race conditions
+    let optionsToUse = msg.options;
+    if (!optionsToUse) {
+      optionsToUse = await figma.clientStorage.getAsync('tocSettings') || {};
+    }
+
     const slides = msg.slides || [];
 
     if (slides.length > 0) {
-      await generateTOCFrame(slides, currentSettings || {});
+      await generateTOCFrame(slides, optionsToUse);
       figma.notify('TOC regenerated with new settings!');
     }
     return;
