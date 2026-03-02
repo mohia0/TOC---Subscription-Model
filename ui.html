@@ -4774,222 +4774,93 @@
           }
         }
         // Attach listeners for live update (STYLE) - MAGIC TARGETED UPDATES
-        // Hero section controls - ONLY affects hero text
+        function liveStyleUpdate(targetType) {
+          updateSettingsFromUI();
+          showTargetedUpdateFeedback(targetType);
+
+          let options = {};
+          if (targetType === 'hero') {
+            options = {
+              heroFontSize: tocSettings.heroFontSize,
+              heroFontWeight: tocSettings.heroFontWeight,
+              heroFontColor: tocSettings.heroFontColor,
+              heroFontFamily: tocSettings.heroFontFamily
+            };
+          } else if (targetType === 'hero-number') {
+            options = {
+              titleNumberFont: tocSettings.titleNumberFont,
+              titleNumberSize: tocSettings.titleNumberSize,
+              titleNumberWeight: tocSettings.titleNumberWeight,
+              titleNumberColor: tocSettings.titleNumberColor,
+              titleNumberLeadingZero: tocSettings.titleNumberLeadingZero
+            };
+          } else if (targetType === 'sub') {
+            options = {
+              subTitleSize: tocSettings.subTitleSize,
+              subTitleWeight: tocSettings.subTitleWeight,
+              subTitleColor: tocSettings.subTitleColor,
+              subTitleFont: tocSettings.subTitleFont,
+              subIndent: tocSettings.subIndent
+            };
+          } else if (targetType === 'sub-number') {
+            options = {
+              subNumberFont: tocSettings.subNumberFont,
+              subNumberSize: tocSettings.subNumberSize,
+              subNumberWeight: tocSettings.subNumberWeight,
+              subNumberColor: tocSettings.subNumberColor,
+              subNumberLeadingZero: tocSettings.subNumberLeadingZero
+            };
+          }
+
+          parent.postMessage({
+            pluginMessage: {
+              type: 'update-toc-style-targeted',
+              targetType: targetType,
+              options: options,
+              slides: slides
+            }
+          }, '*');
+
+          // Also save global settings
+          parent.postMessage({
+            pluginMessage: {
+              type: 'save-toc-settings',
+              settings: tocSettings
+            }
+          }, '*');
+        }
+
+        // Hero section controls
         [heroFontSizeInput, heroFontWeightInput, heroFontColorInput, advPanel.querySelector('#hero-font-family')].forEach(input => {
           if (input) {
-            input.addEventListener('input', () => {
-              updateSettingsFromUI();
-              showTargetedUpdateFeedback('hero');
-              parent.postMessage({
-                pluginMessage: {
-                  type: 'update-toc-style-targeted',
-                  targetType: 'hero',
-                  options: {
-                    heroFontSize: tocSettings.heroFontSize,
-                    heroFontWeight: tocSettings.heroFontWeight,
-                    heroFontColor: tocSettings.heroFontColor,
-                    heroFontFamily: tocSettings.heroFontFamily
-                  },
-                  slides: slides
-                }
-              }, '*');
-            });
-            input.addEventListener('change', () => {
-              updateSettingsFromUI();
-              showTargetedUpdateFeedback('hero');
-              parent.postMessage({
-                pluginMessage: {
-                  type: 'update-toc-style-targeted',
-                  targetType: 'hero',
-                  options: {
-                    heroFontSize: tocSettings.heroFontSize,
-                    heroFontWeight: tocSettings.heroFontWeight,
-                    heroFontColor: tocSettings.heroFontColor,
-                    heroFontFamily: tocSettings.heroFontFamily
-                  },
-                  slides: slides
-                }
-              }, '*');
-            });
-            input.addEventListener('keydown', function (e) {
-              // Allow typing in number inputs
-              if (e.key === 'Enter' || e.key === 'Tab') {
-                e.preventDefault();
-                this.blur();
-              }
-            });
+            input.oninput = () => liveStyleUpdate('hero');
+            input.onchange = () => liveStyleUpdate('hero');
           }
         });
 
-        // Hero Number section controls - ONLY affects hero numbers
+        // Hero Number section controls
         [titleNumberFontInput, titleNumberSizeInput, titleNumberWeightInput, titleNumberColorInput, titleNumberLeadingZeroInput].forEach(input => {
           if (input) {
-            input.addEventListener('input', () => {
-              updateSettingsFromUI();
-              showTargetedUpdateFeedback('hero-number');
-              parent.postMessage({
-                pluginMessage: {
-                  type: 'update-toc-style-targeted',
-                  targetType: 'hero-number',
-                  options: {
-                    titleNumberFont: tocSettings.titleNumberFont,
-                    titleNumberSize: tocSettings.titleNumberSize,
-                    titleNumberWeight: tocSettings.titleNumberWeight,
-                    titleNumberColor: tocSettings.titleNumberColor,
-                    titleNumberLeadingZero: tocSettings.titleNumberLeadingZero
-                  },
-                  slides: slides
-                }
-              }, '*');
-            });
-            input.addEventListener('change', () => {
-              updateSettingsFromUI();
-              showTargetedUpdateFeedback('hero-number');
-              parent.postMessage({
-                pluginMessage: {
-                  type: 'update-toc-style-targeted',
-                  targetType: 'hero-number',
-                  options: {
-                    titleNumberFont: tocSettings.titleNumberFont,
-                    titleNumberSize: tocSettings.titleNumberSize,
-                    titleNumberWeight: tocSettings.titleNumberWeight,
-                    titleNumberColor: tocSettings.titleNumberColor,
-                    titleNumberLeadingZero: tocSettings.titleNumberLeadingZero
-                  },
-                  slides: slides
-                }
-              }, '*');
-            });
+            input.oninput = () => liveStyleUpdate('hero-number');
+            input.onchange = () => liveStyleUpdate('hero-number');
           }
         });
 
-        // Subtitle section controls - ONLY affects subtitle text
+        // Subtitle section controls
         [subTitleSizeInput, subTitleWeightInput, subTitleColorInput, advPanel.querySelector('#sub-title-font'), subIndentInput].forEach(input => {
           if (input) {
-            input.addEventListener('input', () => {
-              updateSettingsFromUI();
-              showTargetedUpdateFeedback('sub');
-              parent.postMessage({
-                pluginMessage: {
-                  type: 'update-toc-style-targeted',
-                  targetType: 'sub',
-                  options: {
-                    subTitleSize: tocSettings.subTitleSize,
-                    subTitleWeight: tocSettings.subTitleWeight,
-                    subTitleColor: tocSettings.subTitleColor,
-                    subTitleFont: tocSettings.subTitleFont,
-                    subIndent: tocSettings.subIndent
-                  },
-                  slides: slides
-                }
-              }, '*');
-            });
-            input.addEventListener('change', () => {
-              updateSettingsFromUI();
-              showTargetedUpdateFeedback('sub');
-              parent.postMessage({
-                pluginMessage: {
-                  type: 'update-toc-style-targeted',
-                  targetType: 'sub',
-                  options: {
-                    subTitleSize: tocSettings.subTitleSize,
-                    subTitleWeight: tocSettings.subTitleWeight,
-                    subTitleColor: tocSettings.subTitleColor,
-                    subTitleFont: tocSettings.subTitleFont,
-                    subIndent: tocSettings.subIndent
-                  },
-                  slides: slides
-                }
-              }, '*');
-            });
+            input.oninput = () => liveStyleUpdate('sub');
+            input.onchange = () => liveStyleUpdate('sub');
           }
         });
 
-        // Subtitle Number section controls - ONLY affects subtitle numbers
+        // Subtitle Number section controls
         [subNumberFontInput, subNumberSizeInput, subNumberWeightInput, subNumberColorInput, subNumberLeadingZeroInput].forEach(input => {
           if (input) {
-            input.addEventListener('input', () => {
-              updateSettingsFromUI();
-              showTargetedUpdateFeedback('sub-number');
-              parent.postMessage({
-                pluginMessage: {
-                  type: 'update-toc-style-targeted',
-                  targetType: 'sub-number',
-                  options: {
-                    subNumberFont: tocSettings.subNumberFont,
-                    subNumberSize: tocSettings.subNumberSize,
-                    subNumberWeight: tocSettings.subNumberWeight,
-                    subNumberColor: tocSettings.subNumberColor,
-                    subNumberLeadingZero: tocSettings.subNumberLeadingZero
-                  },
-                  slides: slides
-                }
-              }, '*');
-            });
-            input.addEventListener('change', () => {
-              updateSettingsFromUI();
-              showTargetedUpdateFeedback('sub-number');
-              parent.postMessage({
-                pluginMessage: {
-                  type: 'update-toc-style-targeted',
-                  targetType: 'sub-number',
-                  options: {
-                    subNumberFont: tocSettings.subNumberFont,
-                    subNumberSize: tocSettings.subNumberSize,
-                    subNumberWeight: tocSettings.subNumberWeight,
-                    subNumberColor: tocSettings.subNumberColor,
-                    subNumberLeadingZero: tocSettings.subNumberLeadingZero
-                  },
-                  slides: slides
-                }
-              }, '*');
-            });
+            input.oninput = () => liveStyleUpdate('sub-number');
+            input.onchange = () => liveStyleUpdate('sub-number');
           }
         });
-        // Attach listeners for live update (LAYOUT)
-        function sendLiveLayoutUpdateInPlace() {
-          const layoutOptions = {
-            titleAlign: layoutPanel.querySelector('#title-align').value,
-            titleCounterAlign: layoutPanel.querySelector('#title-counter-align').value,
-            titleSpacing: parseInt(layoutPanel.querySelector('#title-spacing').value, 10),
-            subtitleAlign: layoutPanel.querySelector('#subtitle-align').value,
-            subtitleCounterAlign: layoutPanel.querySelector('#subtitle-counter-align').value,
-            subtitleSpacing: parseInt(layoutPanel.querySelector('#subtitle-spacing').value, 10),
-            titleNumberPos: layoutPanel.querySelector('#title-number-pos-layout').value,
-            subtitleNumberPos: layoutPanel.querySelector('#subtitle-number-pos-layout').value,
-            columns: parseInt(layoutPanel.querySelector('#toc-columns-layout').value, 10),
-            columnItemSpacing: parseInt(layoutPanel.querySelector('#column-item-spacing').value, 10),
-            paddingTop: parseInt(layoutPanel.querySelector('#padding-top').value, 10),
-            paddingBottom: parseInt(layoutPanel.querySelector('#padding-bottom').value, 10),
-            paddingLeft: parseInt(layoutPanel.querySelector('#padding-left').value, 10),
-            paddingRight: parseInt(layoutPanel.querySelector('#padding-right').value, 10)
-          };
-          parent.postMessage({ pluginMessage: { type: 'update-toc-layout-live', layoutOptions } }, '*');
-        }
-        [
-          layoutPanel.querySelector('#title-align'),
-          layoutPanel.querySelector('#title-counter-align'),
-          layoutPanel.querySelector('#title-spacing'),
-          layoutPanel.querySelector('#subtitle-align'),
-          layoutPanel.querySelector('#subtitle-counter-align'),
-          layoutPanel.querySelector('#subtitle-spacing'),
-          layoutPanel.querySelector('#title-number-pos-layout'),
-          layoutPanel.querySelector('#subtitle-number-pos-layout'),
-          layoutPanel.querySelector('#toc-columns-layout'),
-          layoutPanel.querySelector('#column-item-spacing'),
-          layoutPanel.querySelector('#padding-top'),
-          layoutPanel.querySelector('#padding-bottom'),
-          layoutPanel.querySelector('#padding-left'),
-          layoutPanel.querySelector('#padding-right')
-        ].forEach(input => {
-          if (input) {
-            input.addEventListener('input', sendLiveLayoutUpdateInPlace);
-            input.addEventListener('change', sendLiveLayoutUpdateInPlace);
-          }
-        });
-
-
-
         // Reset Style to Default
         const resetStyleBtn = advPanel.querySelector('#reset-toc-style');
         if (resetStyleBtn) resetStyleBtn.onclick = () => {

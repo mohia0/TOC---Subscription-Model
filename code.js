@@ -2105,9 +2105,6 @@ figma.ui.onmessage = async (msg) => {
       if (node.type === 'TEXT') {
         const tocType = node.getPluginData('tocType');
 
-        // DEBUG: Log all text nodes and their tocType
-        console.log(`🔍 Node: "${node.characters}" | tocType: "${tocType}" | targetType: "${targetType}" | Match: ${tocType === targetType}`);
-
         // MAGIC: Only process if this node matches our target type AND has the correct tocType
         if (tocType === targetType) {
           switch (targetType) {
@@ -2184,174 +2181,19 @@ figma.ui.onmessage = async (msg) => {
     return;
   }
 
-  if (msg.type === 'update-toc-style-live') {
-    const options = msg.options || {};
-    console.log('🚨 OLD STYLE HANDLER CALLED - THIS SHOULD NOT HAPPEN! 🚨');
-    console.log('=== TOC STYLE UPDATE ===');
-    console.log('Received options:', Object.keys(options));
-    console.log('Options details:', options);
-    console.log('Will process:');
-    if (options.heroFontSize !== undefined || options.heroFontWeight !== undefined || options.heroFontColor !== undefined || options.heroFontFamily !== undefined) {
-      console.log('  ✓ Hero styles');
-    }
-    if (options.titleNumberFont !== undefined || options.titleNumberSize !== undefined || options.titleNumberWeight !== undefined || options.titleNumberColor !== undefined || options.titleNumberLeadingZero !== undefined) {
-      console.log('  ✓ Hero number styles');
-    }
-    if (options.subTitleSize !== undefined || options.subTitleWeight !== undefined || options.subTitleColor !== undefined || options.subTitleFont !== undefined || options.subIndent !== undefined) {
-      console.log('  ✓ Subtitle styles');
-    }
-    if (options.subNumberFont !== undefined || options.subNumberSize !== undefined || options.subNumberWeight !== undefined || options.subNumberColor !== undefined || options.subNumberLeadingZero !== undefined) {
-      console.log('  ✓ Subtitle number styles');
-    }
-
+  if (msg.type === 'update-toc-text') {
     const tocRoot = figma.currentPage.findOne(n => n.type === 'FRAME' && n.name === '__TOC_AUTO__');
-    if (!tocRoot) {
-      // Only regenerate if the frame is missing
-      figma.ui.postMessage({ type: 'regenerate-toc', options, slides: msg.slides });
-      return;
-    }
-    // Only update style in place, do NOT remove or regenerate the frame for style changes
-    function mapFontWeight(style) {
-      if (style === 'Bold' || style === '700') return 'Bold';
-      if (style === 'Semi Bold' || style === '600') return 'Semi Bold';
-      return 'Regular';
-    }
-    async function updateTextNodes(node, depth = 0) {
-      if (node.type === 'TEXT') {
-        let tocType = node.getPluginData('tocType');
-        if (!tocType) tocType = (depth === 0 ? 'hero' : 'sub');
+    if (!tocRoot) return;
 
-        // Log which node type is being processed
-        if (tocType === 'hero' || tocType === 'hero-number' || tocType === 'sub' || tocType === 'sub-number') {
-          console.log(`Processing ${tocType} node: "${node.characters}"`);
-        }
-
-        // Title text - ONLY process if hero options are present
-        if (tocType === 'hero' && (options.heroFontSize !== undefined || options.heroFontWeight !== undefined || options.heroFontColor !== undefined || options.heroFontFamily !== undefined)) {
-          console.log('Applying hero styles to:', node.characters);
-          if (options.heroFontFamily && options.heroFontWeight) {
-            await figma.loadFontAsync({ family: options.heroFontFamily, style: mapFontWeight(options.heroFontWeight) });
-            node.fontName = { family: options.heroFontFamily, style: mapFontWeight(options.heroFontWeight) };
-          }
-          if (options.heroFontColor) node.fills = [{ type: 'SOLID', color: hexToRgb(options.heroFontColor) }];
-          if (options.heroFontSize) node.fontSize = options.heroFontSize;
-          if (options.heroFontWeight && !options.heroFontFamily) node.fontName = { family: 'Inter', style: mapFontWeight(options.heroFontWeight) };
-          node.textAutoResize = 'WIDTH_AND_HEIGHT';
-        }
-        // Title number - ONLY process if hero number options are present
-        if (tocType === 'hero-number' && (options.titleNumberFont !== undefined || options.titleNumberSize !== undefined || options.titleNumberWeight !== undefined || options.titleNumberColor !== undefined || options.titleNumberLeadingZero !== undefined)) {
-          console.log('Applying hero number styles to:', node.characters);
-          if (options.titleNumberFont) node.fontName = { family: options.titleNumberFont, style: mapFontWeight(options.titleNumberWeight) };
-          if (options.titleNumberColor) node.fills = [{ type: 'SOLID', color: hexToRgb(options.titleNumberColor) }];
-          if (options.titleNumberSize) node.fontSize = options.titleNumberSize;
-          if (options.titleNumberWeight) node.fontName = { family: options.titleNumberFont || 'Inter', style: mapFontWeight(options.titleNumberWeight) };
-          node.textAutoResize = 'WIDTH_AND_HEIGHT';
-          // Update number text for leading zero
-          var num = node.characters.replace(/^(0?\d+)$/, '$1');
-          var numVal = parseInt(num, 10);
-          if (!!options.titleNumberLeadingZero && numVal < 10) {
-            node.characters = numVal < 10 ? ('0' + numVal) : String(numVal);
-          } else {
-            node.characters = String(numVal);
-          }
-        }
-        // Subtitle text - ONLY process if subtitle options are present
-        if (tocType === 'sub' && (options.subTitleSize !== undefined || options.subTitleWeight !== undefined || options.subTitleColor !== undefined || options.subTitleFont !== undefined || options.subIndent !== undefined)) {
-          console.log('Applying subtitle styles to:', node.characters);
-          if (options.subTitleFont && options.subTitleWeight) {
-            await figma.loadFontAsync({ family: options.subTitleFont, style: mapFontWeight(options.subTitleWeight) });
-            node.fontName = { family: options.subTitleFont, style: mapFontWeight(options.subTitleWeight) };
-          }
-          if (options.subTitleColor) node.fills = [{ type: 'SOLID', color: hexToRgb(options.subTitleColor) }];
-          if (options.subTitleSize) node.fontSize = options.subTitleSize;
-          if (options.subTitleWeight && !options.subTitleFont) node.fontName = { family: 'Inter', style: mapFontWeight(options.subTitleWeight) };
-          if (typeof options.subIndent === 'number' && node.parent && node.parent.type === 'FRAME') {
-            node.parent.paddingLeft = options.subIndent * depth;
-          }
-          node.textAutoResize = 'WIDTH_AND_HEIGHT';
-        }
-        // Subtitle number - ONLY process if subtitle number options are present
-        if (tocType === 'sub-number' && (options.subNumberFont !== undefined || options.subNumberSize !== undefined || options.subNumberWeight !== undefined || options.subNumberColor !== undefined || options.subNumberLeadingZero !== undefined)) {
-          console.log('Applying subtitle number styles to:', node.characters);
-          if (options.subNumberFont) node.fontName = { family: options.subNumberFont, style: mapFontWeight(options.subNumberWeight) };
-          if (options.subNumberColor) node.fills = [{ type: 'SOLID', color: hexToRgb(options.subNumberColor) }];
-          if (options.subNumberSize) node.fontSize = options.subNumberSize;
-          if (options.subNumberWeight) node.fontName = { family: options.subNumberFont || 'Inter', style: mapFontWeight(options.subNumberWeight) };
-          node.textAutoResize = 'WIDTH_AND_HEIGHT';
-          // Update number text for leading zero
-          var num = node.characters.replace(/^(0?\d+)$/, '$1');
-          var numVal = parseInt(num, 10);
-          if (!!options.subNumberLeadingZero && numVal < 10) {
-            node.characters = numVal < 10 ? ('0' + numVal) : String(numVal);
-          } else {
-            node.characters = String(numVal);
-          }
-        }
+    function updateNodeText(node) {
+      if (node.type === 'TEXT' && node.getPluginData('linkedFrameId') === msg.slideId) {
+        node.characters = msg.newName;
       }
       if ('children' in node) {
-        const promises = [];
-        for (const child of node.children) {
-          promises.push(updateTextNodes(child, node.type === 'FRAME' && node.parent === tocRoot ? 0 : depth + 1));
-        }
-        await Promise.all(promises);
+        node.children.forEach(updateNodeText);
       }
     }
-    await updateTextNodes(tocRoot, 0);
-    console.log('TOC style update completed successfully!');
-    figma.notify('TOC style updated!');
-    // --- Live number positioning: reorder children in title/subtitle rows ---
-    function reorderNumberPosition(frame, options) {
-      if (!frame || !frame.children) return;
-      for (const child of frame.children) {
-        if (child.type === 'FRAME' && child.layoutMode === 'HORIZONTAL' && child.children.length === 2) {
-          // Find which child is number and which is text
-          const n0 = child.children[0];
-          const n1 = child.children[1];
-          const t0 = n0.getPluginData ? n0.getPluginData('tocType') : '';
-          const t1 = n1.getPluginData ? n1.getPluginData('tocType') : '';
-          // Title row
-          if ((t0 === 'hero-number' && t1 === 'hero') || (t0 === 'hero' && t1 === 'hero-number')) {
-            const wantRight = options.titleNumberPos === 'right';
-            // Only swap if not already in correct order and both nodes are valid children
-            if ((t0 === 'hero-number' && wantRight && child.children[1] !== n0) ||
-              (t1 === 'hero-number' && !wantRight && child.children[0] !== n1)) {
-              if (child.children.length === 2 && child.children[0] && child.children[1]) {
-                try {
-                  child.insertChild(0, child.children[1]);
-                } catch (e) {
-                  // Ignore Figma API errors
-                }
-              }
-              continue; // Do not recurse after swap
-            }
-          }
-          // Subtitle row
-          if ((t0 === 'sub-number' && t1 === 'sub') || (t0 === 'sub' && t1 === 'sub-number')) {
-            const wantRight = options.subtitleNumberPos === 'right' || options.subNumberPos === 'right';
-            if ((t0 === 'sub-number' && wantRight && child.children[1] !== n0) ||
-              (t1 === 'sub-number' && !wantRight && child.children[0] !== n1)) {
-              if (child.children.length === 2 && child.children[0] && child.children[1]) {
-                try {
-                  child.insertChild(0, child.children[1]);
-                } catch (e) {
-                  // Ignore Figma API errors
-                }
-              }
-              continue; // Do not recurse after swap
-            }
-          }
-        }
-        // Recurse (but limit to depth 1 to prevent sub-sub-slides)
-        // Note: This function doesn't have depth parameter, so we'll limit recursion
-        // by checking if we're already processing a nested level
-        if (!frame.getPluginData || frame.getPluginData('tocType') !== 'sub') {
-          reorderNumberPosition(child, options);
-        }
-      }
-    }
-    reorderNumberPosition(tocRoot, options);
-    figma.notify('TOC style updated in place!');
-    return;
+    updateNodeText(tocRoot);
   }
   if (msg.type === 'update-all-text-style') {
     const tocRoot = figma.currentPage.findOne(n => n.type === 'FRAME' && n.name === '__TOC_AUTO__');
@@ -2399,22 +2241,6 @@ figma.ui.onmessage = async (msg) => {
     }
     figma.notify('Slide number style updated!');
     return;
-  }
-  if (msg.type === 'update-toc-text') {
-    const tocFrame = figma.currentPage.findOne(n => n.type === 'FRAME' && n.name === '__TOC_AUTO__');
-    if (tocFrame) {
-      const allTextNodes = tocFrame.findAll(n => n.type === 'TEXT');
-      for (const textNode of allTextNodes) {
-        if (textNode.getPluginData('linkedFrameId') === msg.slideId) {
-          // Preserve numbering if present, only replace the name part
-          textNode.characters = textNode.characters.replace(/^([\d.]+\s)?(.+)$/, (m, num, oldName) => {
-            if (num) return num + msg.newName;
-            return msg.newName;
-          });
-          textNode.name = msg.newName;
-        }
-      }
-    }
   }
   if (msg.type === 'update-toc-layout') {
     await figma.clientStorage.setAsync('tocLayoutOptions', msg.layoutOptions);
@@ -2500,16 +2326,14 @@ figma.ui.onmessage = async (msg) => {
           // Also update the subIndent in tocSettings for style updates
           if (typeof msg.layoutOptions.subIndent === 'number') {
             // Send a targeted style update for subtitle indentation
-            parent.postMessage({
-              pluginMessage: {
-                type: 'update-toc-style-targeted',
-                targetType: 'sub',
-                options: {
-                  subIndent: msg.layoutOptions.subIndent
-                },
-                slides: slides
-              }
-            }, '*');
+            figma.ui.postMessage({
+              type: 'update-toc-style-targeted',
+              targetType: 'sub',
+              options: {
+                subIndent: msg.layoutOptions.subIndent
+              },
+              slides: slides
+            });
           }
         }
       });
