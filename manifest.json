@@ -1,15 +1,22 @@
 {
-  "name": "TOC Generator 2",
-  "id": "1533998558462836790 ",
+  "name": "TOC Generator",
+  "id": "1533998558462836790",
   "api": "1.0.0",
   "main": "code.js",
   "ui": "ui.html",
-  "editorType": ["figma"],
+  "editorType": [
+    "figma"
+  ],
   "networkAccess": {
-    "allowedDomains": ["https://api.gumroad.com"]
+    "allowedDomains": [
+      "https://api.gumroad.com"
+    ]
   },
   "documentAccess": "dynamic-page",
   "relaunchButtons": [
-    { "command": "update-toc", "name": "Update TOC" }
+    {
+      "command": "update-toc",
+      "name": "Update TOC"
+    }
   ]
-} 
+}
