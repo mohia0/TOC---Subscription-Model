@@ -1416,6 +1416,11 @@
                 <input class="modal-input" id="num-color" type="color" value="#111111" />
               </label>
             </div>
+            <div class="modal-row">
+              <label class="modal-label" data-tooltip="Distance from the slide edge">Padding
+                <input class="modal-input" id="num-padding" type="number" min="0" max="1000" value="80" style="width:70px;" />
+              </label>
+            </div>
           </div>
           <div class="modal-pos-col" style="flex:1;min-width:180px;">
             <div class="modal-row" style="font-weight:700;margin-bottom:12px;color:var(--text-muted);font-size:0.85em;">
@@ -3654,7 +3659,7 @@
         updateNumPreview();
       };
       // Main slide number modal:
-      let numberStyle = { font: 'Inter', size: 24, weight: 'Regular', color: '#111111', pos: 'top-left', leadingZero: true };
+      let numberStyle = { font: 'Inter', size: 24, weight: 'Regular', color: '#111111', padding: 80, pos: 'top-left', leadingZero: true };
       numLeadingZero.checked = false; // Unchecked by default (leading zero ON)
       numLeadingZero.nextElementSibling.textContent = 'Remove leading zero';
       function updateNumPreview() {
@@ -3687,6 +3692,7 @@
           size: parseInt(numSize.value, 10),
           weight: numWeight.value,
           color: numColor.value,
+          padding: parseInt(document.getElementById('num-padding').value, 10) || 0,
           pos: numberStyle.pos,
           leadingZero: !numLeadingZero.checked // true if unchecked (leading zero ON)
         };
@@ -3703,6 +3709,7 @@
           size: parseInt(numSize.value, 10),
           weight: numWeight.value,
           color: numColor.value,
+          padding: parseInt(document.getElementById('num-padding').value, 10) || 0,
           pos: numberStyle.pos,
           leadingZero: !numLeadingZero.checked // true if unchecked (leading zero ON)
         };
@@ -3714,6 +3721,7 @@
               fontWeight: numWeight.value,
               fontSize: parseInt(numSize.value, 10),
               color: hexToRgb(numColor.value),
+              padding: parseInt(document.getElementById('num-padding').value, 10) || 0,
               pos: numberStyle.pos, // Add position to style options
               leadingZero: !numLeadingZero.checked // Add leading zero setting
             }

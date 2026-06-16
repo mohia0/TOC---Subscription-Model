@@ -1905,7 +1905,7 @@ figma.ui.onmessage = async (msg) => {
         numNode.textAutoResize = 'WIDTH_AND_HEIGHT';
         frame.appendChild(numNode);
         // Place number node according to selected position
-        const pos = getNumberPosition(style.pos, frame, numNode, style.size);
+        const pos = getNumberPosition(style.pos, frame, numNode, style.size, style.padding);
         numNode.x = pos.x;
         numNode.y = pos.y;
         added++;
@@ -1973,7 +1973,7 @@ figma.ui.onmessage = async (msg) => {
         numNode.textAutoResize = 'WIDTH_AND_HEIGHT';
         frame.appendChild(numNode);
         // Place number node according to selected position
-        const pos = getNumberPosition(style.pos, frame, numNode, style.size);
+        const pos = getNumberPosition(style.pos, frame, numNode, style.size, style.padding);
         numNode.x = pos.x;
         numNode.y = pos.y;
         added++;
@@ -2040,7 +2040,7 @@ figma.ui.onmessage = async (msg) => {
         numNode.fills = [{ type: 'SOLID', color: rgb }];
         numNode.textAutoResize = 'WIDTH_AND_HEIGHT';
         frame.appendChild(numNode);
-        const pos = getNumberPosition(numberStyle.pos, frame, numNode, numberStyle.size);
+        const pos = getNumberPosition(numberStyle.pos, frame, numNode, numberStyle.size, numberStyle.padding);
         numNode.x = pos.x;
         numNode.y = pos.y;
         added++;
@@ -2293,7 +2293,7 @@ figma.ui.onmessage = async (msg) => {
       if (msg.styleOptions.pos && node.parent && node.parent.type === 'FRAME') {
         // Use getNumberPosition to recalculate x/y
         const frame = node.parent;
-        const pos = getNumberPosition(msg.styleOptions.pos, frame, node, node.fontSize);
+        const pos = getNumberPosition(msg.styleOptions.pos, frame, node, node.fontSize, msg.styleOptions.padding);
         node.x = pos.x;
         node.y = pos.y;
       }
@@ -2613,8 +2613,8 @@ function hexToRgb(hex) {
   };
 }
 
-function getNumberPosition(pos, frame, numNode, size) {
-  const pad = 80;
+function getNumberPosition(pos, frame, numNode, size, pad = 80) {
+  pad = (typeof pad === 'number' && !isNaN(pad)) ? pad : 80;
   let x = pad, y = pad;
   if (pos === 'top-right') {
     x = frame.width - numNode.width - pad;
