@@ -1082,8 +1082,8 @@
       flex-direction: column;
       flex: 1;
       min-height: 0;
-      overflow: hidden;
-      /* Keep hidden to allow internal components to scroll independently */
+      overflow: visible;
+      /* Changed to visible to allow tooltips to bleed out if needed */
     }
 
     #toc-editor {
@@ -1137,7 +1137,8 @@
       position: absolute;
       bottom: 100%;
       left: 50%;
-      transform: translateX(-50%) translateY(-8px);
+      transform: translateX(-50%);
+      margin-bottom: 8px;
       background: rgba(30, 30, 36, 0.98);
       color: #fff;
       backdrop-filter: blur(12px);
@@ -1159,15 +1160,52 @@
       animation: tooltipFadeIn 0.2s ease forwards;
     }
 
+    /* Tooltip Placement Modifiers */
+    [data-tooltip].tooltip-bottom::after {
+      bottom: auto;
+      top: 100%;
+      margin-bottom: 0;
+      margin-top: 8px;
+    }
+    
+    [data-tooltip].tooltip-bottom:hover::after {
+      animation: tooltipFadeInBottom 0.2s ease forwards;
+    }
+
+    [data-tooltip].tooltip-right::after {
+      left: 0;
+      transform: none;
+      text-align: left;
+    }
+
+    [data-tooltip].tooltip-left::after {
+      left: auto;
+      right: 0;
+      transform: none;
+      text-align: right;
+    }
+
     @keyframes tooltipFadeIn {
       from {
         opacity: 0;
-        transform: translate(-50%, 4px);
+        margin-bottom: 4px;
       }
 
       to {
         opacity: 1;
-        transform: translate(-50%, 0);
+        margin-bottom: 8px;
+      }
+    }
+
+    @keyframes tooltipFadeInBottom {
+      from {
+        opacity: 0;
+        margin-top: 4px;
+      }
+
+      to {
+        opacity: 1;
+        margin-top: 8px;
       }
     }
   </style>
@@ -1216,33 +1254,33 @@
                 Detection Direction</div>
               <div class="slides-detect-modes"
                 style="display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:8px;">
-                <button class="icon-btn detect-btn selected" id="detect-z"
+                <button class="icon-btn detect-btn selected tooltip-bottom tooltip-right" id="detect-z"
                   data-tooltip="Z: Left-to-Right, Top-to-Bottom">
                   <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
                     <path d="M3 3h12v2H5v2h8v2H5v2h10v2H3" stroke="currentColor" stroke-width="1.5"
                       stroke-linecap="round" stroke-linejoin="round" />
                   </svg>
                 </button>
-                <button class="icon-btn detect-btn" id="detect-z-flip"
+                <button class="icon-btn detect-btn tooltip-bottom" id="detect-z-flip"
                   data-tooltip="Z Flipped: Right-to-Left, Top-to-Bottom">
                   <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
                     <path d="M15 3H3v2h10v2H5v2h8v2H3v2h12" stroke="currentColor" stroke-width="1.5"
                       stroke-linecap="round" stroke-linejoin="round" />
                   </svg>
                 </button>
-                <button class="icon-btn detect-btn" id="detect-vertical" data-tooltip="Vertical: Top-to-Bottom">
+                <button class="icon-btn detect-btn tooltip-bottom" id="detect-vertical" data-tooltip="Vertical: Top-to-Bottom">
                   <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
                     <path d="M9 3v12M9 3l-2 2M9 3l2 2M9 15l-2-2M9 15l2-2" stroke="currentColor" stroke-width="1.5"
                       stroke-linecap="round" stroke-linejoin="round" />
                   </svg>
                 </button>
-                <button class="icon-btn detect-btn" id="detect-horizontal" data-tooltip="Horizontal: Left-to-Right">
+                <button class="icon-btn detect-btn tooltip-bottom" id="detect-horizontal" data-tooltip="Horizontal: Left-to-Right">
                   <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
                     <path d="M3 9h12M15 9l-2-2M15 9l-2 2M3 9l2-2M3 9l2 2" stroke="currentColor" stroke-width="1.5"
                       stroke-linecap="round" stroke-linejoin="round" />
                   </svg>
                 </button>
-                <button class="icon-btn detect-btn" id="detect-horizontal-rtl" data-tooltip="Horizontal: Right-to-Left">
+                <button class="icon-btn detect-btn tooltip-bottom tooltip-left" id="detect-horizontal-rtl" data-tooltip="Horizontal: Right-to-Left">
                   <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
                     <path d="M15 9H3M3 9l2-2M3 9l2 2M15 9l-2-2M15 9l-2 2" stroke="currentColor" stroke-width="1.5"
                       stroke-linecap="round" stroke-linejoin="round" />
