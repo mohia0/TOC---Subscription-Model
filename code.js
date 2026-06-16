@@ -789,12 +789,24 @@ function sendFramesToUI(direction = 'z', filterForTOC = false) {
     console.log('Sending frames-list with', frameData.length, 'frames');
     figma.ui.postMessage({ type: 'frames-list', frames: frameData });
   } else {
-    // Send only presentation slides (already filtered by getFramesOnCurrentPage)
+    // Check if any frame has a number node
+    const anyHasNumber = ordered.some(f => f.findOne && f.findOne(n => n.type === 'TEXT' && /^__SLIDE_NUMBER__\d+$/.test(n.name)));
     const frameData = ordered.map(function (frame, idx) {
+      let hasNumber = false;
+      let extractedNum = '';
+      if (frame.findOne) {
+        const numNode = frame.findOne(n => n.type === 'TEXT' && /^__SLIDE_NUMBER__\d+$/.test(n.name));
+        if (numNode) {
+          hasNumber = true;
+          const match = numNode.characters.match(/^\d+/);
+          if (match) extractedNum = match[0];
+        }
+      }
       return {
         id: frame.id,
         name: frame.name,
-        number: idx + 1
+        number: hasNumber ? extractedNum : (idx + 1),
+        isSkipped: anyHasNumber && !hasNumber
       };
     });
     console.log('Presentation slides (filtered):', frameData);
