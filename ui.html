@@ -905,6 +905,42 @@
     .slide-row:hover .start-btn {
       display: block;
     }
+    .toggle-switch {
+      position: relative;
+      display: inline-block;
+      width: 32px;
+      height: 18px;
+    }
+    .toggle-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+    .toggle-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background-color: #353545;
+      transition: .4s;
+      border-radius: 18px;
+    }
+    .toggle-slider:before {
+      position: absolute;
+      content: "";
+      height: 14px;
+      width: 14px;
+      left: 2px;
+      bottom: 2px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+    .toggle-switch input:checked + .toggle-slider {
+      background-color: #18A0FB;
+    }
+    .toggle-switch input:checked + .toggle-slider:before {
+      transform: translateX(14px);
+    }
 
     .notion-outline-row {
       display: flex;
@@ -1416,13 +1452,13 @@
                 <input class="modal-input" id="num-color" type="color" value="#111111" />
               </label>
             </div>
-            <div class="modal-row">
+          </div>
+          <div class="modal-pos-col" style="flex:1;min-width:180px;">
+            <div class="modal-row" style="margin-bottom:12px;">
               <label class="modal-label" data-tooltip="Distance from the slide edge">Padding
                 <input class="modal-input" id="num-padding" type="number" min="0" max="1000" value="80" style="width:70px;" />
               </label>
             </div>
-          </div>
-          <div class="modal-pos-col" style="flex:1;min-width:180px;">
             <div class="modal-row" style="font-weight:700;margin-bottom:12px;color:var(--text-muted);font-size:0.85em;">
               Position</div>
             <div class="modal-pos-grid" id="num-pos-grid">
@@ -1434,16 +1470,16 @@
             <div class="modal-row" style="margin-top:20px;">
               <label
                 style="display:flex;align-items:center;gap:8px;font-size:0.9em;color:var(--text-main);cursor:pointer;">
-                <input type="checkbox" id="num-leading-zero"
-                  style="width:16px;height:16px;accent-color:var(--primary);">
+                <div class="toggle-switch">
+                  <input type="checkbox" id="num-leading-zero">
+                  <span class="toggle-slider"></span>
+                </div>
                 <span>Remove leading zero</span>
               </label>
             </div>
           </div>
         </div>
         <div class="modal-preview-col" style="margin-top:16px;">
-          <div class="modal-preview" id="num-preview"
-            style="font-size:24px;min-height:90px;background:rgba(0,0,0,0.3);border-radius:12px;">1</div>
           <div class="modal-actions" style="margin-top:16px;">
             <button class="primary-btn" id="num-apply" style="width:100%;">Apply Settings</button>
           </div>
@@ -3532,6 +3568,7 @@
         slides.forEach((slide, idx) => {
           const row = document.createElement('div');
           row.className = 'slide-row';
+          if (slide.isSkipped) row.style.opacity = '0.5';
           row.innerHTML = `
             <span class='slide-number'>${slide.number}</span>
             <input class='slide-name-input' type='text' value="${slide.name}" data-slide-id="${slide.id}" style="font-size:1em;font-weight:600;background:transparent;border:none;color:#f3f4f8;width:70%;outline:none;" />
@@ -3651,7 +3688,6 @@
       const numSize = document.getElementById('num-size');
       const numWeight = document.getElementById('num-weight');
       const numColor = document.getElementById('num-color');
-      const numPreview = document.getElementById('num-preview');
       const numLeadingZero = document.getElementById('num-leading-zero');
       let leadingZero = false;
       numLeadingZero.onchange = () => {
@@ -3661,19 +3697,20 @@
       // Main slide number modal:
       let numberStyle = { font: 'Inter', size: 24, weight: 'Regular', color: '#111111', padding: 80, pos: 'top-left', leadingZero: true };
       numLeadingZero.checked = false; // Unchecked by default (leading zero ON)
-      numLeadingZero.nextElementSibling.textContent = 'Remove leading zero';
+      numLeadingZero.nextElementSibling.nextElementSibling.textContent = 'Remove leading zero';
       function updateNumPreview() {
-        let pos = numberStyle.pos;
-        let justify = 'flex-start', align = 'flex-start';
-        if (pos === 'top-right') { justify = 'flex-end'; align = 'flex-start'; }
-        if (pos === 'bottom-left') { justify = 'flex-start'; align = 'flex-end'; }
-        if (pos === 'bottom-right') { justify = 'flex-end'; align = 'flex-end'; }
         let num = numLeadingZero.checked ? '1' : '01'; // Fixed logic: checked = no leading zero
-        numPreview.innerHTML = `
-          <div style="width: 220px; height: 100px; background: #181a20; border-radius: 16px; border: 1.5px solid #353545; display: flex; flex-direction: column; justify-content: ${align}; align-items: ${justify}; margin: 0 auto; color: #f3f4f8;">
-            <span style="font-family: ${numFont.value}; font-size: ${numSize.value}px; font-weight: ${numWeight.value === 'Bold' ? '700' : '400'}; color: #fff; margin: 12px;">${num}</span>
-          </div>
-        `;
+        const posButtons = Array.from(document.querySelectorAll('.modal-pos-cell'));
+        posButtons.forEach(btn => {
+           if (btn.getAttribute('data-pos') === numberStyle.pos) {
+             btn.innerText = num;
+             btn.style.fontFamily = numFont.value;
+             btn.style.fontWeight = numWeight.value === 'Bold' ? '700' : '400';
+             btn.style.color = numColor.value;
+           } else {
+             btn.innerText = '';
+           }
+        });
       }
       [numFont, numSize, numWeight, numColor, numLeadingZero].forEach(input => {
         input.oninput = updateNumPreview;
