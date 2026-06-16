@@ -3697,7 +3697,6 @@
       // Main slide number modal:
       let numberStyle = { font: 'Inter', size: 24, weight: 'Regular', color: '#111111', padding: 80, pos: 'top-left', leadingZero: true };
       numLeadingZero.checked = false; // Unchecked by default (leading zero ON)
-      numLeadingZero.nextElementSibling.nextElementSibling.textContent = 'Remove leading zero';
       function updateNumPreview() {
         let num = numLeadingZero.checked ? '1' : '01'; // Fixed logic: checked = no leading zero
         const posButtons = Array.from(document.querySelectorAll('.modal-pos-cell'));
