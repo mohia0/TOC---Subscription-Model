@@ -834,6 +834,36 @@ async function sendSavedTOCToUI() {
   }
 }
 
+// --- Module-level font utilities (accessible to ALL handlers) ---
+function mapFontWeightGlobal(style) {
+  if (!style) return 'Regular';
+  if (style === 'Bold' || style === '700' || style === 700) return 'Bold';
+  if (style === 'Semi Bold' || style === '600' || style === 600) return 'Semi Bold';
+  return 'Regular';
+}
+
+async function loadFontSafe(family, style) {
+  const fam = family || 'Inter';
+  const sty = mapFontWeightGlobal(style);
+  try {
+    await figma.loadFontAsync({ family: fam, style: sty });
+    return { family: fam, style: sty };
+  } catch (e) {
+    // Fallback chain
+    try {
+      await figma.loadFontAsync({ family: fam, style: 'Regular' });
+      return { family: fam, style: 'Regular' };
+    } catch (e2) {
+      try {
+        await figma.loadFontAsync({ family: 'Inter', style: 'Regular' });
+        return { family: 'Inter', style: 'Regular' };
+      } catch (e3) {
+        return { family: 'Inter', style: 'Regular' };
+      }
+    }
+  }
+}
+
 // --- Reusable function to generate TOC frame ---
 async function generateTOCFrame(slides, options, startFrameId) {
   console.log('generateTOCFrame called with:', { slides, options, startFrameId });
@@ -2165,99 +2195,72 @@ figma.ui.onmessage = async (msg) => {
     async function updateSpecificNodes(node, depth = 0) {
       if (node.type === 'TEXT') {
         const tocType = node.getPluginData('tocType');
-
-        // Match logging
         if (tocType === targetType) {
           console.log(`✅ MATCH: Updating ${targetType} node: "${node.characters}"`);
-          switch (targetType) {
-            case 'hero':
-              try {
-                if (options.heroFontFamily && options.heroFontWeight) {
-                  const style = mapFontWeight(options.heroFontWeight);
-                  const safeNameFont = await loadFontIfNeeded(options.heroFontFamily, style);
-                  node.fontName = safeNameFont;
+          try {
+            switch (targetType) {
+              case 'hero': {
+                // Load the font we want (new family/weight, or keep existing)
+                const wantFamily = options.heroFontFamily || (node.fontName && node.fontName.family) || 'Inter';
+                const wantWeight = options.heroFontWeight || (node.fontName && node.fontName.style) || 'Regular';
+                const safeFont = await loadFontSafe(wantFamily, wantWeight);
+                node.fontName = safeFont;
+                if (options.heroFontSize) node.fontSize = parseFloat(options.heroFontSize);
+                if (options.heroFontColor) node.fills = [{ type: 'SOLID', color: hexToRgb(options.heroFontColor) }];
+                node.textAutoResize = 'WIDTH_AND_HEIGHT';
+                break;
+              }
+              case 'hero-number': {
+                const wantFamily = options.titleNumberFont || (node.fontName && node.fontName.family) || 'Inter';
+                const wantWeight = options.titleNumberWeight || (node.fontName && node.fontName.style) || 'Bold';
+                const safeFont = await loadFontSafe(wantFamily, wantWeight);
+                node.fontName = safeFont;
+                if (options.titleNumberSize) node.fontSize = parseFloat(options.titleNumberSize);
+                if (options.titleNumberColor) node.fills = [{ type: 'SOLID', color: hexToRgb(options.titleNumberColor) }];
+                node.textAutoResize = 'WIDTH_AND_HEIGHT';
+                // Leading zero update
+                const numVal = parseInt(node.characters.replace(/^0/, ''), 10) || parseInt(node.characters, 10);
+                if (!isNaN(numVal)) {
+                  node.characters = (!!options.titleNumberLeadingZero && numVal < 10) ? ('0' + numVal) : String(numVal);
                 }
-              } catch (e) {
-                console.log(`⚠️ Failed to load font ${options.heroFontFamily}:`, e);
+                break;
               }
-              if (options.heroFontColor) node.fills = [{ type: 'SOLID', color: hexToRgb(options.heroFontColor) }];
-              if (options.heroFontSize) node.fontSize = options.heroFontSize;
-              node.textAutoResize = 'WIDTH_AND_HEIGHT';
-              console.log(`✨ Applied hero style to: "${node.characters}"`);
-              break;
-
-            case 'hero-number':
-              try {
-                if (options.titleNumberFont && options.titleNumberWeight) {
-                  const style = mapFontWeight(options.titleNumberWeight);
-                  const safeNumFont = await loadFontIfNeeded(options.titleNumberFont, style);
-                  node.fontName = safeNumFont;
+              case 'sub': {
+                const wantFamily = options.subTitleFont || (node.fontName && node.fontName.family) || 'Inter';
+                const wantWeight = options.subTitleWeight || (node.fontName && node.fontName.style) || 'Regular';
+                const safeFont = await loadFontSafe(wantFamily, wantWeight);
+                node.fontName = safeFont;
+                if (options.subTitleSize) node.fontSize = parseFloat(options.subTitleSize);
+                if (options.subTitleColor) node.fills = [{ type: 'SOLID', color: hexToRgb(options.subTitleColor) }];
+                if (typeof options.subIndent === 'number' && node.parent && node.parent.type === 'FRAME') {
+                  node.parent.paddingLeft = options.subIndent;
                 }
-              } catch (e) {
-                console.log('⚠️ Failed to load hero-number font:', e);
+                break;
               }
-              if (options.titleNumberColor) node.fills = [{ type: 'SOLID', color: hexToRgb(options.titleNumberColor) }];
-              if (options.titleNumberSize) node.fontSize = options.titleNumberSize;
-              node.textAutoResize = 'WIDTH_AND_HEIGHT';
-
-              // Update number text for leading zero
-              var num = node.characters.replace(/^(0?\d+)$/, '$1');
-              var numVal = parseInt(num, 10);
-              if (!!options.titleNumberLeadingZero && numVal < 10) {
-                node.characters = (numVal < 10 ? ('0' + numVal) : String(numVal));
-              } else {
-                node.characters = String(numVal);
-              }
-              break;
-
-            case 'sub':
-              try {
-                if (options.subTitleFont && options.subTitleWeight) {
-                  const style = mapFontWeight(options.subTitleWeight);
-                  const safeSubNameFont = await loadFontIfNeeded(options.subTitleFont, style);
-                  node.fontName = safeSubNameFont;
+              case 'sub-number': {
+                const wantFamily = options.subNumberFont || (node.fontName && node.fontName.family) || 'Inter';
+                const wantWeight = options.subNumberWeight || (node.fontName && node.fontName.style) || 'Regular';
+                const safeFont = await loadFontSafe(wantFamily, wantWeight);
+                node.fontName = safeFont;
+                if (options.subNumberSize) node.fontSize = parseFloat(options.subNumberSize);
+                if (options.subNumberColor) node.fills = [{ type: 'SOLID', color: hexToRgb(options.subNumberColor) }];
+                // Leading zero update
+                const sNumVal = parseInt(node.characters.replace(/^0/, ''), 10) || parseInt(node.characters, 10);
+                if (!isNaN(sNumVal)) {
+                  node.characters = (!!options.subNumberLeadingZero && sNumVal < 10) ? ('0' + sNumVal) : String(sNumVal);
                 }
-              } catch (e) {
-                console.log('⚠️ Failed to load subtitle font:', e);
+                break;
               }
-              if (options.subTitleColor) node.fills = [{ type: 'SOLID', color: hexToRgb(options.subTitleColor) }];
-              if (options.subTitleSize) node.fontSize = options.subTitleSize;
-              if (typeof options.subIndent === 'number' && node.parent && node.parent.type === 'FRAME') {
-                node.parent.paddingLeft = options.subIndent; // Fixed: No depth multiplier needed for this layout
-              }
-              break;
-
-            case 'sub-number':
-              try {
-                if (options.subNumberFont && options.subNumberWeight) {
-                  const style = mapFontWeight(options.subNumberWeight);
-                  const safeSubNumFont = await loadFontIfNeeded(options.subNumberFont, style);
-                  node.fontName = safeSubNumFont;
-                }
-              } catch (e) {
-                console.log('⚠️ Failed to load sub-number font:', e);
-              }
-              if (options.subNumberColor) node.fills = [{ type: 'SOLID', color: hexToRgb(options.subNumberColor) }];
-              if (options.subNumberSize) node.fontSize = options.subNumberSize;
-
-              // Update number text for leading zero
-              var sNum = node.characters.replace(/^(0?\d+)$/, '$1');
-              var sNumVal = parseInt(sNum, 10);
-              if (!!options.subNumberLeadingZero && sNumVal < 10) {
-                node.characters = (sNumVal < 10 ? ('0' + sNumVal) : String(sNumVal));
-              } else {
-                node.characters = String(sNumVal);
-              }
-              break;
+            }
+          } catch (err) {
+            console.warn(`⚠️ Failed to update ${targetType} node:`, err);
           }
         }
       }
       if ('children' in node) {
-        const promises = [];
         for (const child of node.children) {
-          promises.push(updateSpecificNodes(child, node.type === 'FRAME' && node.parent === tocRoot ? 0 : depth + 1));
+          await updateSpecificNodes(child, depth + 1);
         }
-        await Promise.all(promises);
       }
     }
 

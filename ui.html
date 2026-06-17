@@ -903,13 +903,19 @@
       font-weight: 600;
       padding: 4px 14px;
       cursor: pointer;
-      opacity: 0.92;
-      transition: background 0.13s, opacity 0.13s;
+      opacity: 1;
+      transition: background 0.13s;
       z-index: 2;
     }
 
     .slide-row:hover .start-btn {
       display: block;
+    }
+
+    /* Skipped rows: dim only number + name, NOT the start button */
+    .slide-row.row-skipped .slide-number,
+    .slide-row.row-skipped .slide-name-input {
+      opacity: 0.4;
     }
     .toggle-switch {
       position: relative;
@@ -1074,7 +1080,7 @@
       display: flex;
       gap: 8px;
       margin-bottom: 16px;
-      background: rgba(255, 255, 255, 0.03);
+      background: rgba(255, 255, 255, 0.06);
       padding: 4px;
       border-radius: 10px;
       border: none;
@@ -1088,7 +1094,7 @@
     .tab-btn {
       flex: 1;
       height: 28px;
-      background: transparent;
+      background: rgba(255, 255, 255, 0.04);
       border: none;
       color: var(--text-muted);
       cursor: pointer;
@@ -1102,11 +1108,11 @@
     .tab-btn.active {
       background: var(--primary);
       color: white;
-      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.2);
+      box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25);
     }
 
     .tab-btn:hover:not(.active) {
-      background: rgba(255, 255, 255, 0.05);
+      background: rgba(255, 255, 255, 0.09);
       color: var(--text-main);
     }
 
@@ -1342,7 +1348,7 @@
           <div class="tab-content-panel active" id="panel-numbering">
             <div class="settings-group">
               <div class="panel-header"
-                style="font-size: 10px; color: var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom: 2px;">
+                style="font-size: 10px; color: var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom: 5px;">
                 Detection Direction</div>
               <div class="slides-detect-modes"
                 style="display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:0;">
@@ -1378,11 +1384,13 @@
                       stroke-linecap="round" stroke-linejoin="round" />
                   </svg>
                 </button>
-                <button class="icon-btn" id="detect-refresh" data-tooltip="Refresh slides" style="margin-left:auto;">
+                <button class="icon-btn tooltip-bottom" id="detect-refresh" data-tooltip="Rescan slides" style="margin-left:auto;">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                     stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.85.83 6.72 2.24"></path>
-                    <path d="M21 3v9h-9"></path>
+                    <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
+                    <path d="M21 3v5h-5"/>
+                    <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
+                    <path d="M8 16H3v5"/>
                   </svg>
                 </button>
               </div>
@@ -1396,24 +1404,22 @@
 
             <div class="slide-controls" style="align-items: center; margin-top: 12px;">
               <button class="primary-btn" id="add-slide-numbers">
-                Add Slide Numbers
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:5px;flex-shrink:0;vertical-align:middle;">
+                  <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.582a.5.5 0 0 1 0 .963L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>
+                  <path d="M20 3v4"/><path d="M22 5h-4"/><path d="M4 17v2"/><path d="M5 18H3"/>
+                </svg>Add Slide Numbers
               </button>
-              <button class="icon-btn" id="slide-number-settings" data-tooltip="Number style settings"
-                style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+              <button class="refresh-btn" id="slide-number-settings" data-tooltip="Number style settings">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                   stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M12 20a8 8 0 1 0-8-8c0 1.5 1.5 3 3 3s3 1.5 3 3-1.5 3-3 3Z"></path>
-                  <circle cx="9" cy="9" r="1" fill="currentColor"></circle>
-                  <circle cx="13" cy="6" r="1" fill="currentColor"></circle>
-                  <circle cx="17" cy="10" r="1" fill="currentColor"></circle>
-                </svg>
+                  <line x1="4" x2="20" y1="9" y2="9"/><line x1="4" x2="20" y1="15" y2="15"/>
+                  <line x1="10" x2="8" y1="3" y2="21"/><line x1="16" x2="14" y1="3" y2="21"/>
+                </svg>Style
               </button>
               <button class="refresh-btn" id="refresh-numbers" data-tooltip="Fix numbering if you removed some slides">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-                  stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;">
-                  <path
-                    d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z">
-                  </path>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;">
+                  <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
+                  <path d="m9 12 2 2 4-4"/>
                 </svg>
                 Fix
               </button>
@@ -1434,7 +1440,7 @@
             <div id="toc-controls-area" style="background:rgba(0,0,0,0.15);border-radius:8px;padding:8px 12px;flex-shrink:0;">
               <div id="toc-status-msg" style="font-size:0.9em;color:var(--primary);min-height:0;"></div>
             </div>
-            <div class="toc-editor" id="toc-editor" style="background:rgba(0,0,0,0.2);border-radius:8px;"></div>
+            <div class="toc-editor" id="toc-editor" style="background:rgba(0,0,0,0.2);border-radius:8px;padding:8px 12px;"></div>
           </div>
 
           <script>
@@ -1953,12 +1959,33 @@
   <script>
     // --- GLOBAL TOC SETTINGS ---
     let tocSettings = {
+      // Hero (Title) text
       heroFontSize: 32,
       heroFontWeight: 'Bold',
-      heroNumberPos: 'left',
-      subFontSize: 25,
-      subFontWeight: 'Regular',
+      heroFontFamily: 'Inter',
+      heroFontColor: '#000000',
+      // Sub (Subtitle) text
+      subTitleSize: 18,
+      subTitleWeight: 'Regular',
+      subTitleFont: 'Inter',
+      subTitleColor: '#000000',
       subIndent: 24,
+      // Title slide number
+      titleNumberFont: 'Inter',
+      titleNumberSize: 32,
+      titleNumberWeight: 'Bold',
+      titleNumberColor: '#000000',
+      titleNumberLeadingZero: true,
+      // Subtitle slide number
+      subNumberFont: 'Inter',
+      subNumberSize: 18,
+      subNumberWeight: 'Regular',
+      subNumberColor: '#000000',
+      subNumberLeadingZero: true,
+      // Layout
+      heroNumberPos: 'left',
+      subFontSize: 18,
+      subFontWeight: 'Regular',
       sectionSpacing: 40,
       columns: 2,
       livePreview: true,
@@ -3765,7 +3792,7 @@
         slides.forEach((slide, idx) => {
           const row = document.createElement('div');
           row.className = 'slide-row';
-          if (slide.isSkipped) row.style.opacity = '0.5';
+          if (slide.isSkipped) row.classList.add('row-skipped');
           row.innerHTML = `
             <span class='slide-number'>${slide.number}</span>
             <input class='slide-name-input' type='text' value="${slide.name}" data-slide-id="${slide.id}" style="font-size:1em;font-weight:600;background:transparent;border:none;color:#f3f4f8;width:70%;outline:none;" />
@@ -4151,7 +4178,7 @@
           row.style.display = 'flex';
           row.style.alignItems = 'center';
           row.style.gap = '10px';
-          row.style.padding = '4px 0 4px ' + (depth * 32) + 'px'; // reduce vertical padding for closer rows
+          row.style.padding = '3px 12px 3px ' + (8 + depth * 32) + 'px';
           row.style.fontWeight = depth === 0 ? '700' : '600';
           row.style.fontSize = '1.08em';
           row.style.background = depth > 0 ? 'rgba(37,99,235,0.08)' : 'transparent';
@@ -4160,22 +4187,7 @@
           row.style.position = 'relative';
           row.style.transition = 'background 0.18s, border 0.18s, padding 0.18s';
 
-          // Remove button
-          const removeBtn = document.createElement('button');
-          removeBtn.innerHTML = '✖';
-          removeBtn.title = 'Remove from TOC';
-          removeBtn.style.background = 'none';
-          removeBtn.style.color = '#ff4d4d';
-          removeBtn.style.border = 'none';
-          removeBtn.style.fontSize = '1.1em';
-          removeBtn.style.cursor = 'pointer';
-          removeBtn.style.marginRight = '8px';
-          removeBtn.onclick = (e) => {
-            e.stopPropagation();
-            removeSlideFromTOC(slide.id);
-            renderTOCControls();
-          };
-          row.appendChild(removeBtn);
+          // Remove button removed — rows use drag-to-reorder only
 
           // Drag handle
           const dragHandle = document.createElement('span');
@@ -4420,15 +4432,18 @@
         buttonRow.style.display = 'flex';
         buttonRow.style.alignItems = 'center';
         buttonRow.style.justifyContent = 'flex-start';
-        buttonRow.style.gap = '18px';
+        buttonRow.style.gap = '6px';
         buttonRow.style.marginBottom = '0';
         buttonRow.style.position = 'relative';
 
         // Generate TOC button (main action)
         const generateBtn = document.createElement('button');
         generateBtn.className = 'primary-btn';
-        generateBtn.textContent = 'Generate TOC';
         generateBtn.style.padding = '0 24px';
+        generateBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:5px;flex-shrink:0;">
+          <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.582a.5.5 0 0 1 0 .963L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>
+          <path d="M20 3v4"/><path d="M22 5h-4"/><path d="M4 17v2"/><path d="M5 18H3"/>
+        </svg>Generate TOC`;
         generateBtn.onclick = () => {
           // Check trial status first
           if (!checkTrialAndUpgrade()) {
@@ -4473,17 +4488,13 @@
 
         // TOC Style button
         const tocStyleBtn = document.createElement('button');
-        tocStyleBtn.className = 'refresh-btn'; // Minimal style
-        tocStyleBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"></circle><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"></circle><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"></circle><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"></circle><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.607-.482 1.926-1.125l1.074-2.152a2 2 0 0 1 1.789-1.108l2.254.045c1.673.033 2.957-1.353 2.957-3.045 0-5.127-4.225-9.317-9.352-9.605A10.01 10.01 0 0 0 12 2Z"></path></svg>Style';
-        tocStyleBtn.title = 'TOC Style';
+        tocStyleBtn.className = 'refresh-btn tooltip-bottom';
+        tocStyleBtn.setAttribute('data-tooltip', 'Typography & colors');
+        tocStyleBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/>
+        </svg>Style`;
         tocStyleBtn.onclick = () => {
-          // Check trial status first
-          if (!checkTrialAndUpgrade()) {
-            return; // Stop if trial expired
-          }
-
-          console.log('TOC Style clicked');
-          // Show TOC style modal
+          if (!checkTrialAndUpgrade()) { return; }
           if (advPanelBg) {
             advPanelBg.style.display = 'flex';
             advPanelBg.classList.add('active');
@@ -4493,17 +4504,14 @@
 
         // TOC Layout button
         const tocLayoutBtn = document.createElement('button');
-        tocLayoutBtn.className = 'refresh-btn'; // Minimal style
-        tocLayoutBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"></rect><path d="M9 3v18"></path><path d="M15 3v18"></path></svg>Layout';
-        tocLayoutBtn.title = 'TOC Layout';
+        tocLayoutBtn.className = 'refresh-btn tooltip-bottom';
+        tocLayoutBtn.setAttribute('data-tooltip', 'Columns & spacing');
+        tocLayoutBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/>
+          <rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/>
+        </svg>Layout`;
         tocLayoutBtn.onclick = () => {
-          // Check trial status first
-          if (!checkTrialAndUpgrade()) {
-            return; // Stop if trial expired
-          }
-
-          console.log('TOC Layout clicked');
-          // Show TOC layout modal
+          if (!checkTrialAndUpgrade()) { return; }
           if (layoutPanelBg) {
             layoutPanelBg.style.display = 'flex';
             layoutPanelBg.classList.add('active');
@@ -4513,19 +4521,17 @@
 
         // Refresh button
         const refreshBtn = document.createElement('button');
-        refreshBtn.className = 'icon-btn';
-        refreshBtn.title = 'Refresh TOC from Slides';
+        refreshBtn.className = 'icon-btn tooltip-bottom tooltip-left';
+        refreshBtn.setAttribute('data-tooltip', 'Rescan slides from document');
         refreshBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.85.83 6.72 2.24"></path><path d="M21 3v9h-9"></path>
+                    <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
+                    <path d="M21 3v5h-5"/>
+                    <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
+                    <path d="M8 16H3v5"/>
                   </svg>`;
         refreshBtn.onclick = () => {
-          // Check trial status first
-          if (!checkTrialAndUpgrade()) {
-            return; // Stop if trial expired
-          }
-
-          console.log('Refresh TOC clicked');
-          showTOCStatus('Refreshing slides...', '#18A0FB', false);
+          if (!checkTrialAndUpgrade()) { return; }
+          showTOCStatus('Rescanning slides...', '#18A0FB', false);
           parent.postMessage({ pluginMessage: { type: 'get-frames', direction: currentDirection, forTOC: true } }, '*');
         };
         buttonRow.appendChild(refreshBtn);
@@ -4818,11 +4824,10 @@
         const listDiv = document.createElement('div');
         listDiv.style.display = 'flex';
         listDiv.style.flexDirection = 'column';
-        listDiv.style.gap = '2px'; // Make slides closer
+        listDiv.style.gap = '0'; // Tight rows
         listDiv.style.flex = '1';
         listDiv.style.minHeight = '0';
         listDiv.style.overflowY = 'auto';
-        listDiv.style.paddingRight = '4px'; // Space for scrollbar
         renderTOCTree(slides, listDiv, 0);
         if (slides.length === 0) {
           const emptyDiv = document.createElement('div');
