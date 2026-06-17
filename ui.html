@@ -1702,7 +1702,7 @@
           <div>
             <span id="license-type-display" style="color:#f8fafc;font-weight:700;font-size:12px;">Premium Member</span>
           </div>
-          <button id="copy-support-email"
+          <button id="premium-support-btn"
             style="background:rgba(59,130,246,0.1);border:1px solid rgba(59,130,246,0.1);border-radius:6px;padding:4px 8px;color:#3b82f6;font-size:10px;font-weight:700;cursor:pointer;transition:all 0.2s;">Support</button>
         </div>
       </div>
@@ -3021,26 +3021,14 @@
         premiumModal.style.display = 'flex';
       };
 
-      // Support Email - Copy to clipboard
-      const copySupportEmailBtn = document.getElementById('copy-support-email');
-      if (copySupportEmailBtn) {
-        copySupportEmailBtn.onclick = () => {
-          const email = 'info@mohihassan.com';
-          navigator.clipboard.writeText(email).then(() => {
-            const originalText = copySupportEmailBtn.textContent;
-            copySupportEmailBtn.textContent = 'Copied!';
-            copySupportEmailBtn.style.background = 'rgba(16, 185, 129, 0.1)';
-            copySupportEmailBtn.style.color = '#10b981';
-
-            // Inform the user via native Figma notification
-            parent.postMessage({ pluginMessage: { type: 'notify', message: 'Email copied to clipboard! ✨' } }, '*');
-
-            setTimeout(() => {
-              copySupportEmailBtn.textContent = originalText;
-              copySupportEmailBtn.style.background = 'rgba(59, 130, 246, 0.1)';
-              copySupportEmailBtn.style.color = '#3b82f6';
-            }, 2000);
-          });
+      // Support Email - Open Support Modal
+      const premiumSupportBtn = document.getElementById('premium-support-btn');
+      if (premiumSupportBtn) {
+        premiumSupportBtn.onclick = () => {
+          document.getElementById('premium-modal').style.display = 'none';
+          if (typeof openSupportModal === 'function') {
+            openSupportModal('support');
+          }
         };
       }
 
@@ -3130,11 +3118,18 @@
         function openSupportModal(type) {
           currentType = type;
           supportDropdown.style.display = 'none';
-          supportModalIcon.textContent = type === 'bug' ? '🐛' : '💡';
-          supportModalTitle.textContent = type === 'bug' ? 'Submit Bug' : 'Submit Suggestion';
-          supportMessage.placeholder = type === 'bug'
-            ? 'Describe what happened and how to reproduce it...'
-            : 'Describe your idea or suggestion...';
+          
+          if (type === 'support') {
+            supportModalIcon.textContent = '👑';
+            supportModalTitle.textContent = 'Premium Support';
+            supportMessage.placeholder = 'How can we help with your subscription or plugin?...';
+          } else {
+            supportModalIcon.textContent = type === 'bug' ? '🐛' : '💡';
+            supportModalTitle.textContent = type === 'bug' ? 'Submit Bug' : 'Submit Suggestion';
+            supportMessage.placeholder = type === 'bug'
+              ? 'Describe what happened and how to reproduce it...'
+              : 'Describe your idea or suggestion...';
+          }
           supportName.value = '';
           supportEmail.value = '';
           supportMessage.value = '';
@@ -3183,8 +3178,15 @@
 
           const subject = currentType === 'bug'
             ? '🐛 Bug Report — TOC Plugin'
-            : '💡 Suggestion — TOC Plugin';
-          const body = `Type: ${currentType === 'bug' ? 'Bug Report' : 'Suggestion'}\nFrom: ${nameVal}\nEmail: ${emailVal}\n\n${message}`;
+            : currentType === 'support'
+              ? '👑 Premium Support — TOC Plugin'
+              : '💡 Suggestion — TOC Plugin';
+              
+          let typeLabel = 'Suggestion';
+          if (currentType === 'bug') typeLabel = 'Bug Report';
+          if (currentType === 'support') typeLabel = 'Premium Support';
+          
+          const body = `Type: ${typeLabel}\nFrom: ${nameVal}\nEmail: ${emailVal}\n\n${message}`;
 
           // Use FormData instead of JSON to bypass Figma's null-origin CORS preflight restrictions
           const formData = new FormData();
