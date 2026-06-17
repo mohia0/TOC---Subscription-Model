@@ -1156,6 +1156,14 @@
       }
     }
 
+    @keyframes supportEmojiPop {
+      0%   { transform: scale(0);    opacity: 0; }
+      55%  { transform: scale(1.25); opacity: 1; }
+      75%  { transform: scale(0.9);  }
+      90%  { transform: scale(1.08); }
+      100% { transform: scale(1);    opacity: 1; }
+    }
+
     .panel-header {
       font-size: 1.1em;
       font-weight: 600;
@@ -1619,11 +1627,22 @@
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="9" fill="#2d2d3d"/><path d="M7 7l6 6M13 7l-6 6" stroke="#888" stroke-width="1.6" stroke-linecap="round"/></svg>
         </button>
       </div>
-      <input id="support-name" type="text" placeholder="Your name" style="background:#2a2a3d;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:9px 12px;color:#f3f4f8;font-size:12px;outline:none;width:100%;box-sizing:border-box;" />
-      <input id="support-email" type="email" placeholder="Your email address" style="background:#2a2a3d;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:9px 12px;color:#f3f4f8;font-size:12px;outline:none;width:100%;box-sizing:border-box;" />
-      <textarea id="support-message" placeholder="Describe the issue or idea..." rows="5" style="background:#2a2a3d;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:9px 12px;color:#f3f4f8;font-size:12px;outline:none;width:100%;box-sizing:border-box;resize:none;font-family:inherit;"></textarea>
-      <div id="support-status" style="font-size:11px;min-height:16px;text-align:center;"></div>
-      <button id="support-submit-btn" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none;border-radius:10px;padding:10px;font-size:13px;font-weight:600;cursor:pointer;transition:opacity 0.2s;">Send Message</button>
+
+      <!-- Form fields (hidden on success) -->
+      <div id="support-form-body" style="display:flex;flex-direction:column;gap:14px;">
+        <input id="support-name" type="text" placeholder="Your name" style="background:#2a2a3d;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:9px 12px;color:#f3f4f8;font-size:12px;outline:none;width:100%;box-sizing:border-box;" />
+        <input id="support-email" type="email" placeholder="Your email address" style="background:#2a2a3d;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:9px 12px;color:#f3f4f8;font-size:12px;outline:none;width:100%;box-sizing:border-box;" />
+        <textarea id="support-message" placeholder="Describe the issue or idea..." rows="5" style="background:#2a2a3d;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:9px 12px;color:#f3f4f8;font-size:12px;outline:none;width:100%;box-sizing:border-box;resize:none;font-family:inherit;"></textarea>
+        <div id="support-status" style="font-size:11px;min-height:16px;text-align:center;"></div>
+        <button id="support-submit-btn" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none;border-radius:10px;padding:10px;font-size:13px;font-weight:600;cursor:pointer;transition:opacity 0.2s;">Send Message</button>
+      </div>
+
+      <!-- Success state (shown after submit) -->
+      <div id="support-success" style="display:none;flex-direction:column;align-items:center;justify-content:center;padding:28px 0 18px;gap:10px;">
+        <div id="support-success-emoji" style="font-size:54px;line-height:1;">🙏</div>
+        <div style="color:#f3f4f8;font-size:15px;font-weight:700;text-align:center;margin-top:4px;">Thank you!</div>
+        <div id="support-success-sub" style="color:#94a3b8;font-size:12px;text-align:center;line-height:1.6;">Your message has been sent.<br>We'll get back to you soon.</div>
+      </div>
     </div>
   </div>
 
@@ -1994,7 +2013,7 @@
       groupSpacing: 16,
       columnSpacing: 48,
       groupPadding: 12,
-      maxItemsPerCol: 6,
+      maxItemsPerCol: 10,
       maxColumnHeight: 800,
       columnWidth: 350,
       textAlignHorizontal: 'CENTER',
@@ -3192,6 +3211,9 @@
           supportSubmitBtn.disabled = false;
           supportSubmitBtn.style.opacity = '1';
           supportSubmitBtn.textContent = 'Send Message';
+          // Reset success state
+          document.getElementById('support-form-body').style.display = 'flex';
+          document.getElementById('support-success').style.display = 'none';
           supportModalBg.style.display = 'flex';
         }
 
@@ -3261,13 +3283,26 @@
             });
             const data = await res.json();
             if (res.ok || data.success) {
-              supportStatus.textContent = '✅ Sent! Thank you for your feedback.';
-              supportStatus.style.color = '#1aef7a';
-              supportMessage.value = '';
-              supportName.value = '';
-              supportEmail.value = '';
-              supportSubmitBtn.textContent = 'Sent!';
-              setTimeout(() => { supportModalBg.style.display = 'none'; }, 2000);
+              // Swap form → success state
+              const formBody = document.getElementById('support-form-body');
+              const successDiv = document.getElementById('support-success');
+              const successSub = document.getElementById('support-success-sub');
+              const emojiEl = document.getElementById('support-success-emoji');
+              const subMsg = currentType === 'bug'
+                ? 'Bug report received.<br>We appreciate the heads up!'
+                : currentType === 'support'
+                  ? 'Our team will reach out shortly.'
+                  : 'Great idea — we\'ll review it!<br>Thank you for helping us improve.';
+              if (successSub) successSub.innerHTML = subMsg;
+              formBody.style.display = 'none';
+              successDiv.style.display = 'flex';
+              // Bounce the emoji
+              if (emojiEl) {
+                emojiEl.style.animation = 'none';
+                emojiEl.offsetHeight; // reflow
+                emojiEl.style.animation = 'supportEmojiPop 0.55s cubic-bezier(0.68,-0.55,0.27,1.55) forwards';
+              }
+              setTimeout(() => { supportModalBg.style.display = 'none'; }, 2800);
             } else {
               throw new Error(data.message || 'Failed');
             }
@@ -4648,7 +4683,7 @@
                 </div>
                 <div style="display:flex;align-items:center;gap:6px;justify-content:space-between;">
                   <span style="font-size:11px;color:#b0b3b8;">Items</span>
-                  <span style="display:flex;align-items:center;"><input id="max-items-per-col" class="modal-input" type="number" value="6" style="width:38px;height:24px;font-size:11px;padding:2px 4px;"></span>
+                  <span style="display:flex;align-items:center;"><input id="max-items-per-col" class="modal-input" type="number" value="10" style="width:38px;height:24px;font-size:11px;padding:2px 4px;"></span>
                 </div>
               </div>
             </div>
@@ -4790,7 +4825,7 @@
             columnWidth: 350,
             textAlignHorizontal: 'CENTER',
             textAlignVertical: 'CENTER',
-            maxItemsPerCol: 6,
+            maxItemsPerCol: 10,
             framePaddingTop: 0,
             framePaddingBottom: 0,
             framePaddingLeft: 0,
@@ -5417,7 +5452,7 @@
               if (textAlignHorizontalInput) textAlignHorizontalInput.value = msg.settings.textAlignHorizontal || 'CENTER';
               if (textAlignVerticalInput) textAlignVerticalInput.value = msg.settings.textAlignVertical || 'TOP';
 
-              if (maxItemsPerColInput) maxItemsPerColInput.value = msg.settings.maxItemsPerCol || 6;
+              if (maxItemsPerColInput) maxItemsPerColInput.value = msg.settings.maxItemsPerCol || 10;
               const framePaddingTopInput = layoutPanel.querySelector('#frame-padding-top');
               const framePaddingBottomInput = layoutPanel.querySelector('#frame-padding-bottom');
               const framePaddingLeftInput = layoutPanel.querySelector('#frame-padding-left');
