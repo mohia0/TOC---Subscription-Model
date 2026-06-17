@@ -3802,12 +3802,15 @@
           showMainStatus('Slide numbers added!', '#1aef7a');
           // Refresh TOC section's slide list to show only slides with numbers
           requestTOCFrames(currentDirection);
+          // Refresh the Numbering section's list to update opacity and numbers
+          requestFrames(currentDirection);
         }
         if (msg.type === 'slide-numbers-error') {
           showMainStatus('Failed to add numbers.', '#ff4d4d');
         }
         if (msg.type === 'slide-numbers-removed') {
           showMainStatus('Slide numbers removed!', '#ff4d4d');
+          requestTOCFrames(currentDirection);
           requestFrames(currentDirection);
         }
         if (msg.type === 'slide-numbers-fixed') {
