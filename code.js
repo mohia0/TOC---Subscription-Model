@@ -786,8 +786,8 @@ function sendFramesToUI(direction = 'z', filterForTOC = false) {
     }
     const frameData = filterFramesWithNumber(ordered);
     console.log('Filtered frames with numbers:', frameData);
-    console.log('Sending frames-list with', frameData.length, 'frames');
-    figma.ui.postMessage({ type: 'frames-list', frames: frameData });
+    console.log('Sending toc-frames-list with', frameData.length, 'frames');
+    figma.ui.postMessage({ type: 'toc-frames-list', frames: frameData });
   } else {
     // Check if any frame has a number node
     const anyHasNumber = ordered.some(f => f.findOne && f.findOne(n => n.type === 'TEXT' && /^__SLIDE_NUMBER__\d+$/.test(n.name)));
@@ -805,7 +805,7 @@ function sendFramesToUI(direction = 'z', filterForTOC = false) {
       return {
         id: frame.id,
         name: frame.name,
-        number: hasNumber ? extractedNum : (idx + 1),
+        number: hasNumber ? extractedNum : (anyHasNumber ? '-' : (idx + 1)),
         isSkipped: anyHasNumber && !hasNumber
       };
     });

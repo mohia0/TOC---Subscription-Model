@@ -3660,18 +3660,14 @@
 
 
 
-        if (msg.type === 'frames-list') {
-          // If forTOC is true, this is for the TOC; otherwise, for Numbering
-          if (msg.frames && msg.frames.length && msg.frames[0].children !== undefined) {
-            // Likely TOC (nested structure)
-            window.mainSlides = msg.frames.map(s => Object.assign({}, s, { children: s.children || [] }));
-            syncMainSlidesToTOC();
-            renderTOCControls();
-          } else {
-            // Numbering section (flat list)
-            allSlides = msg.frames;
-            renderSlides(allSlides, document.getElementById('slides-list'));
-          }
+        if (msg.type === 'toc-frames-list') {
+          window.mainSlides = msg.frames.map(s => Object.assign({}, s, { children: s.children || [] }));
+          syncMainSlidesToTOC();
+          renderTOCControls();
+        } else if (msg.type === 'frames-list') {
+          // Numbering section (flat list)
+          allSlides = msg.frames;
+          renderSlides(allSlides, document.getElementById('slides-list'));
         }
       };
 
@@ -3897,15 +3893,13 @@
       window.addEventListener('message', (event) => {
         const msg = event.data.pluginMessage;
         if (!msg) return;
-        if (msg.type === 'frames-list') {
-          if (msg.frames && msg.frames.length && msg.frames[0].children !== undefined) {
-            window.mainSlides = msg.frames.map(s => Object.assign({}, s, { children: s.children || [] }));
-            syncMainSlidesToTOC();
-            renderTOCControls();
-          } else {
-            allSlides = msg.frames;
-            renderSlides(allSlides, document.getElementById('slides-list'));
-          }
+        if (msg.type === 'toc-frames-list') {
+          window.mainSlides = msg.frames.map(s => Object.assign({}, s, { children: s.children || [] }));
+          syncMainSlidesToTOC();
+          renderTOCControls();
+        } else if (msg.type === 'frames-list') {
+          allSlides = msg.frames;
+          renderSlides(allSlides, document.getElementById('slides-list'));
         }
       });
       // Initialize TOC on startup
@@ -5047,9 +5041,8 @@
       window.addEventListener('message', (event) => {
         const msg = event.data.pluginMessage;
         if (!msg) return;
-        if (msg.type === 'frames-list') {
-          console.log('Received frames-list:', msg.frames);
-          // Convert flat list to tree (no children by default)
+        if (msg.type === 'toc-frames-list') {
+          console.log('Received toc-frames-list:', msg.frames);
           window.mainSlides = msg.frames.map(s => Object.assign({}, s, { children: [] }));
           if (slides.length === 0) {
             slides = window.mainSlides.map(s => Object.assign({}, s, { children: [] }));
@@ -5058,7 +5051,6 @@
           console.log('pendingTOCGeneration:', window.pendingTOCGeneration);
           renderTOCControls();
 
-          // If slides were detected, show success message
           if (slides.length > 0) {
             showTOCStatus(`Detected ${slides.length} slides with numbers`, '#1aef7a', false);
           } else {
