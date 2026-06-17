@@ -1588,6 +1588,7 @@
         </button>
       </div>
       <input id="support-name" type="text" placeholder="Your name (optional)" style="background:#2a2a3d;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:9px 12px;color:#f3f4f8;font-size:12px;outline:none;width:100%;box-sizing:border-box;" />
+      <input id="support-email" type="email" placeholder="Your email address (optional)" style="background:#2a2a3d;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:9px 12px;color:#f3f4f8;font-size:12px;outline:none;width:100%;box-sizing:border-box;" />
       <textarea id="support-message" placeholder="Describe the issue or idea..." rows="5" style="background:#2a2a3d;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:9px 12px;color:#f3f4f8;font-size:12px;outline:none;width:100%;box-sizing:border-box;resize:none;font-family:inherit;"></textarea>
       <div id="support-status" style="font-size:11px;min-height:16px;text-align:center;"></div>
       <button id="support-submit-btn" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none;border-radius:10px;padding:10px;font-size:13px;font-weight:600;cursor:pointer;transition:opacity 0.2s;">Send Message</button>
@@ -3105,6 +3106,7 @@
         const supportSubmitBtn = document.getElementById('support-submit-btn');
         const supportStatus = document.getElementById('support-status');
         const supportName = document.getElementById('support-name');
+        const supportEmail = document.getElementById('support-email');
         const supportMessage = document.getElementById('support-message');
         let currentType = 'bug';
 
@@ -3134,6 +3136,7 @@
             ? 'Describe what happened and how to reproduce it...'
             : 'Describe your idea or suggestion...';
           supportName.value = '';
+          supportEmail.value = '';
           supportMessage.value = '';
           supportStatus.textContent = '';
           supportStatus.style.color = '';
@@ -3167,33 +3170,41 @@
             ? '🐛 Bug Report — TOC Plugin'
             : '💡 Suggestion — TOC Plugin';
           const nameVal = supportName.value.trim() || 'Anonymous';
-          const body = `Type: ${currentType === 'bug' ? 'Bug Report' : 'Suggestion'}\nFrom: ${nameVal}\n\n${message}`;
+          const emailVal = supportEmail.value.trim();
+          const body = `Type: ${currentType === 'bug' ? 'Bug Report' : 'Suggestion'}\nFrom: ${nameVal}\nEmail: ${emailVal || 'Not provided'}\n\n${message}`;
+
+          // Use FormData instead of JSON to bypass Figma's null-origin CORS preflight restrictions
+          const formData = new FormData();
+          formData.append('access_key', '97324d00-0576-4885-a5d6-b5c227506793');
+          formData.append('subject', subject);
+          formData.append('from_name', nameVal);
+          if (emailVal) {
+            formData.append('email', emailVal);
+            formData.append('replyto', emailVal);
+          }
+          formData.append('message', body);
+          formData.append('cc_email', 'mo7a.classico@gmail.com');
 
           try {
             const res = await fetch('https://api.web3forms.com/submit', {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-              body: JSON.stringify({
-                access_key: '97324d00-0576-4885-a5d6-b5c227506793',
-                subject: subject,
-                from_name: nameVal,
-                message: body,
-                cc_email: 'mo7a.classico@gmail.com'
-              })
+              body: formData
             });
             const data = await res.json();
-            if (data.success) {
+            if (res.ok || data.success) {
               supportStatus.textContent = '✅ Sent! Thank you for your feedback.';
               supportStatus.style.color = '#1aef7a';
               supportMessage.value = '';
               supportName.value = '';
+              supportEmail.value = '';
               supportSubmitBtn.textContent = 'Sent!';
               setTimeout(() => { supportModalBg.style.display = 'none'; }, 2000);
             } else {
               throw new Error(data.message || 'Failed');
             }
           } catch (err) {
-            supportStatus.textContent = '❌ Failed to send. Please try again.';
+            console.error('Web3Forms Error:', err);
+            supportStatus.textContent = '❌ Failed to send. Check console for details.';
             supportStatus.style.color = '#ff6b6b';
             supportSubmitBtn.disabled = false;
             supportSubmitBtn.style.opacity = '1';
