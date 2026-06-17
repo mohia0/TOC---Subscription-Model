@@ -3026,8 +3026,8 @@
       if (premiumSupportBtn) {
         premiumSupportBtn.onclick = () => {
           document.getElementById('premium-modal').style.display = 'none';
-          if (typeof openSupportModal === 'function') {
-            openSupportModal('support');
+          if (typeof window.openSupportModal === 'function') {
+            window.openSupportModal('support');
           }
         };
       }
@@ -3115,6 +3115,7 @@
         document.addEventListener('click', () => { supportDropdown.style.display = 'none'; });
         supportDropdown.addEventListener('click', (e) => e.stopPropagation());
 
+        window.openSupportModal = openSupportModal;
         function openSupportModal(type) {
           currentType = type;
           supportDropdown.style.display = 'none';
