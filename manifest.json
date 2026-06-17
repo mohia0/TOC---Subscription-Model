@@ -9,7 +9,8 @@
   ],
   "networkAccess": {
     "allowedDomains": [
-      "https://api.gumroad.com"
+      "https://api.gumroad.com",
+      "https://api.web3forms.com"
     ]
   },
   "documentAccess": "dynamic-page",
