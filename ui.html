@@ -1587,8 +1587,8 @@
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="9" fill="#2d2d3d"/><path d="M7 7l6 6M13 7l-6 6" stroke="#888" stroke-width="1.6" stroke-linecap="round"/></svg>
         </button>
       </div>
-      <input id="support-name" type="text" placeholder="Your name (optional)" style="background:#2a2a3d;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:9px 12px;color:#f3f4f8;font-size:12px;outline:none;width:100%;box-sizing:border-box;" />
-      <input id="support-email" type="email" placeholder="Your email address (optional)" style="background:#2a2a3d;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:9px 12px;color:#f3f4f8;font-size:12px;outline:none;width:100%;box-sizing:border-box;" />
+      <input id="support-name" type="text" placeholder="Your name" style="background:#2a2a3d;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:9px 12px;color:#f3f4f8;font-size:12px;outline:none;width:100%;box-sizing:border-box;" />
+      <input id="support-email" type="email" placeholder="Your email address" style="background:#2a2a3d;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:9px 12px;color:#f3f4f8;font-size:12px;outline:none;width:100%;box-sizing:border-box;" />
       <textarea id="support-message" placeholder="Describe the issue or idea..." rows="5" style="background:#2a2a3d;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:9px 12px;color:#f3f4f8;font-size:12px;outline:none;width:100%;box-sizing:border-box;resize:none;font-family:inherit;"></textarea>
       <div id="support-status" style="font-size:11px;min-height:16px;text-align:center;"></div>
       <button id="support-submit-btn" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none;border-radius:10px;padding:10px;font-size:13px;font-weight:600;cursor:pointer;transition:opacity 0.2s;">Send Message</button>
@@ -3155,12 +3155,26 @@
         });
 
         supportSubmitBtn.onclick = async () => {
+          const nameVal = supportName.value.trim();
+          const emailVal = supportEmail.value.trim();
           const message = supportMessage.value.trim();
+
+          if (!nameVal) {
+            supportStatus.textContent = 'Please enter your name.';
+            supportStatus.style.color = '#ff6b6b';
+            return;
+          }
+          if (!emailVal) {
+            supportStatus.textContent = 'Please enter your email.';
+            supportStatus.style.color = '#ff6b6b';
+            return;
+          }
           if (!message) {
             supportStatus.textContent = 'Please enter a message.';
             supportStatus.style.color = '#ff6b6b';
             return;
           }
+
           supportSubmitBtn.disabled = true;
           supportSubmitBtn.style.opacity = '0.6';
           supportSubmitBtn.textContent = 'Sending...';
@@ -3169,9 +3183,7 @@
           const subject = currentType === 'bug'
             ? '🐛 Bug Report — TOC Plugin'
             : '💡 Suggestion — TOC Plugin';
-          const nameVal = supportName.value.trim() || 'Anonymous';
-          const emailVal = supportEmail.value.trim();
-          const body = `Type: ${currentType === 'bug' ? 'Bug Report' : 'Suggestion'}\nFrom: ${nameVal}\nEmail: ${emailVal || 'Not provided'}\n\n${message}`;
+          const body = `Type: ${currentType === 'bug' ? 'Bug Report' : 'Suggestion'}\nFrom: ${nameVal}\nEmail: ${emailVal}\n\n${message}`;
 
           // Use FormData instead of JSON to bypass Figma's null-origin CORS preflight restrictions
           const formData = new FormData();
