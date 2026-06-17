@@ -1252,7 +1252,13 @@
     <div class="main-col">
       <div class="card">
         <div class="card-content">
-          <div style="display:flex;justify-content:flex-end;align-items:center;margin-bottom:16px;flex-shrink:0;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0;">
+            <!-- LAYOUT TABS -->
+            <div class="tabs-container" style="margin-bottom:0;">
+              <button class="tab-btn active" id="tab-btn-numbering" onclick="switchTab('numbering')">1. Number Slides</button>
+              <button class="tab-btn" id="tab-btn-toc" onclick="switchTab('toc')">2. Generate TOC</button>
+            </div>
+
             <div style="display:flex;align-items:center;gap:8px;">
               <div id="premium-badge"
                 style="background:rgba(2fbbf24,0.1);color:#fbbf24;border:1px solid rgba(251,191,36,0.3);border-radius:8px;padding:4px 8px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;display:none;cursor:pointer;transition:all 0.2s;"
@@ -1289,13 +1295,6 @@
                 </div>
               </div>
             </div>
-          </div>
-
-          <!-- LAYOUT TABS -->
-          <div class="tabs-container">
-            <button class="tab-btn active" id="tab-btn-numbering" onclick="switchTab('numbering')">1. Number
-              Slides</button>
-            <button class="tab-btn" id="tab-btn-toc" onclick="switchTab('toc')">2. Generate TOC</button>
           </div>
 
           <!-- TAB PANEL 1: NUMBERING -->
