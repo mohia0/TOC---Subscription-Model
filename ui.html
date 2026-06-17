@@ -1272,7 +1272,26 @@
                   </path>
                 </svg>
               </button>
-            </div>
+
+              <!-- Support Button + Dropdown -->
+              <div id="support-btn-wrapper" style="position:relative;">
+                <button id="support-btn" class="icon-btn" data-tooltip="Submit Feedback">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                  </svg>
+                </button>
+                <div id="support-dropdown" style="display:none;position:absolute;right:0;top:calc(100% + 6px);background:#1e1e2e;border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:4px;z-index:99999;min-width:160px;box-shadow:0 8px 24px rgba(0,0,0,0.4);">
+                  <button class="support-drop-item" id="support-bug-btn" style="display:flex;align-items:center;gap:8px;width:100%;padding:8px 10px;background:none;border:none;color:#f3f4f8;cursor:pointer;border-radius:7px;font-size:12px;text-align:left;transition:background 0.15s;">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#ff6b6b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2l1.5 1.5"/><path d="M14.5 3.5L16 2"/><path d="M9 7.5a3 3 0 0 0 6 0v-1a3 3 0 0 0-6 0v1z"/><path d="M6.5 13.5a3.5 7.5 0 0 0 11 0"/><path d="M3 9a1 1 0 0 1 1-1h1.5"/><path d="M18.5 8H20a1 1 0 0 1 1 1"/><path d="M3 16a1 1 0 0 0 1 1h1.5"/><path d="M18.5 17H20a1 1 0 0 0 1-1"/><path d="M7 20.5a10 10 0 0 0 10 0"/></svg>
+                    Submit Bug
+                  </button>
+                  <button class="support-drop-item" id="support-suggest-btn" style="display:flex;align-items:center;gap:8px;width:100%;padding:8px 10px;background:none;border:none;color:#f3f4f8;cursor:pointer;border-radius:7px;font-size:12px;text-align:left;transition:background 0.15s;">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="m4.93 4.93 2.83 2.83"/><path d="M2 12h4"/><path d="m4.93 19.07 2.83-2.83"/><path d="M12 18v4"/><path d="m19.07 19.07-2.83-2.83"/><path d="M22 12h-4"/><path d="m19.07 4.93-2.83 2.83"/></svg>
+                    Submit Suggestion
+                  </button>
+                </div>
+              </div>
+
           </div>
 
           <!-- LAYOUT TABS -->
@@ -1560,6 +1579,25 @@
   </div>
 
   <!-- Help Popup Modal -->
+  <!-- Support Modal -->
+  <div id="support-modal-bg" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:200000;align-items:center;justify-content:center;">
+    <div style="background:#1e1e2e;border-radius:16px;padding:22px 22px 18px;width:300px;display:flex;flex-direction:column;gap:14px;box-shadow:0 16px 48px rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.07);">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span id="support-modal-icon" style="font-size:18px;">🐛</span>
+          <span id="support-modal-title" style="font-size:14px;font-weight:700;color:#f3f4f8;">Submit Bug</span>
+        </div>
+        <button id="support-modal-close" style="background:none;border:none;cursor:pointer;color:#888;padding:0;display:flex;">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="9" fill="#2d2d3d"/><path d="M7 7l6 6M13 7l-6 6" stroke="#888" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <input id="support-name" type="text" placeholder="Your name (optional)" style="background:#2a2a3d;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:9px 12px;color:#f3f4f8;font-size:12px;outline:none;width:100%;box-sizing:border-box;" />
+      <textarea id="support-message" placeholder="Describe the issue or idea..." rows="5" style="background:#2a2a3d;border:1px solid rgba(255,255,255,0.08);border-radius:8px;padding:9px 12px;color:#f3f4f8;font-size:12px;outline:none;width:100%;box-sizing:border-box;resize:none;font-family:inherit;"></textarea>
+      <div id="support-status" style="font-size:11px;min-height:16px;text-align:center;"></div>
+      <button id="support-submit-btn" style="background:linear-gradient(135deg,#6366f1,#8b5cf6);color:#fff;border:none;border-radius:10px;padding:10px;font-size:13px;font-weight:600;cursor:pointer;transition:opacity 0.2s;">Send Message</button>
+    </div>
+  </div>
+
   <div id="help-modal" class="modal-bg" style="z-index:100000;">
     <div class="modal" style="text-align:center;width:360px;padding:18px;gap:12px;">
       <div style="font-size:32px;margin-bottom:4px;">💡</div>
@@ -3057,6 +3095,116 @@
       hintBtn.onclick = () => {
         helpModal.style.display = 'flex';
       };
+
+      // --- Support Feedback Button ---
+      (function() {
+        const supportBtn = document.getElementById('support-btn');
+        const supportDropdown = document.getElementById('support-dropdown');
+        const supportModalBg = document.getElementById('support-modal-bg');
+        const supportModalClose = document.getElementById('support-modal-close');
+        const supportModalIcon = document.getElementById('support-modal-icon');
+        const supportModalTitle = document.getElementById('support-modal-title');
+        const supportBugBtn = document.getElementById('support-bug-btn');
+        const supportSuggestBtn = document.getElementById('support-suggest-btn');
+        const supportSubmitBtn = document.getElementById('support-submit-btn');
+        const supportStatus = document.getElementById('support-status');
+        const supportName = document.getElementById('support-name');
+        const supportMessage = document.getElementById('support-message');
+        let currentType = 'bug';
+
+        // Hover effect on dropdown items
+        document.querySelectorAll('.support-drop-item').forEach(btn => {
+          btn.addEventListener('mouseenter', () => { btn.style.background = 'rgba(255,255,255,0.06)'; });
+          btn.addEventListener('mouseleave', () => { btn.style.background = 'none'; });
+        });
+
+        // Toggle dropdown
+        supportBtn.onclick = (e) => {
+          e.stopPropagation();
+          const isOpen = supportDropdown.style.display === 'block';
+          supportDropdown.style.display = isOpen ? 'none' : 'block';
+        };
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', () => { supportDropdown.style.display = 'none'; });
+        supportDropdown.addEventListener('click', (e) => e.stopPropagation());
+
+        function openSupportModal(type) {
+          currentType = type;
+          supportDropdown.style.display = 'none';
+          supportModalIcon.textContent = type === 'bug' ? '🐛' : '💡';
+          supportModalTitle.textContent = type === 'bug' ? 'Submit Bug' : 'Submit Suggestion';
+          supportMessage.placeholder = type === 'bug'
+            ? 'Describe what happened and how to reproduce it...'
+            : 'Describe your idea or suggestion...';
+          supportName.value = '';
+          supportMessage.value = '';
+          supportStatus.textContent = '';
+          supportStatus.style.color = '';
+          supportSubmitBtn.disabled = false;
+          supportSubmitBtn.style.opacity = '1';
+          supportSubmitBtn.textContent = 'Send Message';
+          supportModalBg.style.display = 'flex';
+        }
+
+        supportBugBtn.onclick = () => openSupportModal('bug');
+        supportSuggestBtn.onclick = () => openSupportModal('suggestion');
+
+        supportModalClose.onclick = () => { supportModalBg.style.display = 'none'; };
+        supportModalBg.addEventListener('click', (e) => {
+          if (e.target === supportModalBg) supportModalBg.style.display = 'none';
+        });
+
+        supportSubmitBtn.onclick = async () => {
+          const message = supportMessage.value.trim();
+          if (!message) {
+            supportStatus.textContent = 'Please enter a message.';
+            supportStatus.style.color = '#ff6b6b';
+            return;
+          }
+          supportSubmitBtn.disabled = true;
+          supportSubmitBtn.style.opacity = '0.6';
+          supportSubmitBtn.textContent = 'Sending...';
+          supportStatus.textContent = '';
+
+          const subject = currentType === 'bug'
+            ? '🐛 Bug Report — TOC Plugin'
+            : '💡 Suggestion — TOC Plugin';
+          const nameVal = supportName.value.trim() || 'Anonymous';
+          const body = `Type: ${currentType === 'bug' ? 'Bug Report' : 'Suggestion'}\nFrom: ${nameVal}\n\n${message}`;
+
+          try {
+            const res = await fetch('https://api.web3forms.com/submit', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+              body: JSON.stringify({
+                access_key: '97324d00-0576-4885-a5d6-b5c227506793',
+                subject: subject,
+                from_name: nameVal,
+                message: body,
+                cc_email: 'mo7a.classico@gmail.com'
+              })
+            });
+            const data = await res.json();
+            if (data.success) {
+              supportStatus.textContent = '✅ Sent! Thank you for your feedback.';
+              supportStatus.style.color = '#1aef7a';
+              supportMessage.value = '';
+              supportName.value = '';
+              supportSubmitBtn.textContent = 'Sent!';
+              setTimeout(() => { supportModalBg.style.display = 'none'; }, 2000);
+            } else {
+              throw new Error(data.message || 'Failed');
+            }
+          } catch (err) {
+            supportStatus.textContent = '❌ Failed to send. Please try again.';
+            supportStatus.style.color = '#ff6b6b';
+            supportSubmitBtn.disabled = false;
+            supportSubmitBtn.style.opacity = '1';
+            supportSubmitBtn.textContent = 'Send Message';
+          }
+        };
+      })();
 
       // Show help from help button in trial bar - removed
 
