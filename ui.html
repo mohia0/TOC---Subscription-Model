@@ -4507,8 +4507,7 @@
         tocLayoutBtn.className = 'refresh-btn tooltip-bottom';
         tocLayoutBtn.setAttribute('data-tooltip', 'Columns & spacing');
         tocLayoutBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/>
-          <rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/>
+          <path d="M12 3h7a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-7m0-18H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h7m0-18v18"/>
         </svg>Layout`;
         tocLayoutBtn.onclick = () => {
           if (!checkTrialAndUpgrade()) { return; }

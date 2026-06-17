@@ -1968,60 +1968,56 @@ figma.ui.onmessage = async (msg) => {
       figma.ui.postMessage({ type: 'slide-numbers-error', error: 'Trial expired. Please upgrade.' });
       return;
     }
-    // Fix numbering by renumbering all slides sequentially (removes gaps)
+    // Fix: re-sequence ONLY frames that already have a slide number node.
+    // Frames without numbers (e.g. slides before "Start Numbering from") are left untouched.
     const frames = getFramesOnCurrentPage();
-    // Only use visible and unlocked frames
-    const orderedFrames = orderFrames(frames.filter(f => !f.locked && f.visible !== false), msg.direction);
+    const allVisible = frames.filter(f => !f.locked && f.visible !== false);
+    const orderedAll = orderFrames(allVisible, msg.direction);
     const style = msg.numberStyle || { font: 'Inter', size: 16, weight: 'Regular', color: '#111111', pos: 'top-left', leadingZero: true };
 
-    if (!orderedFrames.length) {
-      figma.ui.postMessage({ type: 'slide-numbers-error', error: 'No frames found on this page.' });
+    // Detect only frames that currently carry a __SLIDE_NUMBER__ node
+    const numberedFrames = orderedAll.filter(frame =>
+      frame.findOne && frame.findOne(n => n.type === 'TEXT' && /^__SLIDE_NUMBER__\d+$/.test(n.name))
+    );
+
+    if (!numberedFrames.length) {
+      figma.ui.postMessage({ type: 'slide-numbers-error', error: 'No numbered slides found to fix.' });
       return;
     }
 
-    // Remove all old number nodes first
-    clearAllSlideNumbers();
-    let added = 0;
+    // Remove old number nodes ONLY from the numbered frames (not all frames)
+    for (const frame of numberedFrames) {
+      const existing = frame.findOne(n => n.type === 'TEXT' && /^__SLIDE_NUMBER__\d+$/.test(n.name));
+      if (existing) { try { existing.remove(); } catch (e) {} }
+    }
 
-    // Renumber all frames sequentially starting from 1
-    for (let i = 0; i < orderedFrames.length; i++) {
-      const frame = orderedFrames[i];
+    let added = 0;
+    // Re-sequence those frames 01, 02, 03… preserving style
+    for (let i = 0; i < numberedFrames.length; i++) {
+      const frame = numberedFrames[i];
       try {
-        // Map UI weight to Figma font style
         let fontStyle = style.weight;
-        if (fontStyle === 'Regular' || fontStyle === 'Bold') {
-          // Use as is
-        } else {
-          fontStyle = 'Regular';
-        }
+        if (fontStyle !== 'Regular' && fontStyle !== 'Bold') fontStyle = 'Regular';
         await figma.loadFontAsync({ family: style.font, style: fontStyle });
         const numNode = figma.createText();
-        let numStr = String(i + 1); // Sequential numbering starting from 1
+        let numStr = String(i + 1);
         let numLeadingZero = style.leadingZero !== false;
         numStr = numLeadingZero && numStr.length < 2 ? '0' + numStr : String(numStr);
         numNode.name = `__SLIDE_NUMBER__${i + 1}`;
         numNode.characters = numStr;
-        console.log('Fixed slide number node:', numNode.name, 'with characters:', numNode.characters);
         numNode.fontSize = style.size;
         numNode.fontName = { family: style.font, style: fontStyle };
-        // Robust hex color conversion
         let rgb;
-        try {
-          rgb = hexToRgb(style.color);
-        } catch (e) {
-          rgb = { r: 0, g: 0, b: 0 };
-        }
+        try { rgb = hexToRgb(style.color); } catch (e) { rgb = { r: 0, g: 0, b: 0 }; }
         numNode.fills = [{ type: 'SOLID', color: rgb }];
         numNode.textAutoResize = 'WIDTH_AND_HEIGHT';
         frame.appendChild(numNode);
-        // Place number node according to selected position
         const pos = getNumberPosition(style.pos, frame, numNode, style.size, style.padding);
         numNode.x = pos.x;
         numNode.y = pos.y;
         added++;
       } catch (e) {
         console.log('Error fixing number for frame:', frame.name, e);
-        figma.ui.postMessage({ type: 'slide-numbers-error', error: 'Font load or node creation failed.' });
       }
     }
 
