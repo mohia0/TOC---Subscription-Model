@@ -1289,6 +1289,15 @@
       height: 100%;
     }
 
+    /* Typography panel: toggles hug their text, no stretching */
+    #advanced-toc-style-popup .segmented-toggle {
+      width: fit-content !important;
+    }
+    #advanced-toc-style-popup .segmented-toggle .seg-btn {
+      flex: 0 0 auto;
+      padding: 3px 8px;
+    }
+
     .segmented-toggle .seg-btn:hover {
       color: var(--text-main);
     }
@@ -1402,12 +1411,18 @@
                   </svg>
                 </button>
               </div>
+              <div id="direction-label" style="font-size:10px;color:var(--text-muted);margin-top:5px;letter-spacing:0.03em;">Detecting: <span id="direction-label-value" style="color:#e2e8f0;font-weight:600;">Z-order</span></div>
             </div>
 
+            <div id="start-numbering-hint" style="display:none;background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.25);border-radius:8px;padding:8px 10px;margin-bottom:6px;font-size:11px;color:#a5b4fc;line-height:1.6;position:relative;">
+              💡 Hover a slide row to reveal <strong>Start Numbering</strong> — begin numbering from any slide.
+              <button onclick="this.parentElement.style.display='none';try{localStorage.setItem('toc-start-hint-seen','1')}catch(e){}" style="position:absolute;top:5px;right:7px;background:none;border:none;color:#6366f1;cursor:pointer;font-size:14px;padding:0;line-height:1;">✕</button>
+            </div>
             <div class="slides-list" id="slides-list"></div>
             <div class="slides-empty" id="slides-empty"
-              style="display:none; padding:24px 0; font-size: 12px; color: #94a3b8;">
-              No slides yet. Add numbers to see them here.
+              style="display:none; padding:20px 0; font-size: 12px; color: #94a3b8; text-align:center; line-height:1.8;">
+              No slides detected yet.<br>
+              <span style="color:#60a5fa;font-size:11px;">Click ⟳ Rescan to detect your document's slides</span>
             </div>
 
             <div class="slide-controls" style="align-items: center; margin-top: 12px;">
@@ -1424,7 +1439,7 @@
                   <line x1="10" x2="8" y1="3" y2="21"/><line x1="16" x2="14" y1="3" y2="21"/>
                 </svg>Style
               </button>
-              <button class="refresh-btn" id="refresh-numbers" data-tooltip="Fix numbering if you removed some slides">
+              <button class="refresh-btn" id="refresh-numbers" data-tooltip="Removed a slide? Fix gaps in numbering">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;">
                   <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
                   <path d="m9 12 2 2 4-4"/>
@@ -1594,7 +1609,7 @@
     <!-- Compact Trial Status Bar -->
     <div id="trial-status-bar"
       style="position:fixed;bottom:0;left:0;right:0;background:rgba(30,30,36,0.95);color:#94a3b8;padding:4px 12px;display:flex;justify-content:space-between;align-items:center;z-index:99999;font-family:'Inter',sans-serif;font-size:10px;font-weight:600;border-top:1px solid rgba(255,255,255,0.1);height:24px;backdrop-filter:blur(8px);">
-      <div style="display:flex;align-items:center;gap:6px;">
+      <div style="display:flex;align-items:center;gap:8px;">
         <span id="trial-status-text" style="color:#e2e8f0;font-weight:700;">TRIAL ACTIVE</span>
         <span id="trial-countdown" style="color:#fbbf24;font-weight:600;">--d --h --m --s</span>
       </div>
@@ -1642,6 +1657,7 @@
         <div id="support-success-emoji" style="font-size:54px;line-height:1;">🙏</div>
         <div style="color:#f3f4f8;font-size:15px;font-weight:700;text-align:center;margin-top:4px;">Thank you!</div>
         <div id="support-success-sub" style="color:#94a3b8;font-size:12px;text-align:center;line-height:1.6;">Your message has been sent.<br>We'll get back to you soon.</div>
+        <button onclick="document.getElementById('support-modal-bg').style.display='none';" style="margin-top:4px;background:none;border:none;color:#6366f1;font-size:11px;cursor:pointer;text-decoration:underline;padding:0;">Close</button>
       </div>
     </div>
   </div>
@@ -1670,7 +1686,7 @@
       </div>
 
       <!-- Quick Action Grid -->
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
         <div
           style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.05);border-radius:8px;padding:8px;text-align:left;">
           <div style="color:#fff;font-weight:700;font-size:11px;display:flex;align-items:center;gap:4px;">🔢 Number
@@ -3870,10 +3886,22 @@
           btn.style.color = '#fff';
           btn.style.border = '1.5px solid #111';
           currentDirection = ['z', 'z-flip', 'vertical', 'horizontal', 'horizontal-rtl'][idx];
+          // Update direction label
+          const _dirNames = ['Z-order', 'Z Flipped', 'Vertical', 'Horizontal →', 'Horizontal ←'];
+          const _dirLabel = document.getElementById('direction-label-value');
+          if (_dirLabel) _dirLabel.textContent = _dirNames[idx];
           requestFrames(currentDirection); // Numbering section
           requestTOCFrames(currentDirection); // TOC section
         };
       });
+
+      // Show "Start Numbering" feature hint on first load only
+      try {
+        if (!localStorage.getItem('toc-start-hint-seen')) {
+          const _hint = document.getElementById('start-numbering-hint');
+          if (_hint) _hint.style.display = 'block';
+        }
+      } catch(e) {}
 
       // Listen for messages from plugin
       window.onmessage = (event) => {
@@ -4043,12 +4071,25 @@
         requestTOCFrames(currentDirection);
         showMainStatus('Slide numbering fixed!', '#18A0FB');
       };
+      let clearConfirming = false;
+      let clearConfirmTimeout;
       removeAllNumbersBtn.onclick = () => {
-        // Check trial status first
-        if (!checkTrialAndUpgrade()) {
-          return; // Stop if trial expired
+        if (!checkTrialAndUpgrade()) { return; }
+        if (!clearConfirming) {
+          clearConfirming = true;
+          removeAllNumbersBtn.textContent = 'Sure?';
+          removeAllNumbersBtn.style.color = '#ff6b6b';
+          clearConfirmTimeout = setTimeout(() => {
+            clearConfirming = false;
+            removeAllNumbersBtn.textContent = 'Clear';
+            removeAllNumbersBtn.style.color = '';
+          }, 2500);
+          return;
         }
-
+        clearTimeout(clearConfirmTimeout);
+        clearConfirming = false;
+        removeAllNumbersBtn.textContent = 'Clear';
+        removeAllNumbersBtn.style.color = '';
         parent.postMessage({ pluginMessage: { type: 'remove-all-numbers' } }, '*');
         showMainStatus('All slide numbers removed!', '#ff4d4d');
       };
@@ -4447,6 +4488,10 @@
         });
       }
 
+      // Track if style/layout settings were changed from defaults
+      let tocStyleDirty = false;
+      let tocLayoutDirty = false;
+
       function renderTOCControls() {
         // Clear list area
         tocEditor.innerHTML = '';
@@ -4525,9 +4570,10 @@
         const tocStyleBtn = document.createElement('button');
         tocStyleBtn.className = 'refresh-btn tooltip-bottom';
         tocStyleBtn.setAttribute('data-tooltip', 'Typography & colors');
+        const styleLabel = tocStyleDirty ? `Typography<span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:#6366f1;margin-left:4px;vertical-align:middle;"></span>` : 'Typography';
         tocStyleBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/>
-        </svg>Style`;
+        </svg>${styleLabel}`;
         tocStyleBtn.onclick = () => {
           if (!checkTrialAndUpgrade()) { return; }
           if (advPanelBg) {
@@ -4541,9 +4587,10 @@
         const tocLayoutBtn = document.createElement('button');
         tocLayoutBtn.className = 'refresh-btn tooltip-bottom';
         tocLayoutBtn.setAttribute('data-tooltip', 'Columns & spacing');
+        const layoutLabel = tocLayoutDirty ? `Layout<span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:#6366f1;margin-left:4px;vertical-align:middle;"></span>` : 'Layout';
         tocLayoutBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 3h7a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-7m0-18H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h7m0-18v18"/>
-        </svg>Layout`;
+        </svg>${layoutLabel}`;
         tocLayoutBtn.onclick = () => {
           if (!checkTrialAndUpgrade()) { return; }
           if (layoutPanelBg) {
@@ -4569,6 +4616,16 @@
           parent.postMessage({ pluginMessage: { type: 'get-frames', direction: currentDirection, forTOC: true } }, '*');
         };
         buttonRow.appendChild(refreshBtn);
+
+        // Slide count badge — inline with rescan, vertically centered
+        const slideCount = (slides && slides.length) || 0;
+        if (slideCount > 0) {
+          const countBadge = document.createElement('span');
+          countBadge.className = 'toc-slide-count';
+          countBadge.style.cssText = 'font-size:10px;color:var(--text-muted);letter-spacing:0.03em;line-height:32px;white-space:nowrap;margin-left:4px;';
+          countBadge.textContent = `${slideCount} slide${slideCount !== 1 ? 's' : ''}`;
+          buttonRow.appendChild(countBadge);
+        }
 
         // Generator Tip Button
         const toggleTipBtn = document.createElement('button');
@@ -4617,6 +4674,15 @@
         } else {
           tocEditor.appendChild(buttonRow);
         }
+
+        // Empty state when no slides
+        if (!slides || !slides.length) {
+          const emptyDiv = document.createElement('div');
+          emptyDiv.style.cssText = 'padding:32px 0;text-align:center;font-size:12px;color:#94a3b8;line-height:1.8;';
+          emptyDiv.innerHTML = '<div style="font-size:26px;margin-bottom:8px;opacity:0.35;">📋</div>No slides detected yet.<br><span style="font-size:11px;color:#60a5fa;">Click ⟳ Rescan to detect slides</span>';
+          tocEditor.appendChild(emptyDiv);
+          return;
+        }
         // --- TOC Layout Popup (same look as styling popup) ---
         let layoutPanelBg = document.getElementById('toc-layout-modal-bg');
         if (layoutPanelBg) layoutPanelBg.remove();
@@ -4647,7 +4713,7 @@
             </div>
           </div>
 
-          <div style="display:flex;flex-direction:column;gap:10px;">
+          <div style="display:flex;flex-direction:column;gap:16px;">
             <!-- Group 1 -->
             <div style="border-bottom:1px solid rgba(255,255,255,0.05);padding-bottom:8px;">
               <div style="font-weight:700;font-size:12px;color:#888;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.03em;">Positioning</div>
@@ -4691,7 +4757,7 @@
             <!-- Group 3 -->
             <div style="padding-bottom:2px;">
               <div style="font-weight:700;font-size:12px;color:#888;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.03em;">Size & Align</div>
-              <div style="display:grid;grid-template-columns: 1fr 1fr;gap:10px;margin-bottom:8px;">
+              <div style="display:grid;grid-template-columns: 1fr 1fr;gap:10px;margin-bottom:10px;">
                 <div style="display:flex;align-items:center;gap:6px;justify-content:space-between;">
                   <span style="font-size:11px;color:#b0b3b8;">Max H</span>
                   <span style="display:flex;align-items:center;"><input id="max-column-height" class="modal-input" type="number" value="800" style="width:40px;height:24px;font-size:11px;padding:2px 4px;"><span style="font-size:10px;margin-left:2px;color:#666;">px</span></span>
@@ -4786,6 +4852,7 @@
             input.addEventListener('change', function () {
               // Special handling for max-items-per-col - regenerate TOC
               if (input.id === 'max-items-per-col') {
+                tocLayoutDirty = true;
                 sendLiveLayoutUpdateInstant();
                 // Also regenerate the TOC structure
                 parent.postMessage({
@@ -4795,6 +4862,7 @@
                   }
                 }, '*');
               } else {
+                tocLayoutDirty = true;
                 sendLiveLayoutUpdateInstant();
               }
             });
@@ -4889,9 +4957,11 @@
         advPanel = document.createElement('div');
         advPanel.id = 'advanced-toc-style-popup';
         advPanel.className = 'modal';
-        advPanel.style.width = '380px'; // Matching scale (~1.1x)
-        advPanel.style.padding = '16px 18px';
-        advPanel.style.gap = '10px';
+        advPanel.style.width = '570px';
+        advPanel.style.maxWidth = 'min(570px, calc(100vw - 40px))';
+        advPanel.style.boxSizing = 'border-box';
+        advPanel.style.padding = '18px 20px';
+        advPanel.style.gap = '8px';
         advPanel.innerHTML = `
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
             <div class="modal-title" style="font-size:1.15em;margin:0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px;"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"></circle><circle cx="17.5" cy="10.5" r=".5" fill="currentColor"></circle><circle cx="8.5" cy="7.5" r=".5" fill="currentColor"></circle><circle cx="6.5" cy="12.5" r=".5" fill="currentColor"></circle><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.607-.482 1.926-1.125l1.074-2.152a2 2 0 0 1 1.789-1.108l2.254.045c1.673.033 2.957-1.353 2.957-3.045 0-5.127-4.225-9.317-9.352-9.605A10.01 10.01 0 0 0 12 2Z"></path></svg>Typography</div>
@@ -4905,89 +4975,87 @@
             </div>
           </div>
 
-          <div style="display:flex;flex-direction:column;gap:12px;">
-            <!-- Hero Section -->
-            <div style="border-bottom:1px solid rgba(255,255,255,0.05);padding-bottom:10px;">
-              <div style="font-weight:700;font-size:12px;color:var(--primary);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.04em;">Title Configuration</div>
-              <div style="display:flex;flex-direction:column;gap:8px;">
-                <!-- Title Text -->
-                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-                   <span style="font-size:11px;color:#b0b3b8;flex:1;">Title Text</span>
-                   <input id="hero-font-size" class="modal-input" type="number" value="32" style="width:40px;height:24px;font-size:11px;">
-                   <input id="hero-font-color" class="modal-input" type="color" value="#000000" style="width:24px;height:24px;">
-                </div>
-                <select id="hero-font-family" class="modal-select" style="width:100%;height:24px;font-size:11px;"><option value="Inter">Inter</option><option value="Arial">Arial</option><option value="Fira Mono">Fira Mono</option></select>
-                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-                   <span style="font-size:11px;color:#b0b3b8;flex:1;">Text Weight</span>
-                   <select id="hero-font-weight" class="modal-select" style="width:120px;height:24px;font-size:10px;"><option value="Bold">Bold</option><option value="Semi Bold">Semi</option><option value="Regular">Regular</option></select>
-                </div>
+          <div style="display:flex;flex-direction:column;gap:16px;">
 
-                <div style="height:1px;background:rgba(255,255,255,0.05);margin:4px 0;"></div>
+            <!-- TITLE CONFIGURATION -->
+            <div style="border-bottom:1px solid rgba(255,255,255,0.05);padding-bottom:14px;">
+              <div style="font-weight:700;font-size:11px;color:var(--primary);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.05em;">Title</div>
 
-                <!-- Title Num -->
-                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-                   <span style="font-size:11px;color:#b0b3b8;flex:1;">Title Num</span>
-                   <input id="title-number-size" class="modal-input" type="number" value="32" style="width:40px;height:24px;font-size:11px;">
-                   <input id="title-number-color" class="modal-input" type="color" value="#000000" style="width:24px;height:24px;">
+              <!-- Title > Text -->
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+                <span style="font-size:11px;color:#888;min-width:32px;flex-shrink:0;">Text</span>
+                <select id="hero-font-family" class="modal-select" style="height:26px;font-size:11px;padding:2px 6px;"><option value="Inter">Inter</option><option value="Arial">Arial</option><option value="Fira Mono">Fira Mono</option></select>
+                <div style="margin-left:auto;display:flex;align-items:center;gap:6px;flex-shrink:0;">
+                  <span style="font-size:10px;color:#666;">Size</span>
+                  <input id="hero-font-size" class="modal-input" type="number" value="32" style="width:42px;height:26px;font-size:11px;padding:2px 4px;">
+                  <span style="font-size:10px;color:#666;">Color</span>
+                  <input id="hero-font-color" class="modal-input" type="color" value="#000000" style="width:26px;height:26px;padding:2px;">
+                  <span style="font-size:10px;color:#666;">Weight</span>
+                  <select id="hero-font-weight" class="modal-select" style="height:26px;font-size:10px;padding:2px 6px;"><option value="Bold">Bold</option><option value="Semi Bold">Semi</option><option value="Regular">Reg</option></select>
                 </div>
-                <select id="title-number-font" class="modal-select" style="width:100%;height:24px;font-size:11px;"><option value="Inter">Inter</option><option value="Arial">Arial</option></select>
-                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-                   <span style="font-size:11px;color:#b0b3b8;flex:1;">Num Weight</span>
-                   <select id="title-number-weight" class="modal-select" style="width:120px;height:24px;font-size:10px;"><option value="Bold">Bold</option><option value="Semi Bold">Semi</option><option value="Regular">Regular</option></select>
-                </div>
-                <div style="display:flex;align-items:center;justify-content:flex-end;gap:8px;">
-                   <label style="font-size:10px;color:#888;display:flex;align-items:center;gap:6px;cursor:pointer;">
-                    <div class="toggle-switch"><input type="checkbox" id="title-number-leading-zero"><span class="toggle-slider"></span></div> No 0
-                   </label>
+              </div>
+
+              <!-- Title > Num -->
+              <div style="display:flex;align-items:center;gap:8px;">
+                <span style="font-size:11px;color:#888;min-width:32px;flex-shrink:0;">Num</span>
+                <select id="title-number-font" class="modal-select" style="height:26px;font-size:11px;padding:2px 6px;"><option value="Inter">Inter</option><option value="Arial">Arial</option></select>
+                <div style="margin-left:auto;display:flex;align-items:center;gap:6px;flex-shrink:0;">
+                  <span style="font-size:10px;color:#666;">Size</span>
+                  <input id="title-number-size" class="modal-input" type="number" value="32" style="width:42px;height:26px;font-size:11px;padding:2px 4px;">
+                  <span style="font-size:10px;color:#666;">Color</span>
+                  <input id="title-number-color" class="modal-input" type="color" value="#000000" style="width:26px;height:26px;padding:2px;">
+                  <span style="font-size:10px;color:#666;">Weight</span>
+                  <select id="title-number-weight" class="modal-select" style="height:26px;font-size:10px;padding:2px 6px;"><option value="Bold">Bold</option><option value="Semi Bold">Semi</option><option value="Regular">Reg</option></select>
+                  <label style="display:flex;align-items:center;gap:4px;cursor:pointer;white-space:nowrap;"><div class="toggle-switch"><input type="checkbox" id="title-number-leading-zero"><span class="toggle-slider"></span></div><span style="font-size:10px;color:#666;">No 0</span></label>
                 </div>
               </div>
             </div>
 
-            <!-- Subtitle Section -->
+            <!-- SUB-SLIDE STYLE -->
             <div style="padding-bottom:4px;">
-              <div style="font-weight:700;font-size:12px;color:var(--primary);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.04em;">Sub-Slide Style</div>
-              <div style="display:flex;flex-direction:column;gap:8px;">
-                <!-- Sub Text -->
-                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-                   <span style="font-size:11px;color:#b0b3b8;flex:1;">Sub Text</span>
-                   <input id="sub-title-size" class="modal-input" type="number" value="18" style="width:40px;height:24px;font-size:11px;">
-                   <input id="sub-title-color" class="modal-input" type="color" value="#000000" style="width:24px;height:24px;">
-                </div>
-                <select id="sub-title-font" class="modal-select" style="width:100%;height:24px;font-size:11px;"><option value="Inter">Inter</option><option value="Arial">Arial</option></select>
-                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-                   <span style="font-size:11px;color:#b0b3b8;flex:1;">Text Weight</span>
-                   <select id="sub-title-weight" class="modal-select" style="width:120px;height:24px;font-size:10px;"><option value="Regular">Regular</option><option value="Bold">Bold</option><option value="Semi Bold">Semi</option></select>
-                </div>
+              <div style="font-weight:700;font-size:11px;color:var(--primary);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.05em;">Sub-Slide</div>
 
-                <div style="height:1px;background:rgba(255,255,255,0.05);margin:4px 0;"></div>
-
-                <!-- Sub Num -->
-                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-                  <span style="font-size:11px;color:#b0b3b8;flex:1;">Sub Num</span>
-                  <input id="sub-number-size" class="modal-input" type="number" value="18" style="width:40px;height:24px;font-size:11px;">
-                  <input id="sub-number-color" class="modal-input" type="color" value="#000000" style="width:24px;height:24px;">
-                </div>
-                <select id="sub-number-font" class="modal-select" style="width:100%;height:24px;font-size:11px;"><option value="Inter">Inter</option><option value="Arial">Arial</option></select>
-                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
-                   <span style="font-size:11px;color:#b0b3b8;flex:1;">Num Weight</span>
-                   <select id="sub-number-weight" class="modal-select" style="width:120px;height:24px;font-size:10px;"><option value="Regular">Regular</option><option value="Bold">Bold</option><option value="Semi Bold">Semi</option></select>
-                </div>
-
-                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:4px;">
-                  <div style="display:flex;align-items:center;gap:4px;">
-                    <span style="font-size:10px;color:#888;">Indent</span>
-                    <input id="sub-indent" class="modal-input" type="number" value="24" style="width:34px;height:22px;font-size:10px;padding:2px 4px;">
-                  </div>
-                  <label style="font-size:10px;color:#888;display:flex;align-items:center;gap:5px;cursor:pointer;">
-                    <div class="toggle-switch"><input type="checkbox" id="sub-number-leading-zero"><span class="toggle-slider"></span></div> No 0
-                  </label>
+              <!-- Sub > Text -->
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+                <span style="font-size:11px;color:#888;min-width:32px;flex-shrink:0;">Text</span>
+                <select id="sub-title-font" class="modal-select" style="height:26px;font-size:11px;padding:2px 6px;"><option value="Inter">Inter</option><option value="Arial">Arial</option></select>
+                <div style="margin-left:auto;display:flex;align-items:center;gap:6px;flex-shrink:0;">
+                  <span style="font-size:10px;color:#666;">Size</span>
+                  <input id="sub-title-size" class="modal-input" type="number" value="18" style="width:42px;height:26px;font-size:11px;padding:2px 4px;">
+                  <span style="font-size:10px;color:#666;">Color</span>
+                  <input id="sub-title-color" class="modal-input" type="color" value="#000000" style="width:26px;height:26px;padding:2px;">
+                  <span style="font-size:10px;color:#666;">Weight</span>
+                  <select id="sub-title-weight" class="modal-select" style="height:26px;font-size:10px;padding:2px 6px;"><option value="Regular">Reg</option><option value="Bold">Bold</option><option value="Semi Bold">Semi</option></select>
                 </div>
               </div>
+
+              <!-- Sub > Num -->
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
+                <span style="font-size:11px;color:#888;min-width:32px;flex-shrink:0;">Num</span>
+                <select id="sub-number-font" class="modal-select" style="height:26px;font-size:11px;padding:2px 6px;"><option value="Inter">Inter</option><option value="Arial">Arial</option></select>
+                <div style="margin-left:auto;display:flex;align-items:center;gap:6px;flex-shrink:0;">
+                  <span style="font-size:10px;color:#666;">Size</span>
+                  <input id="sub-number-size" class="modal-input" type="number" value="18" style="width:42px;height:26px;font-size:11px;padding:2px 4px;">
+                  <span style="font-size:10px;color:#666;">Color</span>
+                  <input id="sub-number-color" class="modal-input" type="color" value="#000000" style="width:26px;height:26px;padding:2px;">
+                  <span style="font-size:10px;color:#666;">Weight</span>
+                  <select id="sub-number-weight" class="modal-select" style="height:26px;font-size:10px;padding:2px 6px;"><option value="Regular">Reg</option><option value="Bold">Bold</option><option value="Semi Bold">Semi</option></select>
+                  <label style="display:flex;align-items:center;gap:4px;cursor:pointer;white-space:nowrap;"><div class="toggle-switch"><input type="checkbox" id="sub-number-leading-zero"><span class="toggle-slider"></span></div><span style="font-size:10px;color:#666;">No 0</span></label>
+                </div>
+              </div>
+
+              <!-- Indent -->
+              <div style="display:flex;align-items:center;gap:6px;">
+                <span style="font-size:11px;color:#888;">Indent</span>
+                <input id="sub-indent" class="modal-input" type="number" value="24" style="width:42px;height:26px;font-size:11px;padding:2px 4px;">
+                <span style="font-size:10px;color:#555;">px</span>
+              </div>
             </div>
+
           </div>
 
-
         `;
+
         advPanelBg.appendChild(advPanel);
         // Show/hide logic
         tocStyleBtn.onclick = () => { advPanelBg.style.display = 'flex'; advPanelBg.classList.add('active'); };
@@ -5023,6 +5091,7 @@
         subNumberLeadingZeroInput.checked = false; // Unchecked by default (leading zero ON)
         // Update settings from UI
         function updateSettingsFromUI() {
+          tocStyleDirty = true;
           tocSettings.heroFontSize = parseInt(heroFontSizeInput.value, 10);
           tocSettings.heroFontWeight = heroFontWeightInput.value;
           tocSettings.heroFontColor = heroFontColorInput.value;
@@ -5511,11 +5580,11 @@
         popup.style.flexDirection = 'column';
         popup.style.gap = '18px';
         popup.innerHTML = `
-          <div style="font-weight:800;font-size:1.1em;color:#fff;margin-bottom:8px;">Styling Menu</div>
+          <div style="font-weight:800;font-size:1.1em;color:#fff;margin-bottom:10px;">Styling Menu</div>
           <div style="display:flex;gap:24px;align-items:center;">
             <div style="flex:1;">
               <div style="font-weight:700;color:#3a86ff;margin-bottom:6px;">Hero Slide Style</div>
-              <label>Font Size <input id="hero-font-size" type="text" value="${heroFontSize}" style="width:60px;margin-left:8px;"></label><br>
+              <label>Font Size <span style="font-size:9px;color:#666;white-space:nowrap;">Size</span><input id="hero-font-size" type="text" value="${heroFontSize}" style="width:60px;margin-left:8px;"></label><br>
               <label>Font Weight <select id="hero-font-weight" style="width:70px;margin-left:8px;">
                 <option value="700" ${heroFontWeight === '700' ? 'selected' : ''}>Bold</option>
                 <option value="600" ${heroFontWeight === '600' ? 'selected' : ''}>SemiBold</option>
@@ -5691,7 +5760,8 @@
             const wrapper = document.createElement('div');
             wrapper.className = 'segmented-toggle';
             
-            wrapper.style.width = select.style.width || 'auto';
+            const inAdvPanel = select.closest('#advanced-toc-style-popup');
+            wrapper.style.width = inAdvPanel ? 'fit-content' : (select.style.width || 'auto');
             wrapper.style.height = select.style.height || '24px';
             if (select.style.marginLeft) wrapper.style.marginLeft = select.style.marginLeft;
             
