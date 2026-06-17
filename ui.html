@@ -1392,21 +1392,6 @@
           <div class="tab-content-panel" id="panel-toc">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
               <div id="toc-status-msg" style="font-size:0.9em;color:var(--primary);"></div>
-              <button id="toggle-generator-tip" class="icon-btn"
-                style="width:24px; height:24px; font-size:12px; opacity:0.6; margin-left: auto;"
-                data-tooltip="Show instructions">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                  stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <path d="M12 16v-4"></path>
-                  <path d="M12 8h.01"></path>
-                </svg>
-              </button>
-            </div>
-            <div id="generator-tip"
-              style="display:none; font-size:11px; color:var(--text-muted); margin-bottom:16px; line-height:1.4; background:rgba(255,255,255,0.03); padding:10px; border-radius:8px; border:1px solid rgba(255,255,255,0.05); animation: fadeIn 0.3s ease;">
-              💡 <strong>Quick Tip:</strong> Select an empty frame in your document, then click "Generate TOC" to create
-              the TOC inside it.
             </div>
             <div class="toc-editor" id="toc-editor"></div>
           </div>
@@ -4388,6 +4373,7 @@
         buttonRow.style.justifyContent = 'flex-start';
         buttonRow.style.gap = '18px';
         buttonRow.style.marginBottom = '18px';
+        buttonRow.style.position = 'relative';
 
         // Generate TOC button (main action)
         const generateBtn = document.createElement('button');
@@ -4494,6 +4480,42 @@
           parent.postMessage({ pluginMessage: { type: 'get-frames', direction: currentDirection, forTOC: true } }, '*');
         };
         buttonRow.appendChild(refreshBtn);
+
+        // Generator Tip Button
+        const toggleTipBtn = document.createElement('button');
+        toggleTipBtn.className = 'icon-btn';
+        toggleTipBtn.title = 'Show instructions';
+        toggleTipBtn.style.marginLeft = 'auto';
+        toggleTipBtn.style.opacity = '0.6';
+        toggleTipBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>';
+
+        const generatorTip = document.createElement('div');
+        generatorTip.style.display = 'none';
+        generatorTip.style.position = 'absolute';
+        generatorTip.style.bottom = '100%';
+        generatorTip.style.right = '0';
+        generatorTip.style.marginBottom = '12px';
+        generatorTip.style.fontSize = '11px';
+        generatorTip.style.color = 'var(--text-muted)';
+        generatorTip.style.lineHeight = '1.4';
+        generatorTip.style.background = '#2a2a3d';
+        generatorTip.style.padding = '10px';
+        generatorTip.style.borderRadius = '8px';
+        generatorTip.style.border = '1px solid rgba(255,255,255,0.08)';
+        generatorTip.style.boxShadow = '0 4px 12px rgba(0,0,0,0.5)';
+        generatorTip.style.width = '240px';
+        generatorTip.style.zIndex = '100';
+        generatorTip.style.animation = 'fadeIn 0.2s ease';
+        generatorTip.innerHTML = '💡 <strong>Quick Tip:</strong> Select an empty frame in your document, then click "Generate TOC" to create the TOC inside it.';
+
+        toggleTipBtn.onclick = () => {
+          const isHidden = generatorTip.style.display === 'none';
+          generatorTip.style.display = isHidden ? 'block' : 'none';
+          toggleTipBtn.style.opacity = isHidden ? '1' : '0.6';
+        };
+
+        buttonRow.appendChild(toggleTipBtn);
+        buttonRow.appendChild(generatorTip);
 
         tocEditor.appendChild(buttonRow);
         // --- TOC Layout Popup (same look as styling popup) ---
@@ -5125,15 +5147,7 @@
           }
         });
 
-        // Toggle generator tip listener
-        const toggleTipBtn = document.getElementById('toggle-generator-tip');
-        const generatorTip = document.getElementById('generator-tip');
-        if (toggleTipBtn && generatorTip) {
-          toggleTipBtn.onclick = () => {
-            const isHidden = generatorTip.style.display === 'none';
-            generatorTip.style.display = isHidden ? 'block' : 'none';
-          };
-        }
+        // Removed old generator tip listener
 
         // Save/Apply Typography Manual Button
         const saveTypographyBtn = advPanel.querySelector('#save-typography-btn');
