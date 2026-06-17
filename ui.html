@@ -50,12 +50,20 @@
       color: #f3f4f8;
     }
 
+    html {
+      background: var(--bg);
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      width: 100%;
+    }
     body {
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: flex-start;
-      height: 100vh;
+      min-height: 100vh;
+      height: 100%;
       overflow: hidden;
       width: 100vw;
       background: var(--bg);
@@ -110,7 +118,7 @@
       border-radius: 0;
       box-shadow: none;
       border: none;
-      padding: 16px 20px;
+      padding: 8px 20px 16px;
       margin: 0;
       width: 100%;
       height: 100%;
@@ -143,7 +151,7 @@
     }
 
     .card>*:first-child {
-      margin-top: 8px;
+      margin-top: 0;
     }
 
     .card>*:last-child {
@@ -218,7 +226,7 @@
     .slides-list {
       background: rgba(0, 0, 0, 0.2);
       border-radius: 8px;
-      border: 1px solid var(--border);
+      border: none;
       flex: 1;
       min-height: 100px;
       overflow-y: auto;
@@ -231,7 +239,7 @@
       width: 100%;
       box-sizing: border-box;
       scrollbar-width: thin;
-      scrollbar-color: #353545 transparent;
+      scrollbar-color: rgba(255,255,255,0.15) transparent;
     }
 
     .slides-list::-webkit-scrollbar {
@@ -262,7 +270,7 @@
       font-size: 0.95em;
       width: 100%;
       background: transparent;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      border-bottom: none;
       transition: background 0.2s ease;
       box-sizing: border-box;
       position: relative;
@@ -339,7 +347,7 @@
       border-radius: 8px;
       font-size: 13px;
       font-weight: 600;
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      border: none;
       background: rgba(255, 255, 255, 0.05);
       color: var(--text-main);
       cursor: pointer;
@@ -358,14 +366,12 @@
     .primary-btn,
     .modal-btn {
       background: var(--primary);
-      border-color: var(--primary);
       color: white;
     }
 
     .primary-btn:hover,
     .modal-btn:hover {
       background: var(--primary-dark);
-      border-color: var(--primary-dark);
     }
 
     .icon-btn,
@@ -378,24 +384,21 @@
     .icon-btn:hover,
     .detect-btn:hover {
       background: rgba(255, 255, 255, 0.1);
-      border-color: rgba(255, 255, 255, 0.2);
     }
 
     .detect-btn.selected {
       background: rgba(37, 99, 235, 0.15);
-      border-color: var(--primary);
       color: var(--primary);
+      box-shadow: inset 0 0 0 1.5px var(--primary);
     }
 
     #remove-all-numbers {
       background: rgba(239, 68, 68, 0.1);
       color: #ef4444;
-      border-color: rgba(239, 68, 68, 0.2);
     }
 
     #remove-all-numbers:hover {
       background: rgba(239, 68, 68, 0.2);
-      border-color: rgba(239, 68, 68, 0.3);
     }
 
     .primary-btn:active,
@@ -407,7 +410,6 @@
     .primary-btn,
     .modal-btn {
       background: var(--primary);
-      border-color: var(--primary);
       color: white;
     }
 
@@ -430,14 +432,13 @@
 
     .detect-btn.selected {
       background: rgba(37, 99, 235, 0.15);
-      border-color: var(--primary);
       color: var(--primary);
+      box-shadow: inset 0 0 0 1.5px var(--primary);
     }
 
     #remove-all-numbers {
       background: rgba(239, 68, 68, 0.1);
       color: #ef4444;
-      border-color: rgba(239, 68, 68, 0.2);
     }
 
     #remove-all-numbers:hover {
@@ -856,30 +857,35 @@
       scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
     }
 
-    /* Show custom scrollbar only in .slides-list */
-    .slides-list {
+    /* Show custom scrollbar in .slides-list and #toc-editor */
+    .slides-list,
+    #toc-editor {
       scrollbar-width: thin !important;
-      scrollbar-color: #d0d6e1 #f8fafc !important;
+      scrollbar-color: rgba(255,255,255,0.15) transparent !important;
     }
 
-    .slides-list::-webkit-scrollbar {
-      width: 6px !important;
+    .slides-list::-webkit-scrollbar,
+    #toc-editor::-webkit-scrollbar {
+      width: 4px !important;
       background: transparent !important;
-      border-radius: 6px !important;
+      border-radius: 4px !important;
       display: block !important;
     }
 
-    .slides-list::-webkit-scrollbar-thumb {
-      background: #d0d6e1 !important;
+    .slides-list::-webkit-scrollbar-thumb,
+    #toc-editor::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.15) !important;
       border-radius: 6px !important;
       transition: background 0.2s !important;
     }
 
-    .slides-list:hover::-webkit-scrollbar-thumb {
-      background: #b0b8c9 !important;
+    .slides-list:hover::-webkit-scrollbar-thumb,
+    #toc-editor:hover::-webkit-scrollbar-thumb {
+      background: rgba(255,255,255,0.25) !important;
     }
 
-    .slides-list::-webkit-scrollbar-track {
+    .slides-list::-webkit-scrollbar-track,
+    #toc-editor::-webkit-scrollbar-track {
       background: transparent !important;
     }
 
@@ -950,7 +956,7 @@
       font-weight: 500;
       font-size: 0.95em;
       background: transparent;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      border-bottom: none;
       color: var(--text-main);
       position: relative;
       transition: all 0.2s ease;
@@ -1071,7 +1077,7 @@
       background: rgba(255, 255, 255, 0.03);
       padding: 4px;
       border-radius: 10px;
-      border: 1px solid rgba(255, 255, 255, 0.05);
+      border: none;
     }
 
     #main-status-msg:empty,
@@ -1156,10 +1162,10 @@
 
     .settings-group {
       background: rgba(0, 0, 0, 0.15);
-      border: 1px solid rgba(255, 255, 255, 0.05);
+      border: none;
       border-radius: 8px;
-      padding: 16px;
-      margin-bottom: 16px;
+      padding: 8px 12px;
+      margin-bottom: 10px;
       flex-shrink: 0;
     }
 
@@ -1244,6 +1250,40 @@
         margin-top: 8px;
       }
     }
+    .segmented-toggle {
+      display: inline-flex;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 6px;
+      padding: 2px;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .segmented-toggle .seg-btn {
+      flex: 1;
+      padding: 4px 6px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 10px;
+      font-weight: 600;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-align: center;
+      white-space: nowrap;
+      height: 100%;
+    }
+
+    .segmented-toggle .seg-btn:hover {
+      color: var(--text-main);
+    }
+
+    .segmented-toggle .seg-btn.active {
+      background: var(--card-bg);
+      color: var(--text-main);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
   </style>
 </head>
 
@@ -1261,11 +1301,12 @@
 
             <div style="display:flex;align-items:center;gap:8px;">
               <div id="premium-badge"
+                class="tooltip-bottom"
                 style="background:rgba(2fbbf24,0.1);color:#fbbf24;border:1px solid rgba(251,191,36,0.3);border-radius:8px;padding:4px 8px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;display:none;cursor:pointer;transition:all 0.2s;"
                 data-tooltip="Click to view subscription details">
                 ⭐ PREMIUM
               </div>
-              <button id="hint-btn" class="icon-btn" data-tooltip="Quick Guide">
+              <button id="hint-btn" class="icon-btn tooltip-bottom" data-tooltip="Quick Guide">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                   stroke-linecap="round" stroke-linejoin="round">
                   <path d="M9 18h6"></path>
@@ -1278,7 +1319,7 @@
 
               <!-- Support Button + Dropdown -->
               <div id="support-btn-wrapper" style="position:relative;">
-                <button id="support-btn" class="icon-btn" data-tooltip="Submit Feedback">
+                <button id="support-btn" class="icon-btn tooltip-bottom" data-tooltip="Submit Feedback">
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
                   </svg>
@@ -1301,10 +1342,10 @@
           <div class="tab-content-panel active" id="panel-numbering">
             <div class="settings-group">
               <div class="panel-header"
-                style="font-size: 10px; color: var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom: 4px;">
+                style="font-size: 10px; color: var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom: 2px;">
                 Detection Direction</div>
               <div class="slides-detect-modes"
-                style="display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:8px;">
+                style="display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:0;">
                 <button class="icon-btn detect-btn selected tooltip-bottom tooltip-right" id="detect-z"
                   data-tooltip="Z: Left-to-Right, Top-to-Bottom">
                   <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
@@ -1389,11 +1430,11 @@
           </div>
 
           <!-- TAB PANEL 2: TOC GENERATION -->
-          <div class="tab-content-panel" id="panel-toc">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-              <div id="toc-status-msg" style="font-size:0.9em;color:var(--primary);"></div>
+          <div class="tab-content-panel" id="panel-toc" style="gap:10px;">
+            <div id="toc-controls-area" style="background:rgba(0,0,0,0.15);border-radius:8px;padding:8px 12px;flex-shrink:0;">
+              <div id="toc-status-msg" style="font-size:0.9em;color:var(--primary);min-height:0;"></div>
             </div>
-            <div class="toc-editor" id="toc-editor"></div>
+            <div class="toc-editor" id="toc-editor" style="background:rgba(0,0,0,0.2);border-radius:8px;"></div>
           </div>
 
           <script>
@@ -4360,11 +4401,19 @@
       }
 
       function renderTOCControls() {
+        // Clear list area
         tocEditor.innerHTML = '';
         tocEditor.style.display = 'flex';
         tocEditor.style.flexDirection = 'column';
-        tocEditor.style.height = '100%';
+        tocEditor.style.flex = '1';
         tocEditor.style.minHeight = '0';
+
+        // Clear button row area (keep status msg div, remove old btn row)
+        const tocControlsAreaEarly = document.getElementById('toc-controls-area');
+        if (tocControlsAreaEarly) {
+          const oldBtnRow = tocControlsAreaEarly.querySelector('.toc-btn-row');
+          if (oldBtnRow) oldBtnRow.remove();
+        }
 
         // --- TOC Controls Layout ---
         const buttonRow = document.createElement('div');
@@ -4372,7 +4421,7 @@
         buttonRow.style.alignItems = 'center';
         buttonRow.style.justifyContent = 'flex-start';
         buttonRow.style.gap = '18px';
-        buttonRow.style.marginBottom = '18px';
+        buttonRow.style.marginBottom = '0';
         buttonRow.style.position = 'relative';
 
         // Generate TOC button (main action)
@@ -4517,7 +4566,17 @@
         buttonRow.appendChild(toggleTipBtn);
         buttonRow.appendChild(generatorTip);
 
-        tocEditor.appendChild(buttonRow);
+        // Append buttonRow to controls area (separate dark section above list)
+        const tocControlsArea = document.getElementById('toc-controls-area');
+        if (tocControlsArea) {
+          // Clear only the button row area (keep status msg)
+          const existingBtnRow = tocControlsArea.querySelector('.toc-btn-row');
+          if (existingBtnRow) existingBtnRow.remove();
+          buttonRow.classList.add('toc-btn-row');
+          tocControlsArea.appendChild(buttonRow);
+        } else {
+          tocEditor.appendChild(buttonRow);
+        }
         // --- TOC Layout Popup (same look as styling popup) ---
         let layoutPanelBg = document.getElementById('toc-layout-modal-bg');
         if (layoutPanelBg) layoutPanelBg.remove();
@@ -4709,6 +4768,9 @@
           }
         });
 
+        // Convert layout selects to segmented toggles AFTER event listeners are wired
+        turnSelectsToToggles(layoutPanel);
+
         // Reset Layout to Default
         const resetLayoutBtn = layoutPanel.querySelector('#reset-toc-layout');
         if (resetLayoutBtn) resetLayoutBtn.onclick = () => {
@@ -4750,7 +4812,7 @@
           // Apply the reset settings immediately
           sendLiveLayoutUpdateInstant();
 
-          alert('Layout reset to default!');
+          parent.postMessage({ pluginMessage: { type: 'notify', message: 'Layout reset to default!' } }, '*');
         };
         // ... rest of renderTOCControls (do not touch slide/TOC list logic) ...
         const listDiv = document.createElement('div');
@@ -4809,25 +4871,35 @@
             <div style="border-bottom:1px solid rgba(255,255,255,0.05);padding-bottom:10px;">
               <div style="font-weight:700;font-size:12px;color:var(--primary);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.04em;">Title Configuration</div>
               <div style="display:flex;flex-direction:column;gap:8px;">
-                <div style="display:flex;align-items:center;gap:10px;justify-content:space-between;">
-                  <span style="font-size:11px;color:#b0b3b8;flex:1;">Title Text</span>
-                  <select id="hero-font-family" class="modal-select" style="width:100px;height:24px;font-size:11px;"><option value="Inter">Inter</option><option value="Arial">Arial</option><option value="Fira Mono">Fira Mono</option></select>
-                  <input id="hero-font-size" class="modal-input" type="number" value="32" style="width:38px;height:24px;font-size:11px;">
-                  <input id="hero-font-color" class="modal-input" type="color" value="#000000" style="width:24px;height:24px;padding:0;border:none;">
+                <!-- Title Text -->
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+                   <span style="font-size:11px;color:#b0b3b8;flex:1;">Title Text</span>
+                   <input id="hero-font-size" class="modal-input" type="number" value="32" style="width:40px;height:24px;font-size:11px;">
+                   <input id="hero-font-color" class="modal-input" type="color" value="#000000" style="width:24px;height:24px;">
                 </div>
-                <div style="display:flex;align-items:center;gap:10px;justify-content:space-between;">
-                  <span style="font-size:11px;color:#b0b3b8;flex:1;">Title Num</span>
-                  <select id="title-number-font" class="modal-select" style="width:100px;height:24px;font-size:11px;"><option value="Inter">Inter</option><option value="Arial">Arial</option></select>
-                  <input id="title-number-size" class="modal-input" type="number" value="32" style="width:38px;height:24px;font-size:11px;">
-                  <input id="title-number-color" class="modal-input" type="color" value="#000000" style="width:24px;height:24px;">
+                <select id="hero-font-family" class="modal-select" style="width:100%;height:24px;font-size:11px;"><option value="Inter">Inter</option><option value="Arial">Arial</option><option value="Fira Mono">Fira Mono</option></select>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+                   <span style="font-size:11px;color:#b0b3b8;flex:1;">Text Weight</span>
+                   <select id="hero-font-weight" class="modal-select" style="width:120px;height:24px;font-size:10px;"><option value="Bold">Bold</option><option value="Semi Bold">Semi</option><option value="Regular">Regular</option></select>
                 </div>
-                <div style="display:flex;align-items:center;gap:20px;margin-top:2px;">
+
+                <div style="height:1px;background:rgba(255,255,255,0.05);margin:4px 0;"></div>
+
+                <!-- Title Num -->
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+                   <span style="font-size:11px;color:#b0b3b8;flex:1;">Title Num</span>
+                   <input id="title-number-size" class="modal-input" type="number" value="32" style="width:40px;height:24px;font-size:11px;">
+                   <input id="title-number-color" class="modal-input" type="color" value="#000000" style="width:24px;height:24px;">
+                </div>
+                <select id="title-number-font" class="modal-select" style="width:100%;height:24px;font-size:11px;"><option value="Inter">Inter</option><option value="Arial">Arial</option></select>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+                   <span style="font-size:11px;color:#b0b3b8;flex:1;">Num Weight</span>
+                   <select id="title-number-weight" class="modal-select" style="width:120px;height:24px;font-size:10px;"><option value="Bold">Bold</option><option value="Semi Bold">Semi</option><option value="Regular">Regular</option></select>
+                </div>
+                <div style="display:flex;align-items:center;justify-content:flex-end;gap:8px;">
                    <label style="font-size:10px;color:#888;display:flex;align-items:center;gap:6px;cursor:pointer;">
-                     <input id="title-number-leading-zero" type="checkbox" style="width:12px;height:12px;"> No Leading Zero
+                    <div class="toggle-switch"><input type="checkbox" id="title-number-leading-zero"><span class="toggle-slider"></span></div> No 0
                    </label>
-                   <select id="hero-font-weight" class="modal-select" style="width:85px;height:22px;font-size:10px;margin-left:auto;">
-                     <option value="Bold">Bold</option><option value="Semi Bold">Semi</option><option value="Regular">Regular</option>
-                   </select>
                 </div>
               </div>
             </div>
@@ -4836,41 +4908,46 @@
             <div style="padding-bottom:4px;">
               <div style="font-weight:700;font-size:12px;color:var(--primary);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.04em;">Sub-Slide Style</div>
               <div style="display:flex;flex-direction:column;gap:8px;">
-                <div style="display:flex;align-items:center;gap:10px;justify-content:space-between;">
-                  <span style="font-size:11px;color:#b0b3b8;flex:1;">Sub Text</span>
-                  <select id="sub-title-font" class="modal-select" style="width:100px;height:24px;font-size:11px;"><option value="Inter">Inter</option><option value="Arial">Arial</option></select>
-                  <input id="sub-title-size" class="modal-input" type="number" value="18" style="width:38px;height:24px;font-size:11px;">
-                  <input id="sub-title-color" class="modal-input" type="color" value="#000000" style="width:24px;height:24px;">
+                <!-- Sub Text -->
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+                   <span style="font-size:11px;color:#b0b3b8;flex:1;">Sub Text</span>
+                   <input id="sub-title-size" class="modal-input" type="number" value="18" style="width:40px;height:24px;font-size:11px;">
+                   <input id="sub-title-color" class="modal-input" type="color" value="#000000" style="width:24px;height:24px;">
                 </div>
-                <div style="display:flex;align-items:center;gap:10px;justify-content:space-between;">
+                <select id="sub-title-font" class="modal-select" style="width:100%;height:24px;font-size:11px;"><option value="Inter">Inter</option><option value="Arial">Arial</option></select>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+                   <span style="font-size:11px;color:#b0b3b8;flex:1;">Text Weight</span>
+                   <select id="sub-title-weight" class="modal-select" style="width:120px;height:24px;font-size:10px;"><option value="Regular">Regular</option><option value="Bold">Bold</option><option value="Semi Bold">Semi</option></select>
+                </div>
+
+                <div style="height:1px;background:rgba(255,255,255,0.05);margin:4px 0;"></div>
+
+                <!-- Sub Num -->
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
                   <span style="font-size:11px;color:#b0b3b8;flex:1;">Sub Num</span>
-                  <select id="sub-number-font" class="modal-select" style="width:100px;height:24px;font-size:11px;"><option value="Inter">Inter</option><option value="Arial">Arial</option></select>
-                  <input id="sub-number-size" class="modal-input" type="number" value="18" style="width:38px;height:24px;font-size:11px;">
+                  <input id="sub-number-size" class="modal-input" type="number" value="18" style="width:40px;height:24px;font-size:11px;">
                   <input id="sub-number-color" class="modal-input" type="color" value="#000000" style="width:24px;height:24px;">
                 </div>
-                <div style="display:flex;align-items:center;gap:12px;justify-content:space-between;margin-top:4px;">
-                  <div style="display:flex;align-items:center;gap:6px;">
+                <select id="sub-number-font" class="modal-select" style="width:100%;height:24px;font-size:11px;"><option value="Inter">Inter</option><option value="Arial">Arial</option></select>
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;">
+                   <span style="font-size:11px;color:#b0b3b8;flex:1;">Num Weight</span>
+                   <select id="sub-number-weight" class="modal-select" style="width:120px;height:24px;font-size:10px;"><option value="Regular">Regular</option><option value="Bold">Bold</option><option value="Semi Bold">Semi</option></select>
+                </div>
+
+                <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:4px;">
+                  <div style="display:flex;align-items:center;gap:4px;">
                     <span style="font-size:10px;color:#888;">Indent</span>
                     <input id="sub-indent" class="modal-input" type="number" value="24" style="width:34px;height:22px;font-size:10px;padding:2px 4px;">
-                    <span style="font-size:9px;color:#666;">px</span>
                   </div>
-                  <select id="sub-title-weight" class="modal-select" style="width:85px;height:22px;font-size:10px;">
-                    <option value="Regular">Regular</option><option value="Bold">Bold</option><option value="Semi Bold">Semi</option>
-                  </select>
-                  <label style="font-size:10px;color:#888;display:flex;align-items:center;gap:6px;cursor:pointer;">
-                     <input id="sub-number-leading-zero" type="checkbox" style="width:12px;height:12px;"> No 0
+                  <label style="font-size:10px;color:#888;display:flex;align-items:center;gap:5px;cursor:pointer;">
+                    <div class="toggle-switch"><input type="checkbox" id="sub-number-leading-zero"><span class="toggle-slider"></span></div> No 0
                   </label>
                 </div>
               </div>
             </div>
           </div>
 
-          <div style="font-size:8.5px;color:#555;margin-top:10px;text-align:center;border-top:1px solid rgba(255,255,255,0.05);padding:10px 10px 8px;">
-            💡 <strong>Tip:</strong> Select an empty frame in your document, then click "Generate TOC" to create the table of contents inside it.
-          </div>
-          <div class="modal-actions" style="margin-top: 4px; padding-top: 8px; border-top: 1px solid rgba(255,255,255,0.05);">
-            <button class="primary-btn" id="save-typography-btn" style="width:100%;">Apply Typography</button>
-          </div>
+
         `;
         advPanelBg.appendChild(advPanel);
         // Show/hide logic
@@ -5012,11 +5089,8 @@
             tocSettings.titleNumberWeight = advPanel.querySelector('#title-number-weight').value;
             tocSettings.titleNumberColor = advPanel.querySelector('#title-number-color').value;
             tocSettings.titleNumberLeadingZero = !advPanel.querySelector('#title-number-leading-zero').checked;
-          }
 
-          const sNumFont = advPanel.querySelector('#sub-number-font');
-          if (sNumFont) {
-            tocSettings.subNumberFont = sNumFont.value;
+            tocSettings.subNumberFont = advPanel.querySelector('#sub-number-font').value;
             tocSettings.subNumberSize = parseInt(advPanel.querySelector('#sub-number-size').value, 10);
             tocSettings.subNumberWeight = advPanel.querySelector('#sub-number-weight').value;
             tocSettings.subNumberColor = advPanel.querySelector('#sub-number-color').value;
@@ -5118,35 +5192,38 @@
         // Hero section controls
         [heroFontSizeInput, heroFontWeightInput, heroFontColorInput, advPanel.querySelector('#hero-font-family')].forEach(input => {
           if (input) {
-            input.oninput = () => liveStyleUpdate('hero');
-            input.onchange = () => liveStyleUpdate('hero');
+            input.addEventListener('input', () => liveStyleUpdate('hero'));
+            input.addEventListener('change', () => liveStyleUpdate('hero'));
           }
         });
 
         // Hero Number section controls
         [titleNumberFontInput, titleNumberSizeInput, titleNumberWeightInput, titleNumberColorInput, titleNumberLeadingZeroInput].forEach(input => {
           if (input) {
-            input.oninput = () => liveStyleUpdate('hero-number');
-            input.onchange = () => liveStyleUpdate('hero-number');
+            input.addEventListener('input', () => liveStyleUpdate('hero-number'));
+            input.addEventListener('change', () => liveStyleUpdate('hero-number'));
           }
         });
 
         // Subtitle section controls
         [subTitleSizeInput, subTitleWeightInput, subTitleColorInput, advPanel.querySelector('#sub-title-font'), subIndentInput].forEach(input => {
           if (input) {
-            input.oninput = () => liveStyleUpdate('sub');
-            input.onchange = () => liveStyleUpdate('sub');
+            input.addEventListener('input', () => liveStyleUpdate('sub'));
+            input.addEventListener('change', () => liveStyleUpdate('sub'));
           }
         });
 
         // Subtitle Number section controls
         [subNumberFontInput, subNumberSizeInput, subNumberWeightInput, subNumberColorInput, subNumberLeadingZeroInput].forEach(input => {
           if (input) {
-            input.oninput = () => liveStyleUpdate('sub-number');
-            input.onchange = () => liveStyleUpdate('sub-number');
+            input.addEventListener('input', () => liveStyleUpdate('sub-number'));
+            input.addEventListener('change', () => liveStyleUpdate('sub-number'));
           }
         });
 
+        // Convert selects to segmented toggles AFTER all event listeners are wired
+        // so the toggle dispatched 'change' events reach our live listeners correctly
+        turnSelectsToToggles(advPanel);
         // Removed old generator tip listener
 
         // Save/Apply Typography Manual Button
@@ -5217,7 +5294,7 @@
             console.log('localStorage not available for clearing settings');
           }
 
-          alert('Style reset to default!');
+          parent.postMessage({ pluginMessage: { type: 'notify', message: 'Typography style reset to default!' } }, '*');
         };
 
         // REMOVED: Old live update function that was causing conflicts
@@ -5563,6 +5640,51 @@
         b: (num & 255) / 255
       };
     }
+
+      // Auto-convert 2 or 3 option selects to segmented toggles
+      function turnSelectsToToggles(root) {
+        const container = root || document;
+        const selects = container.querySelectorAll('select.modal-select');
+        selects.forEach(select => {
+          if (select.options.length === 2 || select.options.length === 3) {
+            select.style.display = 'none';
+            
+            const wrapper = document.createElement('div');
+            wrapper.className = 'segmented-toggle';
+            
+            wrapper.style.width = select.style.width || 'auto';
+            wrapper.style.height = select.style.height || '24px';
+            if (select.style.marginLeft) wrapper.style.marginLeft = select.style.marginLeft;
+            
+            Array.from(select.options).forEach((opt, index) => {
+              const btn = document.createElement('button');
+              btn.type = 'button';
+              btn.className = 'seg-btn' + (opt.selected ? ' active' : '');
+              btn.textContent = opt.text;
+              btn.onclick = (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (select.value !== opt.value) {
+                  select.value = opt.value;
+                  select.dispatchEvent(new Event('change', { bubbles: true }));
+                  select.dispatchEvent(new Event('input', { bubbles: true }));
+                }
+              };
+              wrapper.appendChild(btn);
+            });
+            
+            select.parentNode.insertBefore(wrapper, select.nextSibling);
+
+            select.addEventListener('change', () => {
+               const val = select.value;
+               wrapper.querySelectorAll('.seg-btn').forEach((b, i) => {
+                 b.classList.toggle('active', select.options[i].value === val);
+               });
+            });
+          }
+        });
+      }
+      turnSelectsToToggles();
   </script>
 
   <!-- LOCK SCREEN REMOVED - No longer needed -->
