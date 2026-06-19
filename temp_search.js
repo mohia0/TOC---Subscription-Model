@@ -1,0 +1,1 @@
+const fs = require('fs'); const lines = fs.readFileSync('ui.html', 'utf8').split('\n'); let start=false; lines.forEach((l,i) => { if(l.includes('.notion-outline-row')) start=true; if(start && l.includes('}')) { start=false; console.log(i+': '+l.trim()); } if(start) console.log(i+': '+l.trim()); });
