@@ -810,7 +810,7 @@ function sendFramesToUI(direction = 'z', filterForTOC = false) {
       };
     });
     console.log('Presentation slides (filtered):', frameData);
-    figma.ui.postMessage({ type: 'frames-list', frames: frameData });
+    figma.ui.postMessage({ type: 'frames-list', frames: frameData, hasNumbers: anyHasNumber });
   }
 }
 
