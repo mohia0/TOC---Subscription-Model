@@ -118,7 +118,7 @@
       border-radius: 0;
       box-shadow: none;
       border: none;
-      padding: 8px 20px 16px;
+      padding: 36px 20px 46px;
       margin: 0;
       width: 100%;
       height: 100%;
@@ -225,7 +225,7 @@
 
     .slides-list {
       background: rgba(0, 0, 0, 0.2);
-      border-radius: 8px;
+      border-radius: 0;
       border: none;
       flex: 1;
       min-height: 100px;
@@ -233,6 +233,8 @@
       padding: 0;
       padding-bottom: 8px;
       margin-bottom: 0;
+      margin-left: -20px;
+      margin-right: -20px;
       display: flex;
       flex-direction: column;
       gap: 0;
@@ -266,7 +268,7 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      padding: 8px 14px;
+      padding: 8px 20px;
       font-size: 0.95em;
       width: 100%;
       background: transparent;
@@ -1352,49 +1354,11 @@ window._emptyLottieData = {"v":"5.12.1","fr":60,"ip":0,"op":90,"w":430,"h":430,"
     <div class="main-col">
       <div class="card">
         <div class="card-content">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-shrink:0;">
+          <div style="display:flex;align-items:center;margin-bottom:6px;flex-shrink:0;">
             <!-- LAYOUT TABS -->
-            <div class="tabs-container" style="margin-bottom:0; flex:1; margin-right:12px;">
+            <div class="tabs-container" style="margin-bottom:0; flex:1; margin-right:0;">
               <button class="tab-btn active" id="tab-btn-numbering" onclick="switchTab('numbering')">1. Number Slides</button>
               <button class="tab-btn disabled-clickable tooltip-bottom" id="tab-btn-toc" onclick="switchTab('toc')" data-tooltip="Number your slides first, then generate the TOC! 🎯">2. Generate TOC</button>
-            </div>
-
-            <div style="display:flex;align-items:center;gap:8px;">
-              <div id="premium-badge"
-                class="tooltip-bottom"
-                style="background:rgba(2fbbf24,0.1);color:#fbbf24;border:1px solid rgba(251,191,36,0.3);border-radius:8px;padding:4px 8px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;display:none;cursor:pointer;transition:all 0.2s;"
-                data-tooltip="Click to view subscription details">
-                ⭐ PREMIUM
-              </div>
-              <button id="hint-btn" class="icon-btn tooltip-bottom" data-tooltip="Quick Guide">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                  stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M9 18h6"></path>
-                  <path d="M10 22h4"></path>
-                  <path
-                    d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7z">
-                  </path>
-                </svg>
-              </button>
-
-              <!-- Support Button + Dropdown -->
-              <div id="support-btn-wrapper" style="position:relative;">
-                <button id="support-btn" class="icon-btn tooltip-bottom" data-tooltip="Submit Feedback">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-                  </svg>
-                </button>
-                <div id="support-dropdown" style="display:none;position:absolute;right:0;top:calc(100% + 6px);background:#1e1e2e;border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:4px;z-index:99999;min-width:160px;box-shadow:0 8px 24px rgba(0,0,0,0.4);">
-                  <button class="support-drop-item" id="support-bug-btn" style="display:flex;align-items:center;gap:8px;width:100%;padding:8px 10px;background:none;border:none;color:#f3f4f8;cursor:pointer;border-radius:7px;font-size:12px;text-align:left;transition:background 0.15s;">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#ff6b6b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2l1.5 1.5"/><path d="M14.5 3.5L16 2"/><path d="M9 7.5a3 3 0 0 0 6 0v-1a3 3 0 0 0-6 0v1z"/><path d="M6.5 13.5a3.5 7.5 0 0 0 11 0"/><path d="M3 9a1 1 0 0 1 1-1h1.5"/><path d="M18.5 8H20a1 1 0 0 1 1 1"/><path d="M3 16a1 1 0 0 0 1 1h1.5"/><path d="M18.5 17H20a1 1 0 0 0 1-1"/><path d="M7 20.5a10 10 0 0 0 10 0"/></svg>
-                    Submit Bug
-                  </button>
-                  <button class="support-drop-item" id="support-suggest-btn" style="display:flex;align-items:center;gap:8px;width:100%;padding:8px 10px;background:none;border:none;color:#f3f4f8;cursor:pointer;border-radius:7px;font-size:12px;text-align:left;transition:background 0.15s;">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="m4.93 4.93 2.83 2.83"/><path d="M2 12h4"/><path d="m4.93 19.07 2.83-2.83"/><path d="M12 18v4"/><path d="m19.07 19.07-2.83-2.83"/><path d="M22 12h-4"/><path d="m19.07 4.93-2.83 2.83"/></svg>
-                    Submit Suggestion
-                  </button>
-                </div>
-              </div>
             </div>
           </div>
 
@@ -1651,9 +1615,47 @@ window._emptyLottieData = {"v":"5.12.1","fr":60,"ip":0,"op":90,"w":430,"h":430,"
       </div>
     </div>
 
+    <!-- Bottom Utility Bar (above trial bar) -->
+    <div id="bottom-utility-bar" style="position:fixed;bottom:0;left:0;right:0;background:rgba(22,22,30,0.97);border-top:1px solid rgba(255,255,255,0.07);display:flex;justify-content:space-between;align-items:center;padding:5px 10px;z-index:99998;height:36px;box-sizing:border-box;">
+      <!-- LEFT: badges -->
+      <div style="display:flex;align-items:center;gap:6px;">
+        <div id="premium-badge"
+          class="tooltip-top tooltip-right"
+          style="background:rgba(251,191,36,0.1);color:#fbbf24;border:1px solid rgba(251,191,36,0.3);border-radius:6px;padding:2px 7px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;display:none;cursor:pointer;transition:all 0.2s;"
+          data-tooltip="Click to view subscription details">
+          ⭐ PREMIUM
+        </div>
+        <div id="free-badge"
+          style="background:rgba(100,116,139,0.15);color:#94a3b8;border:1px solid rgba(100,116,139,0.25);border-radius:6px;padding:2px 7px;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">
+          FREE
+        </div>
+      </div>
+      <!-- RIGHT: hint + feedback -->
+      <div style="display:flex;align-items:center;gap:4px;">
+        <button id="hint-btn" class="icon-btn tooltip-top tooltip-left" data-tooltip="Quick Guide" style="width:26px;height:26px;padding:0;display:flex;align-items:center;justify-content:center;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 1 7 7c0 2.38-1.19 4.47-3 5.74V17a1 1 0 0 1-1 1H9a1 1 0 0 1-1-1v-2.26C6.19 13.47 5 11.38 5 9a7 7 0 0 1 7-7z"/></svg>
+        </button>
+        <!-- Support Button + Dropdown -->
+        <div id="support-btn-wrapper" style="position:relative;">
+          <button id="support-btn" class="icon-btn tooltip-top tooltip-left" data-tooltip="Submit Feedback" style="width:26px;height:26px;padding:0;display:flex;align-items:center;justify-content:center;">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          </button>
+          <div id="support-dropdown" style="display:none;position:absolute;right:0;bottom:calc(100% + 6px);background:#1e1e2e;border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:4px;z-index:99999;min-width:160px;box-shadow:0 8px 24px rgba(0,0,0,0.4);">
+            <button class="support-drop-item" id="support-bug-btn" style="display:flex;align-items:center;gap:8px;width:100%;padding:8px 10px;background:none;border:none;color:#f3f4f8;cursor:pointer;border-radius:7px;font-size:12px;text-align:left;transition:background 0.15s;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#ff6b6b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 2l1.5 1.5"/><path d="M14.5 3.5L16 2"/><path d="M9 7.5a3 3 0 0 0 6 0v-1a3 3 0 0 0-6 0v1z"/><path d="M6.5 13.5a3.5 7.5 0 0 0 11 0"/><path d="M3 9a1 1 0 0 1 1-1h1.5"/><path d="M18.5 8H20a1 1 0 0 1 1 1"/><path d="M3 16a1 1 0 0 0 1 1h1.5"/><path d="M18.5 17H20a1 1 0 0 0 1-1"/><path d="M7 20.5a10 10 0 0 0 10 0"/></svg>
+              Submit Bug
+            </button>
+            <button class="support-drop-item" id="support-suggest-btn" style="display:flex;align-items:center;gap:8px;width:100%;padding:8px 10px;background:none;border:none;color:#f3f4f8;cursor:pointer;border-radius:7px;font-size:12px;text-align:left;transition:background 0.15s;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v4"/><path d="m4.93 4.93 2.83 2.83"/><path d="M2 12h4"/><path d="m4.93 19.07 2.83-2.83"/><path d="M12 18v4"/><path d="m19.07 19.07-2.83-2.83"/><path d="M22 12h-4"/><path d="m19.07 4.93-2.83 2.83"/></svg>
+              Submit Suggestion
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
     <!-- Compact Trial Status Bar -->
     <div id="trial-status-bar"
-      style="position:fixed;bottom:0;left:0;right:0;background:rgba(30,30,36,0.95);color:#94a3b8;padding:4px 12px;display:flex;justify-content:space-between;align-items:center;z-index:99999;font-family:'Inter',sans-serif;font-size:10px;font-weight:600;border-top:1px solid rgba(255,255,255,0.1);height:24px;backdrop-filter:blur(8px);">
+      style="position:fixed;top:0;left:0;right:0;background:rgba(30,30,36,0.95);color:#94a3b8;padding:4px 12px;display:flex;justify-content:space-between;align-items:center;z-index:99999;font-family:'Inter',sans-serif;font-size:10px;font-weight:600;border-bottom:1px solid rgba(255,255,255,0.1);height:36px;backdrop-filter:blur(8px);">
       <div style="display:flex;align-items:center;gap:8px;">
         <span id="trial-status-text" style="color:#e2e8f0;font-weight:700;">TRIAL ACTIVE</span>
         <span id="trial-countdown" style="color:#fbbf24;font-weight:600;">--d --h --m --s</span>
@@ -2007,8 +2009,8 @@ window._emptyLottieData = {"v":"5.12.1","fr":60,"ip":0,"op":90,"w":430,"h":430,"
       right: 0;
       bottom: 0;
       background: rgba(0, 0, 0, 0.7);
-      z-index: 99999;
-      /* Reduced z-index to not block trial bar */
+      z-index: 999999;
+      /* Above all bars */
       display: none;
       justify-content: center;
       align-items: center;
@@ -2253,6 +2255,7 @@ window._emptyLottieData = {"v":"5.12.1","fr":60,"ip":0,"op":90,"w":430,"h":430,"
           // Premium users - hide trial bar completely
           if (trialStatusBar) {
             trialStatusBar.style.display = 'none';
+        syncBottomUtilityBar();
             trialStatusBar.style.visibility = 'hidden';
             trialStatusBar.style.opacity = '0';
             trialStatusBar.style.height = '0';
@@ -2292,6 +2295,7 @@ window._emptyLottieData = {"v":"5.12.1","fr":60,"ip":0,"op":90,"w":430,"h":430,"
           if (trialStatusBar) {
             trialStatusBar.classList.add('premium-active');
             trialStatusBar.style.display = 'none';
+        syncBottomUtilityBar();
             trialStatusBar.style.visibility = 'hidden';
             trialStatusBar.style.opacity = '0';
             trialStatusBar.style.height = '0';
@@ -2379,6 +2383,7 @@ window._emptyLottieData = {"v":"5.12.1","fr":60,"ip":0,"op":90,"w":430,"h":430,"
           if (trialState.isSubscribed && trialStatusBar) {
             trialStatusBar.classList.add('premium-active');
             trialStatusBar.style.display = 'none';
+        syncBottomUtilityBar();
             trialStatusBar.style.visibility = 'hidden';
             trialStatusBar.style.opacity = '0';
             trialStatusBar.style.height = '0';
@@ -2450,19 +2455,21 @@ setTimeout(() => {
           // Hide premium badge
           if (premiumBadge) {
             premiumBadge.style.display = 'none';
+        syncBottomUtilityBar();
           }
 
           // Show trial status bar with EXPIRED message
           if (trialStatusBar) {
             trialStatusBar.classList.remove('premium-active');
             trialStatusBar.style.display = 'flex';
+        syncBottomUtilityBar();
             trialStatusBar.style.visibility = 'visible';
             trialStatusBar.style.opacity = '1';
             trialStatusBar.style.height = 'auto';
             trialStatusBar.style.padding = '8px 16px';
             trialStatusBar.style.margin = '0';
             trialStatusBar.style.position = 'fixed';
-            trialStatusBar.style.bottom = '0';
+            trialStatusBar.style.top = '0'; trialStatusBar.style.top = '0'; trialStatusBar.style.bottom = 'auto';
             trialStatusBar.style.left = '0';
             trialStatusBar.style.right = '0';
             trialStatusBar.style.width = 'auto';
@@ -2482,6 +2489,7 @@ setTimeout(() => {
             setTimeout(() => {
               licenseModalBg.style.display = 'none';
               licenseModalBg.classList.remove('active');
+              showCelebrationAnimation();
             }, 2000);
           }, 1000);
 
@@ -2527,6 +2535,7 @@ setTimeout(() => {
 
           if (premiumBadge) {
             premiumBadge.style.display = 'none';
+        syncBottomUtilityBar();
           }
 
           // Show success message
@@ -2641,6 +2650,7 @@ setTimeout(() => {
           // Show premium badge
           if (premiumBadge) {
             premiumBadge.style.display = 'block';
+        syncBottomUtilityBar();
           }
 
           // Show success message
@@ -2698,6 +2708,7 @@ setTimeout(() => {
           // Show premium badge
           if (premiumBadge) {
             premiumBadge.style.display = 'block';
+        syncBottomUtilityBar();
           }
 
           // Show success message
@@ -2934,6 +2945,7 @@ setTimeout(() => {
             }
             if (premiumBadge) {
               premiumBadge.style.display = 'block';
+        syncBottomUtilityBar();
             }
           } else {
             // Trial user - show trial bar, hide premium badge
@@ -2942,6 +2954,7 @@ setTimeout(() => {
             }
             if (premiumBadge) {
               premiumBadge.style.display = 'none';
+        syncBottomUtilityBar();
             }
             updateTrialStatusBar();
           }
@@ -2984,7 +2997,29 @@ setTimeout(() => {
       const hintBtn = document.getElementById('hint-btn');
       const closeHelpBtn = document.getElementById('close-help');
       const premiumBadge = document.getElementById('premium-badge');
+      const freeBadge = document.getElementById('free-badge');
       // Test button references removed for production
+
+      // Sync badge visibility and top padding based on premium state
+      function syncBottomUtilityBar() {
+        const trialBar = document.getElementById('trial-status-bar');
+        const pBadge   = document.getElementById('premium-badge');
+        const fBadge   = document.getElementById('free-badge');
+        const card     = document.querySelector('.card');
+        // Badge visibility
+        if (pBadge && fBadge) {
+          const premiumVisible = pBadge.style.display !== 'none' && pBadge.style.display !== '';
+          fBadge.style.display = premiumVisible ? 'none' : '';
+        }
+        // Top padding: remove when trial bar is hidden
+        if (card) {
+          const trialHidden = !trialBar ||
+            trialBar.style.display === 'none' ||
+            trialBar.style.visibility === 'hidden' ||
+            trialBar.style.position === 'absolute';
+          card.style.paddingTop = trialHidden ? '0' : '36px';
+        }
+      }
 
       // 🎉 MAGICAL CELEBRATION FUNCTION 🎉
       function showCelebrationAnimation() {
@@ -3102,6 +3137,7 @@ setTimeout(() => {
 
           // Show premium badge
           premiumBadge.style.display = 'block';
+        syncBottomUtilityBar();
 
           // 🎉 TRIGGER THE MAGICAL CELEBRATION! 🎉
           setTimeout(() => {
@@ -3112,6 +3148,7 @@ setTimeout(() => {
           if (trialStatusBar) {
             trialStatusBar.classList.add('premium-active');
             trialStatusBar.style.display = 'none';
+        syncBottomUtilityBar();
             trialStatusBar.style.visibility = 'hidden';
             trialStatusBar.style.opacity = '0';
             trialStatusBar.style.height = '0';
@@ -3561,12 +3598,14 @@ setTimeout(() => {
               // Show premium badge
               if (premiumBadge) {
                 premiumBadge.style.display = 'block';
+        syncBottomUtilityBar();
               }
 
               // Hide trial status bar completely
               if (trialStatusBar) {
                 trialStatusBar.classList.add('premium-active');
                 trialStatusBar.style.display = 'none';
+        syncBottomUtilityBar();
                 trialStatusBar.style.visibility = 'hidden';
                 trialStatusBar.style.opacity = '0';
                 trialStatusBar.style.height = '0';
@@ -3592,12 +3631,14 @@ setTimeout(() => {
                 // Show premium badge
                 if (premiumBadge) {
                   premiumBadge.style.display = 'block';
+        syncBottomUtilityBar();
                 }
 
                 // Hide trial status bar completely
                 if (trialStatusBar) {
                   trialStatusBar.classList.add('premium-active');
                   trialStatusBar.style.display = 'none';
+        syncBottomUtilityBar();
                   trialStatusBar.style.visibility = 'hidden';
                   trialStatusBar.style.opacity = '0';
                   trialStatusBar.style.height = '0';
@@ -3661,12 +3702,14 @@ setTimeout(() => {
               // Show premium badge
               if (premiumBadge) {
                 premiumBadge.style.display = 'block';
+        syncBottomUtilityBar();
               }
 
               // Hide trial status bar completely
               if (trialStatusBar) {
                 trialStatusBar.classList.add('premium-active');
                 trialStatusBar.style.display = 'none';
+        syncBottomUtilityBar();
                 trialStatusBar.style.visibility = 'hidden';
                 trialStatusBar.style.opacity = '0';
                 trialStatusBar.style.height = '0';
@@ -3742,12 +3785,14 @@ setTimeout(() => {
             // Show premium badge
             if (premiumBadge) {
               premiumBadge.style.display = 'block';
+        syncBottomUtilityBar();
             }
 
             // Hide trial status bar completely
             if (trialStatusBar) {
               trialStatusBar.classList.add('premium-active');
               trialStatusBar.style.display = 'none';
+        syncBottomUtilityBar();
               trialStatusBar.style.visibility = 'hidden';
               trialStatusBar.style.opacity = '0';
               trialStatusBar.style.height = '0';
@@ -3819,12 +3864,14 @@ setTimeout(() => {
           // Show premium badge
           if (premiumBadge) {
             premiumBadge.style.display = 'block';
+        syncBottomUtilityBar();
           }
 
           // Hide trial status bar completely
           if (trialStatusBar) {
             trialStatusBar.classList.add('premium-active');
             trialStatusBar.style.display = 'none';
+        syncBottomUtilityBar();
             trialStatusBar.style.visibility = 'hidden';
             trialStatusBar.style.opacity = '0';
             trialStatusBar.style.height = '0';
@@ -3848,6 +3895,7 @@ setTimeout(() => {
         if (trialStatusBar) {
           trialStatusBar.classList.add('premium-active');
           trialStatusBar.style.display = 'none';
+        syncBottomUtilityBar();
           trialStatusBar.style.visibility = 'hidden';
           trialStatusBar.style.opacity = '0';
           trialStatusBar.style.height = '0';
@@ -3864,16 +3912,17 @@ setTimeout(() => {
         // Force trial status bar to be visible only for trial users
         if (trialStatusBar) {
           trialStatusBar.style.display = 'flex';
+        syncBottomUtilityBar();
           trialStatusBar.style.visibility = 'visible';
           trialStatusBar.style.opacity = '1';
           trialStatusBar.style.position = 'fixed';
-          trialStatusBar.style.bottom = '0';
+          trialStatusBar.style.top = '0'; trialStatusBar.style.top = '0'; trialStatusBar.style.bottom = 'auto';
           trialStatusBar.style.left = '0';
           trialStatusBar.style.right = '0';
           trialStatusBar.style.zIndex = '99999';
-          trialStatusBar.style.height = '24px';
-          trialStatusBar.style.minHeight = '24px';
-          trialStatusBar.style.maxHeight = '24px';
+          trialStatusBar.style.height = '36px';
+          trialStatusBar.style.minHeight = '36px';
+          trialStatusBar.style.maxHeight = '36px';
           trialStatusBar.style.padding = '0 12px';
           trialStatusBar.style.background = 'rgba(17, 17, 21, 0.98)';
           trialStatusBar.style.borderTop = '1px solid rgba(255, 255, 255, 0.1)';
@@ -4145,6 +4194,7 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
       };
 
       // Initial load
+      syncBottomUtilityBar();
       requestFrames(currentDirection);
 
       // --- Modal logic and settings ---
