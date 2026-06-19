@@ -266,19 +266,21 @@
       display: flex;
       align-items: center;
       gap: 12px;
-      padding: 12px 14px;
+      padding: 8px 14px;
       font-size: 0.95em;
       width: 100%;
       background: transparent;
       border-bottom: none;
-      transition: background 0.2s ease;
+      transition: background 0.15s ease;
       box-sizing: border-box;
       position: relative;
       color: var(--text-main);
+      margin-left: 0;
+      margin-right: 0;
     }
 
     .slide-row:hover {
-      background: rgba(255, 255, 255, 0.02);
+      background: rgba(255, 255, 255, 0.06);
     }
 
     .slide-row:last-child {
@@ -290,13 +292,21 @@
       align-items: center;
       justify-content: center;
       font-weight: 700;
-      font-size: 1em;
+      font-size: 0.85em;
       color: #fff;
       background: var(--primary);
       border-radius: 50%;
       width: 26px;
       height: 26px;
       flex-shrink: 0;
+      transition: background 0.2s;
+    }
+
+    .slide-number--grey {
+      background: rgba(148, 163, 184, 0.25);
+      color: #94a3b8;
+      font-size: 0.75em;
+      font-weight: 500;
     }
 
     .slide-name {
@@ -1466,7 +1476,7 @@ window._emptyLottieData = {"v":"5.12.1","fr":60,"ip":0,"op":90,"w":430,"h":430,"
               </div>
 
               <div style="display: flex; flex-direction: column; align-items: center; position: relative;">
-                <button class="primary-btn" id="add-slide-numbers">
+                <button class="primary-btn" id="add-slide-numbers" disabled>
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:5px;flex-shrink:0;vertical-align:middle;">
                   <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.582a.5.5 0 0 1 0 .963L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>
                   <path d="M20 3v4"/><path d="M22 5h-4"/><path d="M4 17v2"/><path d="M5 18H3"/>
@@ -1953,6 +1963,41 @@ window._emptyLottieData = {"v":"5.12.1","fr":60,"ip":0,"op":90,"w":430,"h":430,"
         transform: translate(0, 0) rotate(360deg);
         opacity: 1;
       }
+    }
+
+    @keyframes buzz {
+      0%   { transform: translateX(0); }
+      15%  { transform: translateX(-6px) rotate(-1deg); }
+      30%  { transform: translateX(6px) rotate(1deg); }
+      45%  { transform: translateX(-5px) rotate(-0.5deg); }
+      60%  { transform: translateX(5px) rotate(0.5deg); }
+      75%  { transform: translateX(-3px); }
+      90%  { transform: translateX(3px); }
+      100% { transform: translateX(0); }
+    }
+
+    .buzz-anim {
+      animation: buzz 0.5s ease;
+    }
+
+    .rescan-toast {
+      display: block;
+      text-align: center;
+      margin-top: 10px;
+      background: rgba(30,30,40,0.95);
+      color: #f87171;
+      font-size: 11px;
+      font-weight: 500;
+      padding: 4px 12px;
+      border-radius: 20px;
+      white-space: nowrap;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.25s;
+      border: 1px solid rgba(248,113,113,0.25);
+    }
+    .rescan-toast.show {
+      opacity: 1;
     }
 
     .celebration-overlay {
@@ -3863,17 +3908,48 @@ setTimeout(() => {
 
       // Add refresh logic for the new refresh icon
       detectRefreshBtn.onclick = () => {
+        const wasEmpty = !allSlides || allSlides.length === 0;
         requestFrames(currentDirection);
         requestTOCFrames(currentDirection);
+        // After a short delay, check if still empty and buzz
+        if (wasEmpty) {
+          setTimeout(() => {
+            if (!allSlides || allSlides.length === 0) {
+              // Buzz the empty state container
+              const emptyWrap = document.querySelector('#slides-list > div');
+              if (emptyWrap) {
+                emptyWrap.classList.remove('buzz-anim');
+                void emptyWrap.offsetWidth; // reflow to restart animation
+                emptyWrap.classList.add('buzz-anim');
+                setTimeout(() => emptyWrap.classList.remove('buzz-anim'), 600);
+              }
+              // Show tiny toast
+              let toast = document.getElementById('rescan-toast');
+              if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'rescan-toast';
+                toast.className = 'rescan-toast';
+                toast.textContent = '⚠ Nothing found on this page';
+                const btn = document.getElementById('empty-rescan-btn');
+                if (btn && btn.parentElement) {
+                  btn.parentElement.appendChild(toast);
+                }
+              }
+              toast.classList.add('show');
+              setTimeout(() => toast && toast.classList.remove('show'), 2500);
+            }
+          }, 400);
+        }
       };
 
       function updateTOCTabState(slides, hasNumbers) {
         const tocBtn = document.getElementById('tab-btn-toc');
         if (!tocBtn) return;
         const hasSlides = slides && slides.length > 0;
-        const styleBtn = document.getElementById('slide-number-settings');
-        const fixBtn   = document.getElementById('refresh-numbers');
-        const clearBtn = document.getElementById('remove-all-numbers');
+        const styleBtn  = document.getElementById('slide-number-settings');
+        const fixBtn    = document.getElementById('refresh-numbers');
+        const clearBtn  = document.getElementById('remove-all-numbers');
+        const addNumBtn = document.getElementById('add-slide-numbers');
         if (hasNumbers) {
           tocBtn.classList.remove('disabled-clickable');
           tocBtn.removeAttribute('data-tooltip');
@@ -3886,15 +3962,17 @@ setTimeout(() => {
           }
         }
         if (hasSlides) {
-          if (styleBtn) styleBtn.disabled = false;
-          if (fixBtn)   fixBtn.disabled   = false;
-          if (clearBtn) clearBtn.disabled = false;
+          if (styleBtn)  styleBtn.disabled  = false;
+          if (fixBtn)    fixBtn.disabled    = false;
+          if (clearBtn)  clearBtn.disabled  = false;
+          if (addNumBtn) addNumBtn.disabled = false;
         } else {
           tocBtn.classList.add('disabled-clickable');
           tocBtn.setAttribute('data-tooltip', 'Number your slides first, then generate the TOC!');
-          if (styleBtn) styleBtn.disabled = true;
-          if (fixBtn)   fixBtn.disabled   = true;
-          if (clearBtn) clearBtn.disabled = true;
+          if (styleBtn)  styleBtn.disabled  = true;
+          if (fixBtn)    fixBtn.disabled    = true;
+          if (clearBtn)  clearBtn.disabled  = true;
+          if (addNumBtn) addNumBtn.disabled = true;
           const tocPanel = document.getElementById('panel-toc');
           if (tocPanel && tocPanel.classList.contains('active')) {
             switchTab('numbering');
@@ -3953,8 +4031,9 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
           const row = document.createElement('div');
           row.className = 'slide-row';
           if (slide.isSkipped) row.classList.add('row-skipped');
+          const hasNum = slide.number !== undefined && slide.number !== null && slide.number !== '';
           row.innerHTML = `
-            <span class='slide-number'>${slide.number}</span>
+            <span class='slide-number${hasNum ? '' : ' slide-number--grey'}'>${hasNum ? slide.number : '—'}</span>
             <input class='slide-name-input' type='text' value="${slide.name}" data-slide-id="${slide.id}" style="font-size:1em;font-weight:600;background:transparent;border:none;color:#f3f4f8;width:70%;outline:none;" />
             <button class='start-btn' data-frameid="${slide.id}">Start Numbering</button>
           `;
