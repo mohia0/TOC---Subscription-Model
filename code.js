@@ -1178,8 +1178,8 @@ async function generateTOCFrame(slides, options, startFrameId) {
           groupFrame.counterAxisSizingMode = 'AUTO';
           groupFrame.fills = [];
           groupFrame.itemSpacing = 12; // Spacing between title and subtitles
-          groupFrame.paddingTop = tocStyle.groupPadding || 24; // Space above group
-          groupFrame.paddingBottom = tocStyle.groupPadding || 24; // Space below group
+          groupFrame.paddingTop = 0; // Space above group
+          groupFrame.paddingBottom = 0; // Space below group
 
           // Title row
           const titleRow = figma.createFrame();
@@ -1322,8 +1322,8 @@ async function generateTOCFrame(slides, options, startFrameId) {
           row.counterAxisSizingMode = 'AUTO';
           row.itemSpacing = tocStyle.numberTextGap !== undefined ? tocStyle.numberTextGap : 16;
           row.fills = [];
-          row.paddingTop = 12; // Space above single items
-          row.paddingBottom = 12; // Space below single items
+          row.paddingTop = 0; // Space above single items
+          row.paddingBottom = 0; // Space below single items
 
           // Apply row alignment settings
           if (tocStyle.textAlignHorizontal) {
@@ -2368,8 +2368,8 @@ figma.ui.onmessage = async (msg) => {
         if (groupFrame.type === 'FRAME' && groupFrame.layoutMode === 'VERTICAL') {
           // Update group padding
           if (typeof msg.layoutOptions.groupPadding === 'number') {
-            groupFrame.paddingTop = msg.layoutOptions.groupPadding;
-            groupFrame.paddingBottom = msg.layoutOptions.groupPadding;
+            groupFrame.paddingTop = 0;
+            groupFrame.paddingBottom = 0;
           }
 
           // Update title row spacing
