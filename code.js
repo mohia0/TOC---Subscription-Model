@@ -558,27 +558,22 @@ function getRemainingTrialDays() {
 
 
 
-// Helper: Recursively scan all frames named with 'Z' in a node
-function scanFrames(node, parentPath = [], results = []) {
-  // Only include frames whose name contains 'Z' (case-insensitive)
-  if (node.type === 'FRAME' && /z/i.test(node.name)) {
-    results.push({
-      id: node.id,
-      name: node.name,
-      type: node.type,
-      parentPath: parentPath.slice(),
-      pageId: figma.currentPage.id
-    });
-  }
-  if ('children' in node) {
-    for (const child of node.children) {
-      // Only scan top-level frames (not nested frames)
-      if (node.type === 'PAGE') {
-        scanFrames(child, [], results);
-      }
+// Helper: Find all slides in a node
+function scanFrames(node) {
+  if (node.type !== 'PAGE') return [];
+  const slides = node.findAll(n => n.type === 'SLIDE');
+  for (const slide of slides) {
+    if (/^\d+$/.test(slide.name.trim())) {
+      slide.name = 'Name';
     }
   }
-  return results;
+  return slides.map(s => ({
+    id: s.id,
+    name: s.name,
+    type: s.type,
+    parentPath: [],
+    pageId: node.id
+  }));
 }
 
 // Helper: Get all pages and frames
@@ -655,54 +650,19 @@ async function ensureFont(fontWeight) {
   }
 }
 
-// Helper: Get all top-level frames on the current page
+// Helper: Get all presentation slides on the current page
 function getFramesOnCurrentPage() {
-  // Get only presentation slides on the current page
-  const allFrames = [];
-
-  function collectFrames(node) {
-    // Only collect frames that are likely to be presentation slides
-    if (node.type === 'FRAME' && node.name !== '__TOC_AUTO__') {
-      // Filter criteria for slides:
-      // 1. Must be a top-level frame (not nested inside another frame)
-      // 2. Must have reasonable dimensions (not too small)
-      // 3. Must not be a component or instance
-      // 4. Must not be inside a group
-      // 5. Must not be a TOC frame or other special frame
-
-      const isTopLevel = node.parent && node.parent.type === 'PAGE';
-      const hasReasonableSize = node.width >= 200 && node.height >= 200; // Minimum slide size
-      const isNotComponent = node.type === 'FRAME' && !node.name.startsWith('_');
-      const isNotNested = !node.parent || node.parent.type === 'PAGE';
-      const isNotSpecialFrame = node.name !== '__TOC_AUTO__' && !node.name.startsWith('__');
-
-      // Additional check: if it's nested, only include if it's a direct child of the page
-      const isDirectChild = node.parent === figma.currentPage;
-
-      // Additional check: prefer frames with slide-like names (optional, not strict)
-      const hasSlideLikeName = /slide|page|frame/i.test(node.name) || node.name.match(/^\d+$/);
-
-      if (isTopLevel && hasReasonableSize && isNotComponent && isDirectChild && isNotSpecialFrame) {
-        allFrames.push(node);
-      }
-    }
-
-    // Only recurse into children if we're at the page level
-    if ('children' in node && (node.type === 'PAGE' || node.type === 'FRAME')) {
-      for (const child of node.children) {
-        collectFrames(child);
-      }
+  const allSlides = figma.currentPage.findAll(n => n.type === 'SLIDE');
+  for (const slide of allSlides) {
+    if (/^\d+$/.test(slide.name.trim())) {
+      slide.name = 'Name';
     }
   }
-
-  // Start from the current page
-  collectFrames(figma.currentPage);
-
-  console.log('Found presentation slides on current page:', allFrames.length);
-  if (allFrames.length > 0) {
-    console.log('Slide names:', allFrames.map(f => f.name));
+  console.log('Found presentation slides on current page:', allSlides.length);
+  if (allSlides.length > 0) {
+    console.log('Slide names:', allSlides.map(f => f.name));
   }
-  return allFrames;
+  return allSlides;
 }
 
 // Helper: Group frames into rows by Y (within a threshold)
@@ -873,7 +833,7 @@ async function generateTOCFrame(slides, options, startFrameId) {
   console.log('Current selection:', selection);
 
   let parentFrame = null;
-  if (selection.length === 1 && selection[0].type === 'FRAME') {
+  if (selection.length === 1 && selection[0].type === 'SLIDE') {
     parentFrame = selection[0];
     console.log('Selected parent frame:', parentFrame.name);
   }
@@ -2228,7 +2188,7 @@ figma.ui.onmessage = async (msg) => {
                 node.fontName = safeFont;
                 if (options.subTitleSize) node.fontSize = parseFloat(options.subTitleSize);
                 if (options.subTitleColor) node.fills = [{ type: 'SOLID', color: hexToRgb(options.subTitleColor) }];
-                if (typeof options.subIndent === 'number' && node.parent && node.parent.type === 'FRAME') {
+                if (typeof options.subIndent === 'number' && node.parent && (node.parent.type === 'FRAME' || node.parent.type === 'SLIDE')) {
                   node.parent.paddingLeft = options.subIndent;
                 }
                 break;
@@ -2301,7 +2261,7 @@ figma.ui.onmessage = async (msg) => {
       if (msg.styleOptions.textAutoResize) node.textAutoResize = msg.styleOptions.textAutoResize;
       if (msg.styleOptions.textAlignHorizontal) node.textAlignHorizontal = msg.styleOptions.textAlignHorizontal;
       // Update position if requested
-      if (msg.styleOptions.pos && node.parent && node.parent.type === 'FRAME') {
+      if (msg.styleOptions.pos && node.parent && (node.parent.type === 'FRAME' || node.parent.type === 'SLIDE')) {
         // Use getNumberPosition to recalculate x/y
         const frame = node.parent;
         const pos = getNumberPosition(msg.styleOptions.pos, frame, node, node.fontSize, msg.styleOptions.padding);
@@ -2546,7 +2506,7 @@ try {
       let frame = null;
       for (const page of figma.root.children) {
         if (page.type !== 'PAGE') continue;
-        frame = page.findOne && page.findOne(n => n.id === frameId && n.type === 'FRAME');
+        frame = page.findOne && page.findOne(n => n.id === frameId && n.type === 'SLIDE');
         if (frame) break;
       }
       if (frame && textNode.characters.replace(/^([\d.]+\s)?(.+)$/, '$2') !== frame.name) {
@@ -2591,10 +2551,15 @@ function getTOCTextNodeMap() {
 // --- Live-linking: Listen for frame name changes and update TOC text ---
 // Load all pages first to enable document change handler in incremental mode
 figma.loadAllPagesAsync().then(() => {
+  let updateFramesTimeout = null;
+  let lastSlideIds = "";
+
   figma.on('documentchange', (event) => {
     const tocTextNodeMap = getTOCTextNodeMap();
+    let shouldCheckOrder = false;
+
     for (const change of event.documentChanges) {
-      if (change.type === 'PROPERTY_CHANGE' && change.propertyName === 'name' && change.node.type === 'FRAME') {
+      if (change.type === 'PROPERTY_CHANGE' && change.propertyName === 'name' && change.node.type === 'SLIDE') {
         const changedFrame = change.node;
         // Find the TOC text node with matching linkedFrameId
         const textNode = tocTextNodeMap[changedFrame.id];
@@ -2605,7 +2570,24 @@ figma.loadAllPagesAsync().then(() => {
           });
           textNode.name = changedFrame.name;
         }
+        shouldCheckOrder = true;
       }
+      if (change.type === 'CREATE' || change.type === 'DELETE' || change.node.type === 'PAGE' || change.node.type === 'SLIDE') {
+        shouldCheckOrder = true;
+      }
+    }
+
+    if (shouldCheckOrder) {
+      if (updateFramesTimeout) clearTimeout(updateFramesTimeout);
+      updateFramesTimeout = setTimeout(() => {
+        const currentSlides = getFramesOnCurrentPage();
+        const currentIds = currentSlides.map(s => s.id).join(',');
+        if (currentIds !== lastSlideIds) {
+          lastSlideIds = currentIds;
+          sendFramesToUI('z', false);
+          sendFramesToUI('z', true);
+        }
+      }, 500);
     }
   });
 }).catch(error => {
@@ -2632,10 +2614,10 @@ function getNumberPosition(pos, frame, numNode, size, pad = 80) {
     y = pad;
   } else if (pos === 'bottom-left') {
     x = pad;
-    y = frame.height - size - pad;
+    y = frame.height - numNode.height - pad;
   } else if (pos === 'bottom-right') {
     x = frame.width - numNode.width - pad;
-    y = frame.height - size - pad;
+    y = frame.height - numNode.height - pad;
   }
   return { x, y };
 }
