@@ -1141,6 +1141,7 @@ async function generateTOCFrame(slides, options, startFrameId) {
 
     // Create horizontal frame for columns
     const rowFrame = figma.createFrame();
+    rowFrame.clipsContent = false;
     rowFrame.layoutMode = 'HORIZONTAL';
     rowFrame.primaryAxisSizingMode = 'AUTO';
     rowFrame.counterAxisSizingMode = 'AUTO';
@@ -1166,6 +1167,7 @@ async function generateTOCFrame(slides, options, startFrameId) {
         if (group.type === 'group') {
           // Create a group frame with title and subtitles
           const groupFrame = figma.createFrame();
+          groupFrame.clipsContent = false;
           groupFrame.layoutMode = 'VERTICAL';
           groupFrame.primaryAxisSizingMode = 'AUTO';
           groupFrame.counterAxisSizingMode = 'AUTO';
@@ -1176,6 +1178,7 @@ async function generateTOCFrame(slides, options, startFrameId) {
 
           // Title row
           const titleRow = figma.createFrame();
+          titleRow.clipsContent = false;
           titleRow.layoutMode = 'HORIZONTAL';
           titleRow.primaryAxisSizingMode = 'AUTO';
           titleRow.counterAxisSizingMode = 'AUTO';
@@ -1240,6 +1243,7 @@ async function generateTOCFrame(slides, options, startFrameId) {
           // Subtitle rows
           for (const child of group.subtitles) {
             const subRow = figma.createFrame();
+            subRow.clipsContent = false;
             subRow.layoutMode = 'HORIZONTAL';
             subRow.primaryAxisSizingMode = 'AUTO';
             subRow.counterAxisSizingMode = 'AUTO';
@@ -1307,6 +1311,7 @@ async function generateTOCFrame(slides, options, startFrameId) {
         } else {
           // Single slide (no subtitles)
           const row = figma.createFrame();
+          row.clipsContent = false;
           row.layoutMode = 'HORIZONTAL';
           row.primaryAxisSizingMode = 'AUTO';
           row.counterAxisSizingMode = 'AUTO';
@@ -1379,6 +1384,7 @@ async function generateTOCFrame(slides, options, startFrameId) {
     const colFrames = [];
     for (let i = 0; i < actualNumColumns; i++) {
       const colFrame = figma.createFrame();
+      colFrame.clipsContent = false;
       colFrame.layoutMode = 'VERTICAL';
       colFrame.primaryAxisSizingMode = 'AUTO';
       colFrame.counterAxisSizingMode = 'FIXED';
@@ -1397,6 +1403,7 @@ async function generateTOCFrame(slides, options, startFrameId) {
   }
   // --- Root frame for the layout ---
   const tocRoot = figma.createFrame();
+  tocRoot.clipsContent = false;
   tocRoot.name = '__TOC_AUTO__';
   tocRoot.setPluginData('isTOCFrame', 'true');
   tocRoot.layoutMode = 'VERTICAL';
