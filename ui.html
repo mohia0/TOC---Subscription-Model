@@ -1493,37 +1493,37 @@ window._emptyLottieData = {"v":"5.12.1","fr":60,"ip":0,"op":90,"w":430,"h":430,"
           <div class="tab-content-panel active" id="panel-numbering">
             <div class="settings-group">
               <div class="panel-header"
-                style="font-size: 10px; color: var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom: 5px;">
+                style="display:none; font-size: 10px; color: var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom: 5px;">
                 Detection Direction</div>
               <div class="slides-detect-modes"
                 style="display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:0;">
-                <button class="icon-btn detect-btn selected tooltip-bottom tooltip-right" id="detect-z"
+                <button class="icon-btn detect-btn selected tooltip-bottom tooltip-right" id="detect-z" style="display:none !important;"
                   data-tooltip="Z: Left-to-Right, Top-to-Bottom">
                   <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
                     <path d="M3 3h12v2H5v2h8v2H5v2h10v2H3" stroke="currentColor" stroke-width="1.5"
                       stroke-linecap="round" stroke-linejoin="round" />
                   </svg>
                 </button>
-                <button class="icon-btn detect-btn tooltip-bottom" id="detect-z-flip"
+                <button class="icon-btn detect-btn tooltip-bottom" id="detect-z-flip" style="display:none !important;"
                   data-tooltip="Z Flipped: Right-to-Left, Top-to-Bottom">
                   <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
                     <path d="M15 3H3v2h10v2H5v2h8v2H3v2h12" stroke="currentColor" stroke-width="1.5"
                       stroke-linecap="round" stroke-linejoin="round" />
                   </svg>
                 </button>
-                <button class="icon-btn detect-btn tooltip-bottom" id="detect-vertical" data-tooltip="Vertical: Top-to-Bottom">
+                <button class="icon-btn detect-btn tooltip-bottom" id="detect-vertical" style="display:none !important;" data-tooltip="Vertical: Top-to-Bottom">
                   <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
                     <path d="M9 3v12M9 3l-2 2M9 3l2 2M9 15l-2-2M9 15l2-2" stroke="currentColor" stroke-width="1.5"
                       stroke-linecap="round" stroke-linejoin="round" />
                   </svg>
                 </button>
-                <button class="icon-btn detect-btn tooltip-bottom" id="detect-horizontal" data-tooltip="Horizontal: Left-to-Right">
+                <button class="icon-btn detect-btn tooltip-bottom" id="detect-horizontal" style="display:none !important;" data-tooltip="Horizontal: Left-to-Right">
                   <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
                     <path d="M3 9h12M15 9l-2-2M15 9l-2 2M3 9l2-2M3 9l2 2" stroke="currentColor" stroke-width="1.5"
                       stroke-linecap="round" stroke-linejoin="round" />
                   </svg>
                 </button>
-                <button class="icon-btn detect-btn tooltip-bottom tooltip-left" id="detect-horizontal-rtl" data-tooltip="Horizontal: Right-to-Left">
+                <button class="icon-btn detect-btn tooltip-bottom tooltip-left" id="detect-horizontal-rtl" style="display:none !important;" data-tooltip="Horizontal: Right-to-Left">
                   <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
                     <path d="M15 9H3M3 9l2-2M3 9l2 2M15 9l-2-2M15 9l-2 2" stroke="currentColor" stroke-width="1.5"
                       stroke-linecap="round" stroke-linejoin="round" />
@@ -1539,7 +1539,7 @@ window._emptyLottieData = {"v":"5.12.1","fr":60,"ip":0,"op":90,"w":430,"h":430,"
                   </svg>
                 </button>
               </div>
-              <div id="direction-label" style="font-size:10px;color:var(--text-muted);margin-top:5px;letter-spacing:0.03em;">Detecting: <span id="direction-label-value" style="color:#e2e8f0;font-weight:600;">Z-order</span></div>
+              <div id="direction-label" style="display:none;font-size:10px;color:var(--text-muted);margin-top:5px;letter-spacing:0.03em;">Detecting: <span id="direction-label-value" style="color:#e2e8f0;font-weight:600;">Z-order</span></div>
             </div>
 
             <div id="start-numbering-hint" style="display:none;background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.25);border-radius:8px;padding:8px 10px;margin-bottom:6px;font-size:11px;color:#a5b4fc;line-height:1.6;position:relative;">
@@ -2353,7 +2353,7 @@ window._emptyLottieData = {"v":"5.12.1","fr":60,"ip":0,"op":90,"w":430,"h":430,"
       livePreview: true,
       tocLayout: 'twocol',
       showNesting: true,
-      groupSpacing: 16,
+      groupSpacing: 24,
       columnSpacing: 48,
       groupPadding: 12,
       maxItemsPerCol: 10,
@@ -5429,7 +5429,7 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
               <div style="display:grid;grid-template-columns: 1fr 1fr;gap:10px;">
                 <div style="display:flex;align-items:center;gap:6px;justify-content:space-between;">
                   <span style="font-size:11px;color:#b0b3b8;">Group<span class="info-icon">!<span class="tooltip">Spacing between slide groups</span></span></span>
-                  <span style="display:flex;align-items:center;"><input id="group-spacing" class="modal-input" type="number" value="16" style="width:38px;height:24px;font-size:11px;padding:2px 4px;"><span style="font-size:10px;margin-left:2px;color:#666;">px</span></span>
+                  <span style="display:flex;align-items:center;"><input id="group-spacing" class="modal-input" type="number" value="24" style="width:38px;height:24px;font-size:11px;padding:2px 4px;"><span style="font-size:10px;margin-left:2px;color:#666;">px</span></span>
                 </div>
                 <div style="display:flex;align-items:center;gap:6px;justify-content:space-between;">
                   <span style="font-size:11px;color:#b0b3b8;">Gaps<span class="info-icon">!<span class="tooltip">Spacing between columns</span></span></span>
@@ -5584,7 +5584,7 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
           const defaultLayoutSettings = {
             titleNumberPos: 'left',
             subtitleNumberPos: 'left',
-            groupSpacing: 16,
+            groupSpacing: 24,
             columnSpacing: 48,
             groupPadding: 12,
             maxColumnHeight: 800,
@@ -6516,6 +6516,77 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
         });
       }
       turnSelectsToToggles();
+
+      // --- CUSTOM SELECT UI INJECTION ---
+      function initCustomSelects() {
+        const selects = document.querySelectorAll('select.modal-select, select[id$="-weight"], select[id$="-font"], select[id$="-layout"], select[id^="hero-"], select[id^="nested-"]');
+        selects.forEach(select => {
+          if (select.parentElement.classList.contains('custom-select-wrapper')) return;
+          if (select.style.display === 'none' && !select.parentElement.classList.contains('custom-select-wrapper')) return;
+
+          const wrapper = document.createElement('div');
+          wrapper.className = 'custom-select-wrapper';
+          wrapper.style.position = 'relative';
+          wrapper.style.display = 'inline-block';
+          wrapper.style.verticalAlign = 'middle';
+          
+          let width = select.style.width || select.getAttribute('width');
+          if (width && width !== 'auto') {
+            wrapper.style.width = width;
+          } else {
+            wrapper.style.minWidth = '80px'; 
+          }
+          
+          if (select.style.flex) wrapper.style.flex = select.style.flex;
+          if (select.style.marginLeft) wrapper.style.marginLeft = select.style.marginLeft;
+
+          select.parentNode.insertBefore(wrapper, select);
+          wrapper.appendChild(select);
+          select.style.display = 'none';
+
+          const trigger = document.createElement('div');
+          trigger.className = 'custom-select-trigger';
+          trigger.innerHTML = <span> + (select.options[select.selectedIndex]?.text || '') + </span>
+            <svg width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-left: 8px; flex-shrink: 0;">
+              <path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>;
+          wrapper.appendChild(trigger);
+
+          const optionsContainer = document.createElement('div');
+          optionsContainer.className = 'custom-select-options';
+          wrapper.appendChild(optionsContainer);
+
+          Array.from(select.options).forEach(option => {
+            const optionDiv = document.createElement('div');
+            optionDiv.className = 'custom-select-option';
+            if (option.selected) optionDiv.classList.add('selected');
+            optionDiv.textContent = option.text;
+            optionDiv.addEventListener('click', () => {
+              select.value = option.value;
+              select.dispatchEvent(new Event('change', { bubbles: true }));
+              select.dispatchEvent(new Event('input', { bubbles: true }));
+              trigger.querySelector('span').textContent = option.text;
+              wrapper.classList.remove('open');
+              optionsContainer.querySelectorAll('.custom-select-option').forEach(el => el.classList.remove('selected'));
+              optionDiv.classList.add('selected');
+            });
+            optionsContainer.appendChild(optionDiv);
+          });
+
+          trigger.addEventListener('click', (e) => {
+            e.stopPropagation();
+            document.querySelectorAll('.custom-select-wrapper').forEach(w => {
+              if (w !== wrapper) w.classList.remove('open');
+            });
+            wrapper.classList.toggle('open');
+          });
+        });
+
+        document.addEventListener('click', () => {
+          document.querySelectorAll('.custom-select-wrapper').forEach(w => w.classList.remove('open'));
+        });
+      }
+      setTimeout(initCustomSelects, 200);
   </script>
 
   <!-- LOCK SCREEN REMOVED - No longer needed -->
