@@ -1,5 +1,5 @@
 // Main Figma plugin code for Table of Contents Generator
-figma.showUI(__html__, { width: 680, height: 800 });
+figma.showUI(__html__, { width: 550, height: 800 });
 
 // --- PROFESSIONAL TRIAL AND SUBSCRIPTION MANAGEMENT ---
 const TRIAL_DAYS = 7; // 7-day trial
@@ -873,13 +873,20 @@ async function generateTOCFrame(slides, options, startFrameId) {
   console.log('Current selection:', selection);
 
   let parentFrame = null;
-  if (selection.length === 1 && selection[0].type === 'FRAME') {
+  
+  // 1. First priority: if a TOC already exists on this page, ALWAYS update it in place, ignoring selection.
+  const existingToc = figma.currentPage.findOne(n => n.type === 'FRAME' && n.name === '__TOC_AUTO__');
+  if (existingToc && existingToc.parent && existingToc.parent.type === 'FRAME') {
+    parentFrame = existingToc.parent;
+    console.log('Found existing TOC, forcing target to its parent frame:', parentFrame.name);
+  } else if (selection.length === 1 && selection[0].type === 'FRAME') {
+    // 2. Fallback: if no TOC exists, use the currently selected frame.
     parentFrame = selection[0];
     console.log('Selected parent frame:', parentFrame.name);
   }
 
   if (!parentFrame) {
-    console.log('No frame selected');
+    console.log('No frame selected and no existing TOC found');
     figma.notify('Please select a frame to generate the TOC inside.');
     figma.ui.postMessage({ type: 'toc-error', error: 'Please select a frame to generate the TOC inside. Click on any frame in your document, then try again.' });
     return;
@@ -1215,7 +1222,7 @@ async function generateTOCFrame(slides, options, startFrameId) {
           titleRow.layoutMode = 'HORIZONTAL';
           titleRow.primaryAxisSizingMode = 'AUTO';
           titleRow.counterAxisSizingMode = 'AUTO';
-          titleRow.itemSpacing = 16;
+          titleRow.itemSpacing = tocStyle.numberTextGap !== undefined ? tocStyle.numberTextGap : 16;
           titleRow.fills = [];
 
           // Apply row alignment settings
@@ -1277,7 +1284,7 @@ async function generateTOCFrame(slides, options, startFrameId) {
             subRow.layoutMode = 'HORIZONTAL';
             subRow.primaryAxisSizingMode = 'AUTO';
             subRow.counterAxisSizingMode = 'AUTO';
-            subRow.itemSpacing = 16;
+            subRow.itemSpacing = tocStyle.numberTextGap !== undefined ? tocStyle.numberTextGap : 16;
             subRow.fills = [];
             subRow.paddingLeft = tocStyle.subIndent || 24;
 
@@ -1342,7 +1349,7 @@ async function generateTOCFrame(slides, options, startFrameId) {
           row.layoutMode = 'HORIZONTAL';
           row.primaryAxisSizingMode = 'AUTO';
           row.counterAxisSizingMode = 'AUTO';
-          row.itemSpacing = 16;
+          row.itemSpacing = tocStyle.numberTextGap !== undefined ? tocStyle.numberTextGap : 16;
           row.fills = [];
           row.paddingTop = 12; // Space above single items
           row.paddingBottom = 12; // Space below single items
@@ -2390,15 +2397,21 @@ figma.ui.onmessage = async (msg) => {
 
           // Update title row spacing
           const titleRow = groupFrame.children.find(n => n.type === 'FRAME' && n.layoutMode === 'HORIZONTAL');
-          if (titleRow && typeof msg.layoutOptions.titleSpacing === 'number') {
-            titleRow.itemSpacing = msg.layoutOptions.titleSpacing;
+          if (titleRow) {
+            if (typeof msg.layoutOptions.numberTextGap === 'number') {
+              titleRow.itemSpacing = msg.layoutOptions.numberTextGap;
+            } else if (typeof msg.layoutOptions.titleSpacing === 'number') {
+              titleRow.itemSpacing = msg.layoutOptions.titleSpacing;
+            }
           }
 
           // Update subtitle rows
           groupFrame.children.forEach(child => {
             if (child.type === 'FRAME' && child.layoutMode === 'HORIZONTAL' && child !== titleRow) {
               // This is a subtitle row
-              if (typeof msg.layoutOptions.subtitleSpacing === 'number') {
+              if (typeof msg.layoutOptions.numberTextGap === 'number') {
+                child.itemSpacing = msg.layoutOptions.numberTextGap;
+              } else if (typeof msg.layoutOptions.subtitleSpacing === 'number') {
                 child.itemSpacing = msg.layoutOptions.subtitleSpacing;
               }
               if (typeof msg.layoutOptions.subIndent === 'number') {
