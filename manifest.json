@@ -1,5 +1,5 @@
 {
-  "name": "TOC Generator",
+  "name": "Live Numbering & Table of Contents",
   "id": "1533998558462836790",
   "api": "1.0.0",
   "main": "code.js",

@@ -1,5 +1,8 @@
-// Main Figma plugin code for Table of Contents Generator
-figma.showUI(__html__, { width: 680, height: 800 });
+// Main Figma plugin code for Live Numbering & Table of Contents
+figma.showUI(__html__, { width: 550, height: 800 });
+
+// Track currently selected layout direction (Z, Vertical, Horizontal, etc.)
+let currentSelectedDirection = 'z';
 
 // --- PROFESSIONAL TRIAL AND SUBSCRIPTION MANAGEMENT ---
 const TRIAL_DAYS = 7; // 7-day trial
@@ -833,13 +836,20 @@ async function generateTOCFrame(slides, options, startFrameId) {
   console.log('Current selection:', selection);
 
   let parentFrame = null;
-  if (selection.length === 1 && selection[0].type === 'SLIDE') {
+  
+  // 1. First priority: if a TOC already exists on this page, ALWAYS update it in place, ignoring selection.
+  const existingToc = figma.currentPage.findOne(n => n.type === 'FRAME' && n.name === '__TOC_AUTO__');
+  if (existingToc && existingToc.parent && (existingToc.parent.type === 'FRAME' || existingToc.parent.type === 'SLIDE')) {
+    parentFrame = existingToc.parent;
+    console.log('Found existing TOC, forcing target to its parent frame:', parentFrame.name);
+  } else if (selection.length === 1 && (selection[0].type === 'FRAME' || selection[0].type === 'SLIDE')) {
+    // 2. Fallback: if no TOC exists, use the currently selected frame.
     parentFrame = selection[0];
     console.log('Selected parent frame:', parentFrame.name);
   }
 
   if (!parentFrame) {
-    console.log('No frame selected');
+    console.log('No frame selected and no existing TOC found');
     figma.notify('Please select a frame to generate the TOC inside.');
     figma.ui.postMessage({ type: 'toc-error', error: 'Please select a frame to generate the TOC inside. Click on any frame in your document, then try again.' });
     return;
@@ -1163,6 +1173,7 @@ async function generateTOCFrame(slides, options, startFrameId) {
           // Create a group frame with title and subtitles
           const groupFrame = figma.createFrame();
           groupFrame.layoutMode = 'VERTICAL';
+          groupFrame.layoutAlign = 'STRETCH';
           groupFrame.primaryAxisSizingMode = 'AUTO';
           groupFrame.counterAxisSizingMode = 'AUTO';
           groupFrame.fills = [];
@@ -1173,9 +1184,10 @@ async function generateTOCFrame(slides, options, startFrameId) {
           // Title row
           const titleRow = figma.createFrame();
           titleRow.layoutMode = 'HORIZONTAL';
+          titleRow.layoutAlign = 'STRETCH';
           titleRow.primaryAxisSizingMode = 'AUTO';
           titleRow.counterAxisSizingMode = 'AUTO';
-          titleRow.itemSpacing = 16;
+          titleRow.itemSpacing = tocStyle.numberTextGap !== undefined ? tocStyle.numberTextGap : 16;
           titleRow.fills = [];
 
           // Apply row alignment settings
@@ -1217,7 +1229,8 @@ async function generateTOCFrame(slides, options, startFrameId) {
           nameText.fontSize = heroFontSize || 18;
           nameText.fontName = safeNameFont;
           nameText.fills = [{ type: 'SOLID', color: tocStyle.heroFontColor ? hexToRgb(tocStyle.heroFontColor) : { r: 0, g: 0, b: 0 } }];
-          nameText.textAutoResize = 'WIDTH_AND_HEIGHT';
+          nameText.layoutGrow = 1;
+          nameText.textAutoResize = 'HEIGHT';
           nameText.textAlignHorizontal = 'LEFT';
           nameText.setPluginData('linkedFrameId', group.title.id);
           nameText.setPluginData('tocType', 'hero');
@@ -1235,9 +1248,10 @@ async function generateTOCFrame(slides, options, startFrameId) {
           for (const child of group.subtitles) {
             const subRow = figma.createFrame();
             subRow.layoutMode = 'HORIZONTAL';
+            subRow.layoutAlign = 'STRETCH';
             subRow.primaryAxisSizingMode = 'AUTO';
             subRow.counterAxisSizingMode = 'AUTO';
-            subRow.itemSpacing = 16;
+            subRow.itemSpacing = tocStyle.numberTextGap !== undefined ? tocStyle.numberTextGap : 16;
             subRow.fills = [];
             subRow.paddingLeft = tocStyle.subIndent || 24;
 
@@ -1280,7 +1294,8 @@ async function generateTOCFrame(slides, options, startFrameId) {
             subNameText.fontSize = tocStyle.subTitleSize || nestedFontSize || 18;
             subNameText.fontName = safeSubNameFont;
             subNameText.fills = [{ type: 'SOLID', color: tocStyle.subTitleColor ? hexToRgb(tocStyle.subTitleColor) : nestedFontColor }];
-            subNameText.textAutoResize = 'WIDTH_AND_HEIGHT';
+            subNameText.layoutGrow = 1;
+            subNameText.textAutoResize = 'HEIGHT';
             subNameText.textAlignHorizontal = 'LEFT';
             subNameText.setPluginData('linkedFrameId', child.id);
             subNameText.setPluginData('tocType', 'sub');
@@ -1300,9 +1315,10 @@ async function generateTOCFrame(slides, options, startFrameId) {
           // Single slide (no subtitles)
           const row = figma.createFrame();
           row.layoutMode = 'HORIZONTAL';
+          row.layoutAlign = 'STRETCH';
           row.primaryAxisSizingMode = 'AUTO';
           row.counterAxisSizingMode = 'AUTO';
-          row.itemSpacing = 16;
+          row.itemSpacing = tocStyle.numberTextGap !== undefined ? tocStyle.numberTextGap : 16;
           row.fills = [];
           row.paddingTop = 12; // Space above single items
           row.paddingBottom = 12; // Space below single items
@@ -1344,7 +1360,8 @@ async function generateTOCFrame(slides, options, startFrameId) {
           nameText.fontSize = heroFontSize || 18;
           nameText.fontName = safeNameFont;
           nameText.fills = [{ type: 'SOLID', color: tocStyle.heroFontColor ? hexToRgb(tocStyle.heroFontColor) : { r: 0, g: 0, b: 0 } }];
-          nameText.textAutoResize = 'WIDTH_AND_HEIGHT';
+          nameText.layoutGrow = 1;
+          nameText.textAutoResize = 'HEIGHT';
           nameText.textAlignHorizontal = 'LEFT';
           nameText.setPluginData('linkedFrameId', group.slide.id);
           nameText.setPluginData('tocType', 'hero');
@@ -1824,6 +1841,7 @@ figma.ui.onmessage = async (msg) => {
     }
     // If msg.forTOC is true, filter for TOC; otherwise, show all slides
     console.log('get-frames called with forTOC:', !!msg.forTOC, 'thenGenerateTOC:', !!msg.thenGenerateTOC);
+    if (msg.direction) currentSelectedDirection = msg.direction;
     sendFramesToUI(msg.direction, !!msg.forTOC);
 
     // If thenGenerateTOC is true, we'll generate TOC after sending frames
@@ -1865,6 +1883,7 @@ figma.ui.onmessage = async (msg) => {
       return;
     }
     // Use direction and numberStyle from UI
+    if (msg.direction) currentSelectedDirection = msg.direction;
     const frames = getFramesOnCurrentPage();
     // Only use visible and unlocked frames
     const orderedFrames = orderFrames(frames.filter(f => !f.locked && f.visible !== false), msg.direction);
@@ -1930,6 +1949,7 @@ figma.ui.onmessage = async (msg) => {
     }
     // Fix: re-sequence ONLY frames that already have a slide number node.
     // Frames without numbers (e.g. slides before "Start Numbering from") are left untouched.
+    if (msg.direction) currentSelectedDirection = msg.direction;
     const frames = getFramesOnCurrentPage();
     const allVisible = frames.filter(f => !f.locked && f.visible !== false);
     const orderedAll = orderFrames(allVisible, msg.direction);
@@ -2006,6 +2026,7 @@ figma.ui.onmessage = async (msg) => {
     const frames = getFramesOnCurrentPage();
     // Only use visible and unlocked frames
     const direction = typeof msg.direction === 'string' ? msg.direction : 'z';
+    currentSelectedDirection = direction;
     const numberStyle = msg.numberStyle || { font: 'Inter', size: 16, weight: 'Regular', color: '#111111', pos: 'top-left', leadingZero: true };
     const orderedFrames = orderFrames(frames.filter(f => !f.locked && f.visible !== false), direction);
     const startIdx = orderedFrames.findIndex(f => f.id === msg.frameId);
@@ -2350,15 +2371,21 @@ figma.ui.onmessage = async (msg) => {
 
           // Update title row spacing
           const titleRow = groupFrame.children.find(n => n.type === 'FRAME' && n.layoutMode === 'HORIZONTAL');
-          if (titleRow && typeof msg.layoutOptions.titleSpacing === 'number') {
-            titleRow.itemSpacing = msg.layoutOptions.titleSpacing;
+          if (titleRow) {
+            if (typeof msg.layoutOptions.numberTextGap === 'number') {
+              titleRow.itemSpacing = msg.layoutOptions.numberTextGap;
+            } else if (typeof msg.layoutOptions.titleSpacing === 'number') {
+              titleRow.itemSpacing = msg.layoutOptions.titleSpacing;
+            }
           }
 
           // Update subtitle rows
           groupFrame.children.forEach(child => {
             if (child.type === 'FRAME' && child.layoutMode === 'HORIZONTAL' && child !== titleRow) {
               // This is a subtitle row
-              if (typeof msg.layoutOptions.subtitleSpacing === 'number') {
+              if (typeof msg.layoutOptions.numberTextGap === 'number') {
+                child.itemSpacing = msg.layoutOptions.numberTextGap;
+              } else if (typeof msg.layoutOptions.subtitleSpacing === 'number') {
                 child.itemSpacing = msg.layoutOptions.subtitleSpacing;
               }
               if (typeof msg.layoutOptions.subIndent === 'number') {
@@ -2451,14 +2478,20 @@ figma.ui.onmessage = async (msg) => {
   }
 
   if (msg.type === 'regenerate-toc') {
-    // Regenerate the entire TOC with new settings
-    const existingTOC = figma.currentPage.findOne(node => node.getPluginData && node.getPluginData('isTOCFrame') === 'true');
-    if (existingTOC) {
-      const parentNode = existingTOC.parent;
-      existingTOC.remove();
-      if (parentNode && parentNode.type === 'FRAME') {
-        figma.currentPage.selection = [parentNode];
-      }
+    // GUARD: Only regenerate if a TOC frame already exists on this page.
+    // This prevents auto-generation when numbering slides or renaming them.
+    const existingTOC = figma.currentPage.findOne(node => node.getPluginData && node.getPluginData('isTOCFrame') === 'true')
+      || figma.currentPage.findOne(node => node.type === 'FRAME' && node.name === '__TOC_AUTO__');
+    if (!existingTOC) {
+      // No TOC on this page yet — do nothing. User must click Generate TOC first.
+      return;
+    }
+
+    // Remove the existing TOC frame before regenerating
+    const parentNode = existingTOC.parent;
+    existingTOC.remove();
+    if (parentNode && parentNode.type === 'FRAME') {
+      figma.currentPage.selection = [parentNode];
     }
 
     // Get current TOC settings, prioritizing freshly sent UI options over stored settings to avoid race conditions
@@ -2584,8 +2617,8 @@ figma.loadAllPagesAsync().then(() => {
         const currentIds = currentSlides.map(s => s.id).join(',');
         if (currentIds !== lastSlideIds) {
           lastSlideIds = currentIds;
-          sendFramesToUI('z', false);
-          sendFramesToUI('z', true);
+          sendFramesToUI(currentSelectedDirection, false);
+          sendFramesToUI(currentSelectedDirection, true);
         }
       }, 500);
     }

@@ -1,5 +1,5 @@
 /**
- * Dev Watch Script — TOC Generator Figma Plugin
+ * Dev Watch Script — Live Numbering & Table of Contents Figma Plugin
  *
  * Watches code.js and ui.html for changes.
  * When a file changes, it prints a message so you know to

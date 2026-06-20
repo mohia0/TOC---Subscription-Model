@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>TOC</title>
+  <title>Live Numbering & Table of Contents</title>
   <style>
     :root {
       --primary: #2563eb;
@@ -1332,6 +1332,63 @@
       cursor: default !important;
       pointer-events: none;
     }
+
+    /* Glow effect for Fix button when out of sequence */
+    .highlight-glow {
+      position: relative !important;
+      background: rgba(24, 160, 251, 0.15) !important;
+      color: #18A0FB !important;
+      box-shadow: 0 0 10px rgba(24, 160, 251, 0.6) !important;
+      border: 1.5px solid #18A0FB !important;
+      animation: fixButtonPulse 1.8s infinite alternate !important;
+    }
+
+    @keyframes fixButtonPulse {
+      0% {
+        box-shadow: 0 0 4px rgba(24, 160, 251, 0.3);
+      }
+      100% {
+        box-shadow: 0 0 16px rgba(24, 160, 251, 0.8), inset 0 0 4px rgba(24, 160, 251, 0.4);
+      }
+    }
+
+    /* Out of sequence warning tooltip */
+    .fix-sequence-tooltip {
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      margin-bottom: 8px;
+      background: rgba(30, 30, 36, 0.98);
+      color: #fff;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 10px;
+      line-height: 1.4;
+      font-weight: 500;
+      white-space: normal;
+      width: max-content;
+      max-width: 185px;
+      text-align: center;
+      pointer-events: none;
+      z-index: 1000000;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      animation: tooltipFadeIn 0.2s ease forwards;
+    }
+
+    .fix-sequence-tooltip::before {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border-width: 5px;
+      border-style: solid;
+      border-color: rgba(30, 30, 36, 0.98) transparent transparent transparent;
+    }
   </style>
 
 <script>
@@ -1416,7 +1473,20 @@ window._emptyLottieData = {"v":"5.12.1","fr":60,"ip":0,"op":90,"w":430,"h":430,"
             <div class="slides-list" id="slides-list"></div>
 
             <div class="slide-controls" style="align-items: center; margin-top: 12px; display: flex;">
-              <div style="display: flex; gap: 4px; flex: 1;">
+              <div style="display: flex; gap: 6px; flex: 1; align-items: center;">
+                <div style="display: flex; flex-direction: column; align-items: center; position: relative;">
+                  <button class="primary-btn" id="add-slide-numbers" disabled>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:5px;flex-shrink:0;vertical-align:middle;">
+                    <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.582a.5.5 0 0 1 0 .963L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>
+                    <path d="M20 3v4"/><path d="M22 5h-4"/><path d="M4 17v2"/><path d="M5 18H3"/>
+                  </svg>Add Slide Numbers
+                </button>
+                  <div style="position: absolute; top: 100%; width: 200px; margin-top: 4px;">
+                    <div id="main-status-msg"
+                  style="flex: 1; text-align: center; color: var(--text-main); font-size: 10px; font-weight: 600; line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin: 0 4px;">
+                </div>
+                  </div>
+                </div>
                 <button class="refresh-btn" id="slide-number-settings" data-tooltip="Number style settings" disabled>
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                   stroke-linecap="round" stroke-linejoin="round">
@@ -1424,26 +1494,17 @@ window._emptyLottieData = {"v":"5.12.1","fr":60,"ip":0,"op":90,"w":430,"h":430,"
                   <line x1="10" x2="8" y1="3" y2="21"/><line x1="16" x2="14" y1="3" y2="21"/>
                 </svg>Style
               </button>
-                <button class="refresh-btn" id="refresh-numbers" data-tooltip="Removed a slide? Fix gaps in numbering" disabled>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;">
-                  <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
-                  <path d="m9 12 2 2 4-4"/>
-                </svg>
-                Fix
-              </button>
-              </div>
-
-              <div style="display: flex; flex-direction: column; align-items: center; position: relative;">
-                <button class="primary-btn" id="add-slide-numbers" disabled>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:5px;flex-shrink:0;vertical-align:middle;">
-                  <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.582a.5.5 0 0 1 0 .963L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>
-                  <path d="M20 3v4"/><path d="M22 5h-4"/><path d="M4 17v2"/><path d="M5 18H3"/>
-                </svg>Add Slide Numbers
-              </button>
-                <div style="position: absolute; top: 100%; width: 200px; margin-top: 4px;">
-                  <div id="main-status-msg"
-                style="flex: 1; text-align: center; color: var(--text-main); font-size: 10px; font-weight: 600; line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin: 0 4px;">
-              </div>
+                <div style="position: relative; display: inline-flex; align-items: center;">
+                  <button class="refresh-btn" id="refresh-numbers" data-tooltip="Removed a slide? Fix gaps in numbering" disabled>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;">
+                      <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
+                      <path d="m9 12 2 2 4-4"/>
+                    </svg>
+                    Fix
+                  </button>
+                  <div id="fix-sequence-tooltip" class="fix-sequence-tooltip" style="display: none;">
+                    Slide numbers are out of sequence! Click Fix to update them.
+                  </div>
                 </div>
               </div>
 
@@ -1458,23 +1519,23 @@ window._emptyLottieData = {"v":"5.12.1","fr":60,"ip":0,"op":90,"w":430,"h":430,"
 
           <!-- TAB PANEL 2: TOC GENERATION -->
           <div class="tab-content-panel" id="panel-toc" style="gap:10px;">
-            <div id="toc-controls-area" style="background:rgba(0,0,0,0.15);border-radius:8px;padding:8px 12px;flex-shrink:0;">
-              <div id="toc-status-msg" style="font-size:0.9em;color:var(--primary);min-height:0;"></div>
-            </div>
+
             <div id="pro-tip-banner" style="font-size: 11px; color: #b0b3b8; padding: 8px 10px; display: flex; align-items: flex-start; gap: 8px; background: rgba(24, 160, 251, 0.08); border-left: 2px solid #18A0FB; border-radius: 4px; margin-bottom: -2px; position: relative;">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#18A0FB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-top: 1px;">
                 <circle cx="12" cy="12" r="10"></circle>
                 <line x1="12" y1="16" x2="12" y2="12"></line>
                 <line x1="12" y1="8" x2="12.01" y2="8"></line>
               </svg>
-              <div style="line-height: 1.4; flex-grow: 1; padding-right: 12px;">
-                <strong>Pro Tip:</strong> Drag and drop items to nest them as sub-pages. Click any name to edit it!
+              <div style="line-height: 1.5; flex-grow: 1; padding-right: 12px; padding-bottom: 8px;">
+                <div style="margin-bottom: 4px; color: #E2E8F0;">
+                  Select an empty frame, then click <strong>Generate TOC</strong>.
+                </div>
+                <div>
+                  <strong>Pro Tip:</strong> Drag and drop items below to nest them as sub-pages. Click any name to edit its text!
+                </div>
               </div>
-              <button id="close-pro-tip" style="background: none; border: none; padding: 0; margin: 0; color: #b0b3b8; cursor: pointer; position: absolute; right: 8px; top: 8px; display: flex; align-items: center; justify-content: center;" title="Dismiss">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <line x1="18" y1="6" x2="6" y2="18"></line>
-                  <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
+              <button id="close-pro-tip" style="background: none; border: none; padding: 0; margin: 0; color: #8b8e94; cursor: pointer; position: absolute; right: 8px; bottom: 8px; font-size: 9px; text-decoration: underline; opacity: 0.8;" title="Dismiss">
+                don't show again
               </button>
             </div>
             <script>
@@ -1496,6 +1557,10 @@ window._emptyLottieData = {"v":"5.12.1","fr":60,"ip":0,"op":90,"w":430,"h":430,"
               });
             </script>
             <div class="toc-editor" id="toc-editor" style="background:rgba(0,0,0,0.2);border-radius:8px;padding:8px 12px;"></div>
+            <div id="toc-controls-area" class="slide-controls" style="background:rgba(0,0,0,0.15); border-radius:8px; padding:8px 12px; margin-top: 12px; display: flex; flex-direction: column; position: relative;">
+              <div id="toc-status-msg" style="font-size:0.9em;color:var(--primary);min-height:0; text-align: left; margin-bottom: 8px;"></div>
+              <div id="toc-buttons-wrapper" style="display: flex; flex-direction: row; justify-content: space-between; align-items: center; width: 100%;"></div>
+            </div>
           </div>
 
           <script>
@@ -3418,10 +3483,10 @@ setTimeout(() => {
           supportStatus.textContent = '';
 
           const subject = currentType === 'bug'
-            ? '🐛 Bug Report — TOC Plugin'
+            ? '🐛 Bug Report — Live Numbering & Table of Contents'
             : currentType === 'support'
-              ? '👑 Premium Support — TOC Plugin'
-              : '💡 Suggestion — TOC Plugin';
+              ? '👑 Premium Support — Live Numbering & Table of Contents'
+              : '💡 Suggestion — Live Numbering & Table of Contents';
               
           let typeLabel = 'Suggestion';
           if (currentType === 'bug') typeLabel = 'Bug Report';
@@ -3964,6 +4029,8 @@ setTimeout(() => {
       }
 
       // --- Slides Preview Logic (Vertical List) ---
+      // Stable map: slideId -> user-given display name. Survives all reorders/refreshes.
+      window.slideDisplayNames = window.slideDisplayNames || {};
       const slidesList = document.getElementById('slides-list');
       const detectBtns = [
         document.getElementById('detect-z'),
@@ -4064,6 +4131,69 @@ setTimeout(() => {
         }
       }
 
+      function updateFixButtonHighlight() {
+        const fixBtn = document.getElementById('refresh-numbers');
+        const tooltip = document.getElementById('fix-sequence-tooltip');
+        if (!fixBtn) return;
+
+        let outOfSequence = false;
+        const hasNumbers = window._hasNumbers || false;
+
+        // 1. Check canvas/numbering list (allSlides)
+        if (hasNumbers && allSlides && allSlides.length > 0) {
+          const numbered = allSlides.filter(s => !s.isSkipped && s.number !== '-' && s.number !== '');
+          if (numbered.length > 1) {
+            for (let i = 0; i < numbered.length - 1; i++) {
+              const currentNum = parseInt(numbered[i].number, 10);
+              const nextNum = parseInt(numbered[i+1].number, 10);
+              if (isNaN(currentNum) || isNaN(nextNum) || nextNum - currentNum !== 1) {
+                outOfSequence = true;
+                break;
+              }
+            }
+          }
+        }
+
+        // 2. Check TOC editor list (slides)
+        if (!outOfSequence && hasNumbers && slides && slides.length > 0) {
+          // Recursive check for sequential numbering in nested tree structure
+          const flatNumbered = [];
+          function collectNumbered(nodes) {
+            for (const s of nodes) {
+              if (s.number !== null && s.number !== undefined && s.number !== '') {
+                flatNumbered.push(s);
+              }
+              if (s.children && s.children.length > 0) {
+                collectNumbered(s.children);
+              }
+            }
+          }
+          collectNumbered(slides);
+          if (flatNumbered.length > 1) {
+            for (let i = 0; i < flatNumbered.length - 1; i++) {
+              const currentNum = parseInt(flatNumbered[i].number, 10);
+              const nextNum = parseInt(flatNumbered[i+1].number, 10);
+              if (isNaN(currentNum) || isNaN(nextNum) || nextNum - currentNum !== 1) {
+                outOfSequence = true;
+                break;
+              }
+            }
+          }
+        }
+
+        if (outOfSequence) {
+          fixBtn.classList.add('highlight-glow');
+          if (tooltip) {
+            tooltip.style.display = 'block';
+          }
+        } else {
+          fixBtn.classList.remove('highlight-glow');
+          if (tooltip) {
+            tooltip.style.display = 'none';
+          }
+        }
+      }
+
       function renderSlides(slides, parentElement, hasNumbers) {
         if (hasNumbers === undefined) hasNumbers = window._hasNumbers || false;
         parentElement.innerHTML = '';
@@ -4110,15 +4240,21 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
         const topRescanBtn = document.getElementById('detect-refresh');
         if (topRescanBtn) topRescanBtn.style.display = '';
         parentElement.style.display = 'flex';
-        // Restore: simple list with inline name editing
+        // Simple list with inline name editing
+        // Numbers are always sequential (1, 2, 3...) regardless of Figma order
         slides.forEach((slide, idx) => {
           const row = document.createElement('div');
           row.className = 'slide-row';
           if (slide.isSkipped) row.classList.add('row-skipped');
+          // Always use sequential number based on position in the list
+          const seqNum = idx + 1;
           const hasNum = slide.number !== undefined && slide.number !== null && slide.number !== '';
+          // Retrieve the saved display name (survives reorders)
+          const savedName = window.slideDisplayNames && window.slideDisplayNames[slide.id];
+          const displayVal = savedName || slide.displayName || '';
           row.innerHTML = `
-            <span class='slide-number${hasNum ? '' : ' slide-number--grey'}'>${hasNum ? slide.number : '—'}</span>
-            <input class='slide-name-input' type='text' value="${slide.name}" data-slide-id="${slide.id}" style="font-size:1em;font-weight:600;background:transparent;border:none;color:#f3f4f8;width:70%;outline:none;" />
+            <span class='slide-number'>${seqNum}</span>
+            <input class='slide-name-input' type='text' value="${displayVal.replace(/"/g, '&quot;')}" data-slide-id="${slide.id}" placeholder="Slide Name" style="font-size:1em;font-weight:600;background:transparent;border:none;color:#f3f4f8;width:70%;outline:none;" />
             <button class='start-btn' data-frameid="${slide.id}">Start Numbering</button>
           `;
           // Add event for Start button
@@ -4130,9 +4266,13 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
           const input = row.querySelector('.slide-name-input');
           let lastValue = input.value;
           input.addEventListener('blur', (e) => {
-            if (e.target.value !== lastValue) {
-              updateSlideNameEverywhere(slide.id, e.target.value);
-              lastValue = e.target.value;
+            const newVal = e.target.value.trim();
+            if (newVal !== lastValue) {
+              // Persist in the stable ID-keyed map
+              if (!window.slideDisplayNames) window.slideDisplayNames = {};
+              window.slideDisplayNames[slide.id] = newVal;
+              updateSlideNameEverywhere(slide.id, newVal);
+              lastValue = newVal;
             }
           });
           input.addEventListener('keydown', (e) => {
@@ -4142,6 +4282,7 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
           });
           slidesList.appendChild(row);
         });
+        updateFixButtonHighlight();
       }
 
       // Handle detection mode button clicks
@@ -4432,10 +4573,16 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
         }
       }
       function updateSlideNameEverywhere(slideId, newName) {
+        // Always persist in the stable ID-keyed map
+        if (!window.slideDisplayNames) window.slideDisplayNames = {};
+        window.slideDisplayNames[slideId] = newName;
         // Update in slides (TOC tree)
         function updateNameInTree(tree) {
           for (let s of tree) {
-            if (s.id === slideId) s.name = newName;
+            if (s.id === slideId) {
+              s.name = newName;
+              s.displayName = newName;
+            }
             if (s.children) updateNameInTree(s.children);
           }
         }
@@ -4443,17 +4590,33 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
         // Update in mainSlides (main section)
         if (window.mainSlides) {
           for (let s of window.mainSlides) {
-            if (s.id === slideId) s.name = newName;
+            if (s.id === slideId) {
+              s.name = newName;
+              s.displayName = newName;
+            }
             if (s.children) updateNameInTree(s.children);
+          }
+        }
+        // Update in allSlides (Numbering tab list)
+        if (window.allSlides || typeof allSlides !== 'undefined') {
+          const _allSlides = window.allSlides || allSlides;
+          for (let s of _allSlides) {
+            if (s.id === slideId) {
+              s.displayName = newName;
+            }
           }
         }
         // Send update to Figma backend (frame name)
         parent.postMessage({ pluginMessage: { type: 'update-slide-names', slides: [{ id: slideId, name: newName }] } }, '*');
-        // Send update to Figma backend (TOC text node)
-        parent.postMessage({ pluginMessage: { type: 'update-toc-text', slideId: slideId, newName: newName } }, '*');
+        
         renderTOCControls();
-        if (typeof renderSlides === 'function') renderSlides(window.mainSlides, document.getElementById('slides-list'));
-        onSlidesChanged();
+        // Re-render numbering list preserving names (don't call requestFrames - that would reset names)
+        const slideListEl = document.getElementById('slides-list');
+        if (slideListEl && typeof allSlides !== 'undefined' && allSlides.length > 0) {
+          renderSlides(allSlides, slideListEl, window._hasNumbers || false);
+        }
+        // Save the TOC structure (but DO NOT auto-regenerate TOC on rename)
+        parent.postMessage({ pluginMessage: { type: 'save-toc-structure', toc: slides } }, '*');
       }
       // Keep mainSlides and slides (TOC) in sync on mainSlides update
       function syncMainSlidesToTOC() {
@@ -4484,7 +4647,7 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
           for (const ms of window.mainSlides) {
             const existing = flatExisting[ms.id];
             newNodesMap[ms.id] = Object.assign({}, ms, {
-              displayName: existing ? existing.displayName : ms.name,
+              displayName: (window.slideDisplayNames && window.slideDisplayNames[ms.id]) || (existing ? existing.displayName : null) || ms.displayName || '',
               children: existing && existing.children ? existing.children.slice() : []
             });
           }
@@ -4521,7 +4684,7 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
       initializeTOC();
 
       // --- Render TOC Controls (Tree/Nesting) ---
-      function renderTOCTree(slidesArr, parentElem, depth = 0, parentArr = null, parentIdx = null) {
+      function renderTOCTree(slidesArr, parentElem, depth = 0, parentArr = null, parentIdx = null, ctx = { seq: 1 }) {
         slidesArr.forEach((slide, idx) => {
           // Drop zone above
           const dropZoneAbove = document.createElement('div');
@@ -4565,15 +4728,30 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
           row.className = 'notion-outline-row';
           row.style.display = 'flex';
           row.style.alignItems = 'center';
-          row.style.gap = '10px';
-          row.style.padding = '3px 12px 3px ' + (8 + depth * 32) + 'px';
+          row.style.gap = '12px';
+          row.style.padding = '10px 14px 10px ' + (14 + depth * 28) + 'px';
           row.style.fontWeight = depth === 0 ? '700' : '600';
-          row.style.fontSize = '1.08em';
-          row.style.background = depth > 0 ? 'rgba(37,99,235,0.08)' : 'transparent';
-          row.style.borderLeft = depth > 0 ? '3px solid #2563eb' : 'none';
+          row.style.fontSize = '0.95em';
+          row.style.background = depth > 0 ? 'rgba(37, 99, 235, 0.08)' : 'rgba(255, 255, 255, 0.03)';
+          row.style.border = depth > 0 ? '1px solid rgba(37, 99, 235, 0.15)' : '1px solid rgba(255, 255, 255, 0.05)';
+          row.style.borderLeft = depth > 0 ? '3px solid #2563eb' : '1px solid rgba(255, 255, 255, 0.05)';
+          row.style.borderRadius = '8px';
           row.style.color = '#fff';
           row.style.position = 'relative';
-          row.style.transition = 'background 0.18s, border 0.18s, padding 0.18s';
+          row.style.boxSizing = 'border-box';
+          row.style.transition = 'all 0.2s ease';
+
+          // Hover effects
+          row.onmouseenter = () => {
+            row.style.background = depth > 0 ? 'rgba(37, 99, 235, 0.15)' : 'rgba(255, 255, 255, 0.06)';
+            row.style.borderColor = depth > 0 ? 'rgba(37, 99, 235, 0.3)' : 'rgba(255, 255, 255, 0.1)';
+            if (depth > 0) row.style.borderLeft = '3px solid #3a86ff';
+          };
+          row.onmouseleave = () => {
+            row.style.background = depth > 0 ? 'rgba(37, 99, 235, 0.08)' : 'rgba(255, 255, 255, 0.03)';
+            row.style.borderColor = depth > 0 ? 'rgba(37, 99, 235, 0.15)' : 'rgba(255, 255, 255, 0.05)';
+            if (depth > 0) row.style.borderLeft = '3px solid #2563eb';
+          };
 
           // Remove button removed — rows use drag-to-reorder only
 
@@ -4598,7 +4776,7 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
           dragHandle.ondragend = (e) => {
             draggedSlideId = null;
             row.style.opacity = '';
-            row.style.background = depth > 0 ? 'rgba(37,99,235,0.08)' : 'transparent';
+            row.style.background = depth > 0 ? 'rgba(37, 99, 235, 0.08)' : 'rgba(255, 255, 255, 0.03)';
             renderTOCControls();
           };
           row.appendChild(dragHandle);
@@ -4658,7 +4836,9 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
           // Slide number
           const numSpan = document.createElement('span');
           numSpan.className = 'slide-number';
-          numSpan.textContent = (slide.number !== null && slide.number !== undefined) ? slide.number : '';
+          // Use sequential number
+          const seqNum = ctx.seq++;
+          numSpan.textContent = seqNum;
           numSpan.style.color = '#fff';
           numSpan.style.userSelect = 'none';
           row.appendChild(numSpan);
@@ -4667,7 +4847,10 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
           const nameInput = document.createElement('input');
           nameInput.className = 'slide-name-input';
           nameInput.type = 'text';
-          nameInput.value = slide.name;
+          // Use the stable display name from the ID-keyed map
+          const tocSavedName = window.slideDisplayNames && window.slideDisplayNames[slide.id];
+          nameInput.value = tocSavedName || slide.displayName || '';
+          nameInput.placeholder = 'Slide Name';
           nameInput.setAttribute('data-slide-id', slide.id);
           nameInput.style.fontSize = '1em';
           nameInput.style.fontWeight = depth === 0 ? '700' : '600';
@@ -4681,9 +4864,13 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
           nameInput.onmousedown = (e) => { e.stopPropagation(); };
           let lastTOCValue = nameInput.value;
           nameInput.addEventListener('blur', (e) => {
-            if (e.target.value !== lastTOCValue) {
-              updateSlideNameEverywhere(slide.id, e.target.value);
-              lastTOCValue = e.target.value;
+            const newTOCVal = e.target.value.trim();
+            if (newTOCVal !== lastTOCValue) {
+              // Persist in the stable ID-keyed map
+              if (!window.slideDisplayNames) window.slideDisplayNames = {};
+              window.slideDisplayNames[slide.id] = newTOCVal;
+              updateSlideNameEverywhere(slide.id, newTOCVal);
+              lastTOCValue = newTOCVal;
             }
           });
           nameInput.addEventListener('keydown', (e) => {
@@ -4700,7 +4887,9 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
             row.style.background = 'rgba(37,99,235,0.18)';
           };
           row.ondragleave = (e) => {
-            row.style.background = depth > 0 ? 'rgba(37,99,235,0.08)' : 'transparent';
+            row.style.background = depth > 0 ? 'rgba(37, 99, 235, 0.08)' : 'rgba(255, 255, 255, 0.03)';
+            row.style.borderColor = depth > 0 ? 'rgba(37, 99, 235, 0.15)' : 'rgba(255, 255, 255, 0.05)';
+            if (depth > 0) row.style.borderLeft = '3px solid #2563eb';
           };
           row.ondrop = (e) => {
             e.preventDefault();
@@ -4757,7 +4946,7 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
 
           // Recursively render children (but limit to depth 1 to prevent sub-sub-slides)
           if (slide.children && slide.children.length > 0 && depth === 0) {
-            renderTOCTree(slide.children, parentElem, depth + 1, slidesArr, idx);
+            renderTOCTree(slide.children, parentElem, depth + 1, slidesArr, idx, ctx);
           }
           // Drop zone below
           const dropZoneBelow = document.createElement('div');
@@ -4856,6 +5045,8 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
           if (slides && slides.length > 0) {
             console.log('Generating TOC with slides:', slides);
             showTOCStatus('Generating TOC...', '#18A0FB', false);
+            // Mark that user has generated TOC at least once (enables live updates from style/layout panels)
+            window._tocHasBeenGenerated = true;
             parent.postMessage({
               pluginMessage: {
                 type: 'generate-toc-autolayout',
@@ -4939,50 +5130,15 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
           buttonRow.appendChild(countBadge);
         }
 
-        // Generator Tip Button
-        const toggleTipBtn = document.createElement('button');
-        toggleTipBtn.className = 'icon-btn';
-        toggleTipBtn.title = 'Show instructions';
-        toggleTipBtn.style.marginLeft = 'auto';
-        toggleTipBtn.style.opacity = '0.6';
-        toggleTipBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>';
-
-        const generatorTip = document.createElement('div');
-        generatorTip.style.display = 'none';
-        generatorTip.style.position = 'absolute';
-        generatorTip.style.top = '100%';
-        generatorTip.style.right = '0';
-        generatorTip.style.marginTop = '8px';
-        generatorTip.style.fontSize = '11px';
-        generatorTip.style.color = 'var(--text-muted)';
-        generatorTip.style.lineHeight = '1.4';
-        generatorTip.style.background = '#2a2a3d';
-        generatorTip.style.padding = '10px';
-        generatorTip.style.borderRadius = '8px';
-        generatorTip.style.border = '1px solid rgba(255,255,255,0.08)';
-        generatorTip.style.boxShadow = '0 4px 12px rgba(0,0,0,0.5)';
-        generatorTip.style.width = '240px';
-        generatorTip.style.zIndex = '100';
-        generatorTip.style.animation = 'fadeIn 0.2s ease';
-        generatorTip.innerHTML = '💡 <strong>Quick Tip:</strong> Select an empty frame in your document, then click "Generate TOC" to create the TOC inside it.';
-
-        toggleTipBtn.onclick = () => {
-          const isHidden = generatorTip.style.display === 'none';
-          generatorTip.style.display = isHidden ? 'block' : 'none';
-          toggleTipBtn.style.opacity = isHidden ? '1' : '0.6';
-        };
-
-        buttonRow.appendChild(toggleTipBtn);
-        buttonRow.appendChild(generatorTip);
-
         // Append buttonRow to controls area (separate dark section above list)
         const tocControlsArea = document.getElementById('toc-controls-area');
         if (tocControlsArea) {
-          // Clear only the button row area (keep status msg)
-          const existingBtnRow = tocControlsArea.querySelector('.toc-btn-row');
+          const wrapper = tocControlsArea.querySelector('#toc-buttons-wrapper') || tocControlsArea;
+          const existingBtnRow = wrapper.querySelector('.toc-btn-row');
           if (existingBtnRow) existingBtnRow.remove();
+          
           buttonRow.classList.add('toc-btn-row');
-          tocControlsArea.appendChild(buttonRow);
+          wrapper.appendChild(buttonRow);
         } else {
           tocEditor.appendChild(buttonRow);
         }
@@ -5063,6 +5219,10 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
                   <span style="font-size:11px;color:#b0b3b8;">Items</span>
                   <span style="display:flex;align-items:center;"><input id="max-items-per-col" class="modal-input" type="number" value="10" style="width:38px;height:24px;font-size:11px;padding:2px 4px;"></span>
                 </div>
+                <div style="display:flex;align-items:center;gap:6px;justify-content:space-between;">
+                  <span style="font-size:11px;color:#b0b3b8;">Num Gap</span>
+                  <span style="display:flex;align-items:center;"><input id="number-text-gap" class="modal-input" type="number" value="16" style="width:38px;height:24px;font-size:11px;padding:2px 4px;"><span style="font-size:10px;margin-left:2px;color:#666;">px</span></span>
+                </div>
               </div>
             </div>
 
@@ -5111,6 +5271,7 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
           layoutPanel.querySelector('#column-width'),
           layoutPanel.querySelector('#layout-mode'),
           layoutPanel.querySelector('#max-items-per-col'),
+          layoutPanel.querySelector('#number-text-gap'),
           layoutPanel.querySelector('#text-align-horizontal')
         ];
         function sendLiveLayoutUpdateInstant() {
@@ -5123,6 +5284,7 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
             maxColumnHeight: parseInt(layoutPanel.querySelector('#max-column-height').value, 10),
             columnWidth: parseInt(layoutPanel.querySelector('#column-width').value, 10),
             maxItemsPerCol: parseInt(layoutPanel.querySelector('#max-items-per-col').value, 10),
+            numberTextGap: parseInt(layoutPanel.querySelector('#number-text-gap').value, 10),
             framePaddingTop: 0,
             framePaddingBottom: 0,
             framePaddingLeft: 0,
@@ -5206,6 +5368,7 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
             textAlignHorizontal: 'CENTER',
             textAlignVertical: 'CENTER',
             maxItemsPerCol: 10,
+            numberTextGap: 16,
             framePaddingTop: 0,
             framePaddingBottom: 0,
             framePaddingLeft: 0,
@@ -5223,6 +5386,7 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
           layoutPanel.querySelector('#text-align-horizontal').value = defaultLayoutSettings.textAlignHorizontal;
 
           layoutPanel.querySelector('#max-items-per-col').value = defaultLayoutSettings.maxItemsPerCol;
+          layoutPanel.querySelector('#number-text-gap').value = defaultLayoutSettings.numberTextGap;
           layoutPanel.querySelector('#enable-grouping').checked = defaultLayoutSettings.enableGrouping;
           layoutPanel.querySelector('#group-standalone').checked = defaultLayoutSettings.groupStandalone;
 
@@ -5255,6 +5419,7 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
         } else {
           tocEditor.appendChild(listDiv);
         }
+        updateFixButtonHighlight();
         // --- TOC Style Panel (was Advanced TOC Style Settings) ---
         let advPanelBg = document.getElementById('toc-style-modal-bg');
         if (advPanelBg) advPanelBg.remove();
@@ -5526,13 +5691,16 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
           }, '*');
 
           // Request a single fresh regeneration of the TOC to cleanly apply all saved settings
-          parent.postMessage({
-            pluginMessage: {
-              type: 'regenerate-toc',
-              options: tocSettings,
-              slides: slides
-            }
-          }, '*');
+          // Only if TOC was already generated by user
+          if (window._tocHasBeenGenerated) {
+            parent.postMessage({
+              pluginMessage: {
+                type: 'regenerate-toc',
+                options: tocSettings,
+                slides: slides
+              }
+            }, '*');
+          }
         }
 
         // Show targeted update feedback
@@ -5834,6 +6002,8 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
               if (textAlignVerticalInput) textAlignVerticalInput.value = msg.settings.textAlignVertical || 'TOP';
 
               if (maxItemsPerColInput) maxItemsPerColInput.value = msg.settings.maxItemsPerCol || 10;
+              const numberTextGapInput = layoutPanel.querySelector('#number-text-gap');
+              if (numberTextGapInput) numberTextGapInput.value = msg.settings.numberTextGap || 16;
               const framePaddingTopInput = layoutPanel.querySelector('#frame-padding-top');
               const framePaddingBottomInput = layoutPanel.querySelector('#frame-padding-bottom');
               const framePaddingLeftInput = layoutPanel.querySelector('#frame-padding-left');
@@ -5945,11 +6115,10 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
 
       // After any change to slides (nest, reorder, rename, etc.), call this:
       function onSlidesChanged() {
-        // Save TOC structure to backend
+        // Save the TOC structure
         parent.postMessage({ pluginMessage: { type: 'save-toc-structure', toc: slides } }, '*');
-        // Live update if enabled - but don't send style updates here to avoid conflicts
-        // Always trigger live TOC export update in Figma and save structure
-        parent.postMessage({ pluginMessage: { type: 'regenerate-toc', slides: slides, options: tocSettings } }, '*');
+        // Live update the TOC on structural changes (nesting, reordering)
+        parent.postMessage({ pluginMessage: { type: 'regenerate-toc', slides: slides } }, '*');
       }
       // Patch all slide structure-changing actions to call onSlidesChanged()
       // (nest, reorder, rename, etc.)

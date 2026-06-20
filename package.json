@@ -1,7 +1,7 @@
 {
-  "name": "toc-generator-plugin",
+  "name": "live-numbering-toc-plugin",
   "version": "1.0.0",
-  "description": "TOC Generator Figma Plugin with Subscription Model",
+  "description": "Live Numbering & Table of Contents Figma Plugin with Subscription Model",
   "private": true,
   "scripts": {
     "dev": "node scripts/watch.js",

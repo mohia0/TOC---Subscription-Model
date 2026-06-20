@@ -1,5 +1,5 @@
 /**
- * Build Script — TOC Generator Figma Plugin
+ * Build Script — Live Numbering & Table of Contents Figma Plugin
  *
  * This is a plain JS/HTML plugin — "build" means:
  *   1. Validate that ui.html and code.js exist
