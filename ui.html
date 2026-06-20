@@ -1492,7 +1492,7 @@ window._emptyLottieData = {"v":"5.12.1","fr":60,"ip":0,"op":90,"w":430,"h":430,"
           <!-- TAB PANEL 1: NUMBERING -->
           <div class="tab-content-panel active" id="panel-numbering">            <div id="start-numbering-hint" style="display:none;background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.25);border-radius:8px;padding:8px 10px;margin-bottom:6px;font-size:11px;color:#a5b4fc;line-height:1.6;position:relative;">
               💡 Hover a slide row to reveal <strong>Start Numbering</strong> — begin numbering from any slide.
-              <button onclick="this.parentElement.style.display='none';try{localStorage.setItem('toc-start-hint-seen','1')}catch(e){}" style="position:absolute;top:5px;right:7px;background:none;border:none;color:#6366f1;cursor:pointer;font-size:14px;padding:0;line-height:1;">✕</button>
+              <button onclick="this.parentElement.style.display='none';try{localStorage.setItem('toc-start-hint-seen','1')}catch(e){}parent.postMessage({pluginMessage:{type:'dismiss-hint',hint:'toc-start-hint-seen'}},'*')" style="position:absolute;top:5px;right:7px;background:none;border:none;color:#6366f1;cursor:pointer;font-size:14px;padding:0;line-height:1;">✕</button>
             </div>
             <div class="slides-list" id="slides-list"></div>
 
@@ -1553,7 +1553,7 @@ window._emptyLottieData = {"v":"5.12.1","fr":60,"ip":0,"op":90,"w":430,"h":430,"
           <!-- TAB PANEL 2: TOC GENERATION -->
           <div class="tab-content-panel" id="panel-toc" style="gap:10px;">
 
-            <div id="pro-tip-banner" style="font-size: 11px; color: #b0b3b8; padding: 8px 10px; display: flex; align-items: flex-start; gap: 8px; background: rgba(24, 160, 251, 0.08); border-left: 2px solid #18A0FB; border-radius: 4px; margin-bottom: -2px; position: relative;">
+            <div id="pro-tip-banner" style="display: none; font-size: 11px; color: #b0b3b8; padding: 8px 10px; display: flex; align-items: flex-start; gap: 8px; background: rgba(24, 160, 251, 0.08); border-left: 2px solid #18A0FB; border-radius: 4px; margin-bottom: -2px; position: relative;">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#18A0FB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-top: 1px;">
                 <circle cx="12" cy="12" r="10"></circle>
                 <line x1="12" y1="16" x2="12" y2="12"></line>
@@ -1584,7 +1584,7 @@ window._emptyLottieData = {"v":"5.12.1","fr":60,"ip":0,"op":90,"w":430,"h":430,"
                 if (closeBtn) {
                   closeBtn.onclick = () => {
                     if (tipBanner) tipBanner.style.display = 'none';
-                    try { localStorage.setItem('tocProTipDismissed', 'true'); } catch(e){}
+                    try { localStorage.setItem('tocProTipDismissed', 'true'); } catch(e){}parent.postMessage({pluginMessage:{type:'dismiss-hint',hint:'tocProTipDismissed'}},'*')
                   };
                 }
               });
@@ -3132,6 +3132,38 @@ setTimeout(() => {
       window.addEventListener('message', (event) => {
         const msg = event.data.pluginMessage;
         if (!msg) return;
+        if (msg.type === 'init-dismissed-hints') {
+          const dismissed = msg.dismissed || {};
+          
+          // Start numbering hint
+          const _hint = document.getElementById('start-numbering-hint');
+          if (dismissed['toc-start-hint-seen']) {
+            if (_hint) _hint.style.display = 'none';
+          } else {
+            try {
+              if (!localStorage.getItem('toc-start-hint-seen')) {
+                if (_hint) _hint.style.display = 'block';
+              }
+            } catch(e) {
+              if (_hint) _hint.style.display = 'block';
+            }
+          }
+          
+          // Pro-tip banner
+          const tipBanner = document.getElementById('pro-tip-banner');
+          if (dismissed['tocProTipDismissed']) {
+            if (tipBanner) tipBanner.style.display = 'none';
+          } else {
+            try {
+              if (localStorage.getItem('tocProTipDismissed') !== 'true') {
+                if (tipBanner) tipBanner.style.display = 'flex';
+              }
+            } catch(e) {
+              if (tipBanner) tipBanner.style.display = 'flex';
+            }
+          }
+        }
+
 
         // REMOVED: Duplicate license-activated handler - now handled above
 
@@ -5377,6 +5409,10 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
                   <span style="font-size:11px;color:#b0b3b8;">Num Gap<span class="info-icon">!<span class="tooltip">Gap between number and text</span></span></span>
                   <span style="display:flex;align-items:center;"><input id="number-text-gap" class="modal-input" type="number" value="16" style="width:38px;height:24px;font-size:11px;padding:2px 4px;"><span style="font-size:10px;margin-left:2px;color:#666;">px</span></span>
                 </div>
+                <div style="display:flex;align-items:center;gap:6px;justify-content:space-between;">
+                  <span style="font-size:11px;color:#b0b3b8;">Indent<span class="info-icon">!<span class="tooltip" style="left: auto; right: 0; text-align: right;">Indent of subtitle text</span></span></span>
+                  <span style="display:flex;align-items:center;"><input id="sub-indent" class="modal-input" type="number" value="24" style="width:38px;height:24px;font-size:11px;padding:2px 4px;"><span style="font-size:10px;margin-left:2px;color:#666;">px</span></span>
+                </div>
               </div>
             </div>
 
@@ -5426,6 +5462,7 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
           layoutPanel.querySelector('#layout-mode'),
           layoutPanel.querySelector('#max-items-per-col'),
           layoutPanel.querySelector('#number-text-gap'),
+          layoutPanel.querySelector('#sub-indent'),
           layoutPanel.querySelector('#text-align-horizontal')
         ];
         function sendLiveLayoutUpdateInstant() {
@@ -5439,6 +5476,7 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
             columnWidth: parseInt(layoutPanel.querySelector('#column-width').value, 10),
             maxItemsPerCol: parseInt(layoutPanel.querySelector('#max-items-per-col').value, 10),
             numberTextGap: parseInt(layoutPanel.querySelector('#number-text-gap').value, 10),
+            subIndent: parseInt(layoutPanel.querySelector('#sub-indent').value, 10),
             framePaddingTop: 0,
             framePaddingBottom: 0,
             framePaddingLeft: 0,
@@ -5523,6 +5561,7 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
             textAlignVertical: 'CENTER',
             maxItemsPerCol: 10,
             numberTextGap: 16,
+            subIndent: 24,
             framePaddingTop: 0,
             framePaddingBottom: 0,
             framePaddingLeft: 0,
@@ -5541,6 +5580,7 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
 
           layoutPanel.querySelector('#max-items-per-col').value = defaultLayoutSettings.maxItemsPerCol;
           layoutPanel.querySelector('#number-text-gap').value = defaultLayoutSettings.numberTextGap;
+          layoutPanel.querySelector('#sub-indent').value = defaultLayoutSettings.subIndent;
           layoutPanel.querySelector('#enable-grouping').checked = defaultLayoutSettings.enableGrouping;
           layoutPanel.querySelector('#group-standalone').checked = defaultLayoutSettings.groupStandalone;
 
@@ -5613,11 +5653,11 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
             <div style="border-bottom:1px solid rgba(255,255,255,0.05);padding-bottom:14px;">
               <div style="font-weight:700;font-size:11px;color:var(--primary);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.05em;">Title</div>
 
-              <!-- Title > Text -->
+              <!-- Title > Font -->
               <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;">
                 <div style="display:flex;align-items:center;gap:8px;">
-                  <span style="font-size:11px;color:#888;min-width:32px;flex-shrink:0;">Text</span>
-                  <select id="hero-font-family" class="modal-select" style="flex:1;height:26px;font-size:11px;padding:2px 6px;"><option value="Inter">Inter</option><option value="Arial">Arial</option><option value="Fira Mono">Fira Mono</option><option value="Roboto">Roboto</option><option value="Montserrat">Montserrat</option><option value="Poppins">Poppins</option><option value="Open Sans">Open Sans</option><option value="Lato">Lato</option><option value="Fira Mono">Fira Mono</option><option value="Roboto">Roboto</option><option value="Montserrat">Montserrat</option><option value="Poppins">Poppins</option><option value="Open Sans">Open Sans</option><option value="Lato">Lato</option></select>
+                  <span style="font-size:11px;color:#888;min-width:32px;flex-shrink:0;">Font</span>
+                  <select id="hero-font-family" class="modal-select" style="flex:1;height:26px;font-size:11px;padding:2px 6px;"><option value="Inter">Inter</option><option value="Arial">Arial</option><option value="Fira Mono">Fira Mono</option><option value="Roboto">Roboto</option><option value="Montserrat">Montserrat</option><option value="Poppins">Poppins</option><option value="Open Sans">Open Sans</option><option value="Lato">Lato</option></select>
                 </div>
                 <div style="display:flex;align-items:center;gap:6px;margin-left:0px;flex-wrap:wrap;">
                   
@@ -5655,10 +5695,10 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
             <div style="padding-bottom:4px;">
               <div style="font-weight:700;font-size:11px;color:var(--primary);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.05em;">Sub-Slide</div>
 
-              <!-- Sub > Text -->
+              <!-- Sub > Font -->
               <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;">
                 <div style="display:flex;align-items:center;gap:8px;">
-                  <span style="font-size:11px;color:#888;min-width:32px;flex-shrink:0;">Text</span>
+                  <span style="font-size:11px;color:#888;min-width:32px;flex-shrink:0;">Font</span>
                   <select id="sub-title-font" class="modal-select" style="flex:1;height:26px;font-size:11px;padding:2px 6px;"><option value="Inter">Inter</option><option value="Arial">Arial</option><option value="Fira Mono">Fira Mono</option><option value="Roboto">Roboto</option><option value="Montserrat">Montserrat</option><option value="Poppins">Poppins</option><option value="Open Sans">Open Sans</option><option value="Lato">Lato</option></select>
                 </div>
                 <div style="display:flex;align-items:center;gap:6px;margin-left:0px;flex-wrap:wrap;">
@@ -5690,13 +5730,6 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
                   <label style="display:flex;align-items:center;gap:4px;cursor:pointer;white-space:nowrap;"><div class="toggle-switch"><input type="checkbox" id="sub-number-leading-zero"><span class="toggle-slider"></span></div><span style="font-size:10px;color:#666;">No 0</span></label>
                 
                 </div>
-              </div>
-
-              <!-- Indent -->
-              <div style="display:flex;align-items:center;gap:6px;">
-                <span style="font-size:11px;color:#888;">Indent</span>
-                <input id="sub-indent" class="modal-input" type="number" value="24" style="width:42px;height:26px;font-size:11px;padding:2px 4px;">
-                <span style="font-size:10px;color:#555;">px</span>
               </div>
             </div>
 
@@ -5823,7 +5856,7 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
           const sWeight = advPanel.querySelector('#sub-title-weight');
           const sColor = advPanel.querySelector('#sub-title-color');
           const sFont = advPanel.querySelector('#sub-title-font');
-          const sIndent = advPanel.querySelector('#sub-indent');
+          const sIndent = document.getElementById('sub-indent');
 
           // Update global tocSettings
           if (hSize) tocSettings.heroFontSize = parseInt(hSize.value, 10);
@@ -6109,7 +6142,7 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
               const subTitleSizeInput = advPanel.querySelector('#sub-title-size');
               const subTitleWeightInput = advPanel.querySelector('#sub-title-weight');
               const subTitleColorInput = advPanel.querySelector('#sub-title-color');
-              const subIndentInput = advPanel.querySelector('#sub-indent');
+              const subIndentInput = document.getElementById('sub-indent');
               const titleNumberFontInput = advPanel.querySelector('#title-number-font');
               const titleNumberSizeInput = advPanel.querySelector('#title-number-size');
               const titleNumberWeightInput = advPanel.querySelector('#title-number-weight');
@@ -6491,7 +6524,9 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
             optionDiv.className = 'custom-select-option';
             if (option.selected) optionDiv.classList.add('selected');
             optionDiv.textContent = option.text;
-            optionDiv.addEventListener('click', () => {
+            optionDiv.addEventListener('click', (e) => {
+              e.preventDefault();
+              e.stopPropagation();
               select.value = option.value;
               select.dispatchEvent(new Event('change', { bubbles: true }));
               select.dispatchEvent(new Event('input', { bubbles: true }));
@@ -6504,6 +6539,7 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
           });
 
           trigger.addEventListener('click', (e) => {
+            e.preventDefault();
             e.stopPropagation();
             document.querySelectorAll('.custom-select-wrapper').forEach(w => {
               if (w !== wrapper) w.classList.remove('open');

@@ -1451,6 +1451,17 @@ async function generateTOCFrame(slides, options, startFrameId) {
 
 // Handle messages from UI
 figma.ui.onmessage = async (msg) => {
+  if (msg.type === 'dismiss-hint') {
+    try {
+      const dismissed = await figma.clientStorage.getAsync('dismissedHints') || {};
+      dismissed[msg.hint] = true;
+      await figma.clientStorage.setAsync('dismissedHints', dismissed);
+    } catch (e) {
+      console.error('Error saving dismissed hint:', e);
+    }
+    return;
+  }
+
   // Trial and subscription messages
   if (msg.type === 'activate-license') {
     try {
@@ -2097,6 +2108,16 @@ figma.ui.onmessage = async (msg) => {
     }
     // After updating, send the new frame list to UI
     sendFramesToUI('z');
+  // Send dismissed hints from clientStorage to UI
+  (async () => {
+    try {
+      const dismissed = await figma.clientStorage.getAsync('dismissedHints') || {};
+      figma.ui.postMessage({ type: 'init-dismissed-hints', dismissed });
+    } catch (e) {
+      console.error('Error loading dismissed hints:', e);
+    }
+  })();
+
   }
   if (msg.type === 'get-saved-toc') {
     // Try to load from clientStorage
