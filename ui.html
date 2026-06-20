@@ -1490,59 +1490,7 @@ window._emptyLottieData = {"v":"5.12.1","fr":60,"ip":0,"op":90,"w":430,"h":430,"
           </div>
 
           <!-- TAB PANEL 1: NUMBERING -->
-          <div class="tab-content-panel active" id="panel-numbering">
-            <div class="settings-group">
-              <div class="panel-header"
-                style="display:none; font-size: 10px; color: var(--text-muted); text-transform:uppercase; letter-spacing:0.05em; margin-bottom: 5px;">
-                Detection Direction</div>
-              <div class="slides-detect-modes"
-                style="display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:0;">
-                <button class="icon-btn detect-btn selected tooltip-bottom tooltip-right" id="detect-z" style="display:none !important;"
-                  data-tooltip="Z: Left-to-Right, Top-to-Bottom">
-                  <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
-                    <path d="M3 3h12v2H5v2h8v2H5v2h10v2H3" stroke="currentColor" stroke-width="1.5"
-                      stroke-linecap="round" stroke-linejoin="round" />
-                  </svg>
-                </button>
-                <button class="icon-btn detect-btn tooltip-bottom" id="detect-z-flip" style="display:none !important;"
-                  data-tooltip="Z Flipped: Right-to-Left, Top-to-Bottom">
-                  <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
-                    <path d="M15 3H3v2h10v2H5v2h8v2H3v2h12" stroke="currentColor" stroke-width="1.5"
-                      stroke-linecap="round" stroke-linejoin="round" />
-                  </svg>
-                </button>
-                <button class="icon-btn detect-btn tooltip-bottom" id="detect-vertical" style="display:none !important;" data-tooltip="Vertical: Top-to-Bottom">
-                  <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
-                    <path d="M9 3v12M9 3l-2 2M9 3l2 2M9 15l-2-2M9 15l2-2" stroke="currentColor" stroke-width="1.5"
-                      stroke-linecap="round" stroke-linejoin="round" />
-                  </svg>
-                </button>
-                <button class="icon-btn detect-btn tooltip-bottom" id="detect-horizontal" style="display:none !important;" data-tooltip="Horizontal: Left-to-Right">
-                  <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
-                    <path d="M3 9h12M15 9l-2-2M15 9l-2 2M3 9l2-2M3 9l2 2" stroke="currentColor" stroke-width="1.5"
-                      stroke-linecap="round" stroke-linejoin="round" />
-                  </svg>
-                </button>
-                <button class="icon-btn detect-btn tooltip-bottom tooltip-left" id="detect-horizontal-rtl" style="display:none !important;" data-tooltip="Horizontal: Right-to-Left">
-                  <svg width="16" height="16" viewBox="0 0 18 18" fill="none">
-                    <path d="M15 9H3M3 9l2-2M3 9l2 2M15 9l-2-2M15 9l-2 2" stroke="currentColor" stroke-width="1.5"
-                      stroke-linecap="round" stroke-linejoin="round" />
-                  </svg>
-                </button>
-                <button class="icon-btn tooltip-bottom" id="detect-refresh" data-tooltip="Rescan slides" style="margin-left:auto;">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                    stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
-                    <path d="M21 3v5h-5"/>
-                    <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
-                    <path d="M8 16H3v5"/>
-                  </svg>
-                </button>
-              </div>
-              <div id="direction-label" style="display:none;font-size:10px;color:var(--text-muted);margin-top:5px;letter-spacing:0.03em;">Detecting: <span id="direction-label-value" style="color:#e2e8f0;font-weight:600;">Z-order</span></div>
-            </div>
-
-            <div id="start-numbering-hint" style="display:none;background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.25);border-radius:8px;padding:8px 10px;margin-bottom:6px;font-size:11px;color:#a5b4fc;line-height:1.6;position:relative;">
+          <div class="tab-content-panel active" id="panel-numbering">            <div id="start-numbering-hint" style="display:none;background:rgba(99,102,241,0.1);border:1px solid rgba(99,102,241,0.25);border-radius:8px;padding:8px 10px;margin-bottom:6px;font-size:11px;color:#a5b4fc;line-height:1.6;position:relative;">
               💡 Hover a slide row to reveal <strong>Start Numbering</strong> — begin numbering from any slide.
               <button onclick="this.parentElement.style.display='none';try{localStorage.setItem('toc-start-hint-seen','1')}catch(e){}" style="position:absolute;top:5px;right:7px;background:none;border:none;color:#6366f1;cursor:pointer;font-size:14px;padding:0;line-height:1;">✕</button>
             </div>
@@ -1585,7 +1533,16 @@ window._emptyLottieData = {"v":"5.12.1","fr":60,"ip":0,"op":90,"w":430,"h":430,"
               </div>
 
               <div style="display: flex; justify-content: flex-end; flex: 1;">
-                <button class="refresh-btn" id="remove-all-numbers" data-tooltip="Remove all slide numbers"
+                
+                <button class="icon-btn tooltip-bottom" id="detect-refresh" data-tooltip="Rescan slides" style="margin-right:8px; display:inline-flex; align-items:center; justify-content:center;">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
+                    <path d="M21 3v5h-5"/>
+                    <path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
+                    <path d="M8 16H3v5"/>
+                  </svg>
+                </button>
+<button class="refresh-btn" id="remove-all-numbers" data-tooltip="Remove all slide numbers"
                  disabled>
                 Clear
               </button>
@@ -4184,13 +4141,7 @@ setTimeout(() => {
       // Stable map: slideId -> user-given display name. Survives all reorders/refreshes.
       window.slideDisplayNames = window.slideDisplayNames || {};
       const slidesList = document.getElementById('slides-list');
-      const detectBtns = [
-        document.getElementById('detect-z'),
-        document.getElementById('detect-z-flip'),
-        document.getElementById('detect-vertical'),
-        document.getElementById('detect-horizontal'),
-        document.getElementById('detect-horizontal-rtl')
-      ];
+      
       const detectRefreshBtn = document.getElementById('detect-refresh');
       let currentDirection = 'z';
 
@@ -4437,28 +4388,7 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
         updateFixButtonHighlight();
       }
 
-      // Handle detection mode button clicks
-      detectBtns.forEach((btn, idx) => {
-        btn.onclick = () => {
-          detectBtns.forEach(b => {
-            b.classList.remove('selected', 'active');
-            b.style.background = '';
-            b.style.color = '';
-            b.style.border = '';
-          });
-          btn.classList.add('selected', 'active');
-          btn.style.background = '#111';
-          btn.style.color = '#fff';
-          btn.style.border = '1.5px solid #111';
-          currentDirection = ['z', 'z-flip', 'vertical', 'horizontal', 'horizontal-rtl'][idx];
-          // Update direction label
-          const _dirNames = ['Z-order', 'Z Flipped', 'Vertical', 'Horizontal →', 'Horizontal ←'];
-          const _dirLabel = document.getElementById('direction-label-value');
-          if (_dirLabel) _dirLabel.textContent = _dirNames[idx];
-          requestFrames(currentDirection); // Numbering section
-          requestTOCFrames(currentDirection); // TOC section
-        };
-      });
+      
 
       // Show "Start Numbering" feature hint on first load only
       try {
@@ -6546,10 +6476,10 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
 
           const trigger = document.createElement('div');
           trigger.className = 'custom-select-trigger';
-          trigger.innerHTML = <span> + (select.options[select.selectedIndex]?.text || '') + </span>
+          trigger.innerHTML = `<span>` + (select.options[select.selectedIndex]?.text || '') + `</span>
             <svg width="10" height="6" viewBox="0 0 10 6" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-left: 8px; flex-shrink: 0;">
               <path d="M1 1L5 5L9 1" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>;
+            </svg>`;
           wrapper.appendChild(trigger);
 
           const optionsContainer = document.createElement('div');
