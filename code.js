@@ -2228,7 +2228,7 @@ figma.ui.onmessage = async (msg) => {
                 node.fontName = safeFont;
                 if (options.subTitleSize) node.fontSize = parseFloat(options.subTitleSize);
                 if (options.subTitleColor) node.fills = [{ type: 'SOLID', color: hexToRgb(options.subTitleColor) }];
-                if (typeof options.subIndent === 'number' && node.parent && node.parent.type === 'FRAME') {
+                if (typeof options.subIndent === 'number' && node.parent && (node.parent.type === 'FRAME' || node.parent.type === 'SLIDE')) {
                   node.parent.paddingLeft = options.subIndent;
                 }
                 break;
@@ -2301,7 +2301,7 @@ figma.ui.onmessage = async (msg) => {
       if (msg.styleOptions.textAutoResize) node.textAutoResize = msg.styleOptions.textAutoResize;
       if (msg.styleOptions.textAlignHorizontal) node.textAlignHorizontal = msg.styleOptions.textAlignHorizontal;
       // Update position if requested
-      if (msg.styleOptions.pos && node.parent && node.parent.type === 'FRAME') {
+      if (msg.styleOptions.pos && node.parent && (node.parent.type === 'FRAME' || node.parent.type === 'SLIDE')) {
         // Use getNumberPosition to recalculate x/y
         const frame = node.parent;
         const pos = getNumberPosition(msg.styleOptions.pos, frame, node, node.fontSize, msg.styleOptions.padding);
@@ -2632,10 +2632,10 @@ function getNumberPosition(pos, frame, numNode, size, pad = 80) {
     y = pad;
   } else if (pos === 'bottom-left') {
     x = pad;
-    y = frame.height - size - pad;
+    y = frame.height - numNode.height - pad;
   } else if (pos === 'bottom-right') {
     x = frame.width - numNode.width - pad;
-    y = frame.height - size - pad;
+    y = frame.height - numNode.height - pad;
   }
   return { x, y };
 }

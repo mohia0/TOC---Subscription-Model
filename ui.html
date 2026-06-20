@@ -270,23 +270,22 @@
       padding: 10px 14px;
       font-size: 0.95em;
       width: 100%;
-      background: transparent;
-      border-bottom: none;
-      transition: background 0.15s ease;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 8px;
+      margin-bottom: 8px;
+      transition: all 0.2s ease;
       box-sizing: border-box;
       position: relative;
-      color: var(--text-main);
-      margin-left: 0;
-      margin-right: 0;
-      min-height: 48px;
     }
 
     .slide-row:hover {
-      background: rgba(255, 255, 255, 0.02);
+      background: rgba(255, 255, 255, 0.06);
+      border-color: rgba(255, 255, 255, 0.1);
     }
 
     .slide-row:last-child {
-      border-bottom: none;
+      margin-bottom: 0;
     }
 
     .slide-number {
@@ -1462,6 +1461,40 @@ window._emptyLottieData = {"v":"5.12.1","fr":60,"ip":0,"op":90,"w":430,"h":430,"
             <div id="toc-controls-area" style="background:rgba(0,0,0,0.15);border-radius:8px;padding:8px 12px;flex-shrink:0;">
               <div id="toc-status-msg" style="font-size:0.9em;color:var(--primary);min-height:0;"></div>
             </div>
+            <div id="pro-tip-banner" style="font-size: 11px; color: #b0b3b8; padding: 8px 10px; display: flex; align-items: flex-start; gap: 8px; background: rgba(24, 160, 251, 0.08); border-left: 2px solid #18A0FB; border-radius: 4px; margin-bottom: -2px; position: relative;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#18A0FB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-top: 1px;">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+              </svg>
+              <div style="line-height: 1.4; flex-grow: 1; padding-right: 12px;">
+                <strong>Pro Tip:</strong> Drag and drop items to nest them as sub-pages. Click any name to edit it!
+              </div>
+              <button id="close-pro-tip" style="background: none; border: none; padding: 0; margin: 0; color: #b0b3b8; cursor: pointer; position: absolute; right: 8px; top: 8px; display: flex; align-items: center; justify-content: center;" title="Dismiss">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+              </button>
+            </div>
+            <script>
+              document.addEventListener('DOMContentLoaded', () => {
+                const tipBanner = document.getElementById('pro-tip-banner');
+                const closeBtn = document.getElementById('close-pro-tip');
+                try {
+                  if (localStorage.getItem('tocProTipDismissed') === 'true') {
+                    if (tipBanner) tipBanner.style.display = 'none';
+                  }
+                } catch(e){}
+                
+                if (closeBtn) {
+                  closeBtn.onclick = () => {
+                    if (tipBanner) tipBanner.style.display = 'none';
+                    try { localStorage.setItem('tocProTipDismissed', 'true'); } catch(e){}
+                  };
+                }
+              });
+            </script>
             <div class="toc-editor" id="toc-editor" style="background:rgba(0,0,0,0.2);border-radius:8px;padding:8px 12px;"></div>
           </div>
 
@@ -4007,10 +4040,16 @@ setTimeout(() => {
           }
         }
         if (hasSlides) {
-          if (styleBtn)  styleBtn.disabled  = false;
-          if (fixBtn)    fixBtn.disabled    = false;
-          if (clearBtn)  clearBtn.disabled  = false;
           if (addNumBtn) addNumBtn.disabled = false;
+          if (hasNumbers) {
+            if (styleBtn)  styleBtn.disabled  = false;
+            if (fixBtn)    fixBtn.disabled    = false;
+            if (clearBtn)  clearBtn.disabled  = false;
+          } else {
+            if (styleBtn)  styleBtn.disabled  = true;
+            if (fixBtn)    fixBtn.disabled    = true;
+            if (clearBtn)  clearBtn.disabled  = true;
+          }
         } else {
           tocBtn.classList.add('disabled-clickable');
           tocBtn.setAttribute('data-tooltip', 'Number your slides first, then generate the TOC!');
@@ -4419,8 +4458,48 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
       // Keep mainSlides and slides (TOC) in sync on mainSlides update
       function syncMainSlidesToTOC() {
         if (window.mainSlides && window.mainSlides.length > 0) {
-          // Overwrite slides with a deep copy of mainSlides
-          slides = JSON.parse(JSON.stringify(window.mainSlides));
+          const flatExisting = {};
+          function flatten(arr) {
+            for (const s of arr) {
+              flatExisting[s.id] = s;
+              if (s.children && s.children.length > 0) flatten(s.children);
+            }
+          }
+          if (slides && slides.length > 0) flatten(slides);
+
+          const isChild = new Set();
+          function markChildren(arr) {
+            for (const s of arr) {
+              if (s.children && s.children.length > 0) {
+                s.children.forEach(c => {
+                  isChild.add(c.id);
+                  markChildren([c]);
+                });
+              }
+            }
+          }
+          if (slides && slides.length > 0) markChildren(slides);
+
+          const newNodesMap = {};
+          for (const ms of window.mainSlides) {
+            const existing = flatExisting[ms.id];
+            newNodesMap[ms.id] = Object.assign({}, ms, {
+              displayName: existing ? existing.displayName : ms.name,
+              children: existing && existing.children ? existing.children.slice() : []
+            });
+          }
+
+          for (const id in newNodesMap) {
+            const node = newNodesMap[id];
+            if (node.children) {
+              node.children = node.children.map(child => newNodesMap[child.id]).filter(Boolean);
+            }
+          }
+
+          slides = window.mainSlides
+            .filter(ms => !isChild.has(ms.id))
+            .map(ms => newNodesMap[ms.id]);
+            
           renderTOCControls();
         }
       }
