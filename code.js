@@ -1216,7 +1216,8 @@ async function generateTOCFrame(slides, options, startFrameId) {
           numText.fontSize = numFontSize || 18;
           numText.fontName = safeNumFont;
           numText.fills = [{ type: 'SOLID', color: numColor }];
-          numText.textAutoResize = 'WIDTH_AND_HEIGHT';
+          numText.textAutoResize = 'HEIGHT';
+          numText.resize(Math.max(40, numStr.length * ((numFontSize || 18) * 0.7)), 20);
           numText.textAlignHorizontal = 'RIGHT';
           numText.setPluginData('tocType', 'hero-number');
 
@@ -1281,7 +1282,8 @@ async function generateTOCFrame(slides, options, startFrameId) {
             subNumText.fontSize = subNumFontSize || 18;
             subNumText.fontName = safeSubNumFont;
             subNumText.fills = [{ type: 'SOLID', color: subNumColor }];
-            subNumText.textAutoResize = 'WIDTH_AND_HEIGHT';
+            subNumText.textAutoResize = 'HEIGHT';
+            subNumText.resize(Math.max(40, subNumStr.length * ((subNumFontSize || 18) * 0.7)), 20);
             subNumText.textAlignHorizontal = 'RIGHT';
             subNumText.setPluginData('tocType', 'sub-number');
 
@@ -1348,7 +1350,8 @@ async function generateTOCFrame(slides, options, startFrameId) {
           numText.fontSize = numFontSize || 18;
           numText.fontName = safeNumFont;
           numText.fills = [{ type: 'SOLID', color: numColor }];
-          numText.textAutoResize = 'WIDTH_AND_HEIGHT';
+          numText.textAutoResize = 'HEIGHT';
+          numText.resize(Math.max(40, numStr.length * ((numFontSize || 18) * 0.7)), 20);
           numText.textAlignHorizontal = 'RIGHT';
           numText.setPluginData('tocType', 'hero-number');
 
@@ -2360,7 +2363,7 @@ figma.ui.onmessage = async (msg) => {
         colFrame.resize(newWidth, newHeight);
       }
 
-      // Update group frames (frames containing title + subtitles)
+      // Update group frames (frames containing title + subtitles) or standalone horizontal slide frames
       colFrame.children.forEach(groupFrame => {
         if (groupFrame.type === 'FRAME' && groupFrame.layoutMode === 'VERTICAL') {
           // Update group padding
@@ -2405,6 +2408,13 @@ figma.ui.onmessage = async (msg) => {
               },
               slides: slides
             });
+          }
+        } else if (groupFrame.type === 'FRAME' && groupFrame.layoutMode === 'HORIZONTAL') {
+          // standalone horizontal slide frame
+          if (typeof msg.layoutOptions.numberTextGap === 'number') {
+            groupFrame.itemSpacing = msg.layoutOptions.numberTextGap;
+          } else if (typeof msg.layoutOptions.titleSpacing === 'number') {
+            groupFrame.itemSpacing = msg.layoutOptions.titleSpacing;
           }
         }
       });
