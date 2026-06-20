@@ -1172,7 +1172,7 @@ async function generateTOCFrame(slides, options, startFrameId) {
           groupFrame.primaryAxisSizingMode = 'AUTO';
           groupFrame.counterAxisSizingMode = 'AUTO';
           groupFrame.fills = [];
-          groupFrame.itemSpacing = 12; // Spacing between title and subtitles
+          groupFrame.itemSpacing = 6; // Spacing between title and subtitles
           groupFrame.paddingTop = 0; // Space above group
           groupFrame.paddingBottom = 0; // Space below group
 
