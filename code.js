@@ -558,27 +558,30 @@ function getRemainingTrialDays() {
 
 
 
-// Helper: Recursively scan all frames named with 'Z' in a node
-function scanFrames(node, parentPath = [], results = []) {
-  // Only include frames whose name contains 'Z' (case-insensitive)
-  if (node.type === 'FRAME' && /z/i.test(node.name)) {
-    results.push({
-      id: node.id,
-      name: node.name,
-      type: node.type,
-      parentPath: parentPath.slice(),
-      pageId: figma.currentPage.id
-    });
-  }
-  if ('children' in node) {
+// Helper: Find all slides in a node
+function scanFrames(node) {
+  if (node.type !== 'PAGE') return [];
+  const slides = [];
+  if (node.children) {
     for (const child of node.children) {
-      // Only scan top-level frames (not nested frames)
-      if (node.type === 'PAGE') {
-        scanFrames(child, [], results);
+      if (child.type === 'FRAME' || child.type === 'SLIDE') {
+        slides.push(child);
+      } else if (child.type === 'SECTION' && child.children) {
+        for (const grandchild of child.children) {
+          if (grandchild.type === 'FRAME' || grandchild.type === 'SLIDE') {
+            slides.push(grandchild);
+          }
+        }
       }
     }
   }
-  return results;
+  return slides.map(s => ({
+    id: s.id,
+    name: s.name,
+    type: s.type,
+    parentPath: [],
+    pageId: node.id
+  }));
 }
 
 // Helper: Get all pages and frames
@@ -655,54 +658,25 @@ async function ensureFont(fontWeight) {
   }
 }
 
-// Helper: Get all top-level frames on the current page
+// Helper: Get all presentation slides on the current page
 function getFramesOnCurrentPage() {
-  // Get only presentation slides on the current page
-  const allFrames = [];
-
-  function collectFrames(node) {
-    // Only collect frames that are likely to be presentation slides
-    if (node.type === 'FRAME' && node.name !== '__TOC_AUTO__') {
-      // Filter criteria for slides:
-      // 1. Must be a top-level frame (not nested inside another frame)
-      // 2. Must have reasonable dimensions (not too small)
-      // 3. Must not be a component or instance
-      // 4. Must not be inside a group
-      // 5. Must not be a TOC frame or other special frame
-
-      const isTopLevel = node.parent && node.parent.type === 'PAGE';
-      const hasReasonableSize = node.width >= 200 && node.height >= 200; // Minimum slide size
-      const isNotComponent = node.type === 'FRAME' && !node.name.startsWith('_');
-      const isNotNested = !node.parent || node.parent.type === 'PAGE';
-      const isNotSpecialFrame = node.name !== '__TOC_AUTO__' && !node.name.startsWith('__');
-
-      // Additional check: if it's nested, only include if it's a direct child of the page
-      const isDirectChild = node.parent === figma.currentPage;
-
-      // Additional check: prefer frames with slide-like names (optional, not strict)
-      const hasSlideLikeName = /slide|page|frame/i.test(node.name) || node.name.match(/^\d+$/);
-
-      if (isTopLevel && hasReasonableSize && isNotComponent && isDirectChild && isNotSpecialFrame) {
-        allFrames.push(node);
-      }
-    }
-
-    // Only recurse into children if we're at the page level
-    if ('children' in node && (node.type === 'PAGE' || node.type === 'FRAME')) {
+  const allSlides = [];
+  for (const node of figma.currentPage.children) {
+    if (node.type === 'FRAME' || node.type === 'SLIDE') {
+      allSlides.push(node);
+    } else if (node.type === 'SECTION') {
       for (const child of node.children) {
-        collectFrames(child);
+        if (child.type === 'FRAME' || child.type === 'SLIDE') {
+          allSlides.push(child);
+        }
       }
     }
   }
-
-  // Start from the current page
-  collectFrames(figma.currentPage);
-
-  console.log('Found presentation slides on current page:', allFrames.length);
-  if (allFrames.length > 0) {
-    console.log('Slide names:', allFrames.map(f => f.name));
+  console.log('Found presentation slides on current page:', allSlides.length);
+  if (allSlides.length > 0) {
+    console.log('Slide names:', allSlides.map(f => f.name));
   }
-  return allFrames;
+  return allSlides;
 }
 
 // Helper: Group frames into rows by Y (within a threshold)
@@ -754,38 +728,22 @@ function sendFramesToUI(direction = 'z', filterForTOC = false) {
   console.log('sendFramesToUI called with filterForTOC:', filterForTOC, 'frames found:', frames.length);
 
   if (filterForTOC) {
-    // Helper: Get slide number from __SLIDE_NUMBER__ node
-    function getSlideNumber(frame) {
-      const numNode = frame.findOne && frame.findOne(n => n.type === 'TEXT' && /^__SLIDE_NUMBER__\d+$/.test(n.name));
-      if (numNode) {
-        // Try to parse the number from the node's characters
-        const match = numNode.characters.match(/^\d+/);
-        if (match) return parseInt(match[0], 10);
+    const frameData = ordered.map(function (frame, idx) {
+      let extractedNum = idx + 1;
+      if (frame.findOne) {
+        const numNode = frame.findOne(n => n.type === 'TEXT' && /^__SLIDE_NUMBER__\d+$/.test(n.name));
+        if (numNode) {
+          const match = numNode.characters.match(/^\d+/);
+          if (match) extractedNum = parseInt(match[0], 10);
+        }
       }
-      return null;
-    }
-    // Recursive filter: Only include frames (and their children) that have a slide number node
-    function filterFramesWithNumber(framesArr) {
-      return framesArr.map(function (frame) {
-        var hasNumber = frame.findOne && frame.findOne(function (n) { return n.type === 'TEXT' && /^__SLIDE_NUMBER__\d+$/.test(n.name); });
-        var filteredChildren = [];
-        if (frame.children && Array.isArray(frame.children)) {
-          filteredChildren = filterFramesWithNumber(frame.children);
-        }
-        if (hasNumber || filteredChildren.length > 0) {
-          console.log('Frame with number found:', frame.name, 'hasNumber:', hasNumber);
-          return {
-            id: frame.id,
-            name: frame.name,
-            number: getSlideNumber(frame), // Use actual slide number
-            children: filteredChildren
-          };
-        }
-        return null;
-      }).filter(Boolean);
-    }
-    const frameData = filterFramesWithNumber(ordered);
-    console.log('Filtered frames with numbers:', frameData);
+      return {
+        id: frame.id,
+        name: frame.name,
+        number: extractedNum,
+        children: []
+      };
+    });
     console.log('Sending toc-frames-list with', frameData.length, 'frames');
     figma.ui.postMessage({ type: 'toc-frames-list', frames: frameData });
   } else {
@@ -873,13 +831,12 @@ async function generateTOCFrame(slides, options, startFrameId) {
   console.log('Current selection:', selection);
 
   let parentFrame = null;
-  
   // 1. First priority: if a TOC already exists on this page, ALWAYS update it in place, ignoring selection.
   const existingToc = figma.currentPage.findOne(n => n.type === 'FRAME' && n.name === '__TOC_AUTO__');
-  if (existingToc && existingToc.parent && existingToc.parent.type === 'FRAME') {
+  if (existingToc && existingToc.parent && (existingToc.parent.type === 'FRAME' || existingToc.parent.type === 'SLIDE' || existingToc.parent.type === 'SECTION')) {
     parentFrame = existingToc.parent;
     console.log('Found existing TOC, forcing target to its parent frame:', parentFrame.name);
-  } else if (selection.length === 1 && selection[0].type === 'FRAME') {
+  } else if (selection.length === 1 && (selection[0].type === 'FRAME' || selection[0].type === 'SLIDE' || selection[0].type === 'SECTION')) {
     // 2. Fallback: if no TOC exists, use the currently selected frame.
     parentFrame = selection[0];
     console.log('Selected parent frame:', parentFrame.name);
@@ -1251,7 +1208,8 @@ async function generateTOCFrame(slides, options, startFrameId) {
           numText.fontSize = numFontSize || 18;
           numText.fontName = safeNumFont;
           numText.fills = [{ type: 'SOLID', color: numColor }];
-          numText.textAutoResize = 'WIDTH_AND_HEIGHT';
+          numText.textAutoResize = 'HEIGHT';
+          numText.resize(Math.max(40, numStr.length * ((numFontSize || 18) * 0.7)), 20);
           numText.textAlignHorizontal = 'RIGHT';
           numText.setPluginData('tocType', 'hero-number');
 
@@ -1264,7 +1222,8 @@ async function generateTOCFrame(slides, options, startFrameId) {
           nameText.fontSize = heroFontSize || 18;
           nameText.fontName = safeNameFont;
           nameText.fills = [{ type: 'SOLID', color: tocStyle.heroFontColor ? hexToRgb(tocStyle.heroFontColor) : { r: 0, g: 0, b: 0 } }];
-          nameText.textAutoResize = 'WIDTH_AND_HEIGHT';
+          nameText.layoutGrow = 1;
+          nameText.textAutoResize = 'HEIGHT';
           nameText.textAlignHorizontal = 'LEFT';
           nameText.setPluginData('linkedFrameId', group.title.id);
           nameText.setPluginData('tocType', 'hero');
@@ -1314,7 +1273,8 @@ async function generateTOCFrame(slides, options, startFrameId) {
             subNumText.fontSize = subNumFontSize || 18;
             subNumText.fontName = safeSubNumFont;
             subNumText.fills = [{ type: 'SOLID', color: subNumColor }];
-            subNumText.textAutoResize = 'WIDTH_AND_HEIGHT';
+            subNumText.textAutoResize = 'HEIGHT';
+            subNumText.resize(Math.max(40, subNumStr.length * ((subNumFontSize || 18) * 0.7)), 20);
             subNumText.textAlignHorizontal = 'RIGHT';
             subNumText.setPluginData('tocType', 'sub-number');
 
@@ -1327,7 +1287,8 @@ async function generateTOCFrame(slides, options, startFrameId) {
             subNameText.fontSize = tocStyle.subTitleSize || nestedFontSize || 18;
             subNameText.fontName = safeSubNameFont;
             subNameText.fills = [{ type: 'SOLID', color: tocStyle.subTitleColor ? hexToRgb(tocStyle.subTitleColor) : nestedFontColor }];
-            subNameText.textAutoResize = 'WIDTH_AND_HEIGHT';
+            subNameText.layoutGrow = 1;
+            subNameText.textAutoResize = 'HEIGHT';
             subNameText.textAlignHorizontal = 'LEFT';
             subNameText.setPluginData('linkedFrameId', child.id);
             subNameText.setPluginData('tocType', 'sub');
@@ -1379,7 +1340,8 @@ async function generateTOCFrame(slides, options, startFrameId) {
           numText.fontSize = numFontSize || 18;
           numText.fontName = safeNumFont;
           numText.fills = [{ type: 'SOLID', color: numColor }];
-          numText.textAutoResize = 'WIDTH_AND_HEIGHT';
+          numText.textAutoResize = 'HEIGHT';
+          numText.resize(Math.max(40, numStr.length * ((numFontSize || 18) * 0.7)), 20);
           numText.textAlignHorizontal = 'RIGHT';
           numText.setPluginData('tocType', 'hero-number');
 
@@ -1391,7 +1353,8 @@ async function generateTOCFrame(slides, options, startFrameId) {
           nameText.fontSize = heroFontSize || 18;
           nameText.fontName = safeNameFont;
           nameText.fills = [{ type: 'SOLID', color: tocStyle.heroFontColor ? hexToRgb(tocStyle.heroFontColor) : { r: 0, g: 0, b: 0 } }];
-          nameText.textAutoResize = 'WIDTH_AND_HEIGHT';
+          nameText.layoutGrow = 1;
+          nameText.textAutoResize = 'HEIGHT';
           nameText.textAlignHorizontal = 'LEFT';
           nameText.setPluginData('linkedFrameId', group.slide.id);
           nameText.setPluginData('tocType', 'hero');
@@ -2432,6 +2395,13 @@ figma.ui.onmessage = async (msg) => {
               slides: slides
             });
           }
+        } else if (groupFrame.type === 'FRAME' && groupFrame.layoutMode === 'HORIZONTAL') {
+          // This is a single, non-nested slide
+          if (typeof msg.layoutOptions.numberTextGap === 'number') {
+            groupFrame.itemSpacing = msg.layoutOptions.numberTextGap;
+          } else if (typeof msg.layoutOptions.titleSpacing === 'number') {
+            groupFrame.itemSpacing = msg.layoutOptions.titleSpacing;
+          }
         }
       });
     });
@@ -2559,7 +2529,7 @@ try {
       let frame = null;
       for (const page of figma.root.children) {
         if (page.type !== 'PAGE') continue;
-        frame = page.findOne && page.findOne(n => n.id === frameId && n.type === 'FRAME');
+        frame = page.findOne && page.findOne(n => n.id === frameId && n.type === 'SLIDE');
         if (frame) break;
       }
       if (frame && textNode.characters.replace(/^([\d.]+\s)?(.+)$/, '$2') !== frame.name) {
@@ -2604,10 +2574,15 @@ function getTOCTextNodeMap() {
 // --- Live-linking: Listen for frame name changes and update TOC text ---
 // Load all pages first to enable document change handler in incremental mode
 figma.loadAllPagesAsync().then(() => {
+  let updateFramesTimeout = null;
+  let lastSlideIds = "";
+
   figma.on('documentchange', (event) => {
     const tocTextNodeMap = getTOCTextNodeMap();
+    let shouldCheckOrder = false;
+
     for (const change of event.documentChanges) {
-      if (change.type === 'PROPERTY_CHANGE' && change.propertyName === 'name' && change.node.type === 'FRAME') {
+      if (change.type === 'PROPERTY_CHANGE' && change.propertyName === 'name' && change.node.type === 'SLIDE') {
         const changedFrame = change.node;
         // Find the TOC text node with matching linkedFrameId
         const textNode = tocTextNodeMap[changedFrame.id];
@@ -2618,7 +2593,24 @@ figma.loadAllPagesAsync().then(() => {
           });
           textNode.name = changedFrame.name;
         }
+        shouldCheckOrder = true;
       }
+      if (change.type === 'CREATE' || change.type === 'DELETE' || change.node.type === 'PAGE' || change.node.type === 'SLIDE') {
+        shouldCheckOrder = true;
+      }
+    }
+
+    if (shouldCheckOrder) {
+      if (updateFramesTimeout) clearTimeout(updateFramesTimeout);
+      updateFramesTimeout = setTimeout(() => {
+        const currentSlides = getFramesOnCurrentPage();
+        const currentIds = currentSlides.map(s => s.id).join(',');
+        if (currentIds !== lastSlideIds) {
+          lastSlideIds = currentIds;
+          sendFramesToUI('z', false);
+          sendFramesToUI('z', true);
+        }
+      }, 500);
     }
   });
 }).catch(error => {

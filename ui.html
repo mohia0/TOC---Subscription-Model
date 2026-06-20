@@ -1416,7 +1416,20 @@ window._emptyLottieData = {"v":"5.12.1","fr":60,"ip":0,"op":90,"w":430,"h":430,"
             <div class="slides-list" id="slides-list"></div>
 
             <div class="slide-controls" style="align-items: center; margin-top: 12px; display: flex;">
-              <div style="display: flex; gap: 4px; flex: 1;">
+              <div style="display: flex; gap: 6px; flex: 1; align-items: center;">
+                <div style="display: flex; flex-direction: column; align-items: center; position: relative;">
+                  <button class="primary-btn" id="add-slide-numbers" disabled>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:5px;flex-shrink:0;vertical-align:middle;">
+                    <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.582a.5.5 0 0 1 0 .963L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>
+                    <path d="M20 3v4"/><path d="M22 5h-4"/><path d="M4 17v2"/><path d="M5 18H3"/>
+                  </svg>Add Slide Numbers
+                </button>
+                  <div style="position: absolute; bottom: 100%; width: 200px; margin-bottom: 4px;">
+                    <div id="main-status-msg"
+                  style="flex: 1; text-align: center; color: var(--text-main); font-size: 10px; font-weight: 600; line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin: 0 4px;">
+                </div>
+                  </div>
+                </div>
                 <button class="refresh-btn" id="slide-number-settings" data-tooltip="Number style settings" disabled>
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                   stroke-linecap="round" stroke-linejoin="round">
@@ -1424,26 +1437,14 @@ window._emptyLottieData = {"v":"5.12.1","fr":60,"ip":0,"op":90,"w":430,"h":430,"
                   <line x1="10" x2="8" y1="3" y2="21"/><line x1="16" x2="14" y1="3" y2="21"/>
                 </svg>Style
               </button>
-                <button class="refresh-btn" id="refresh-numbers" data-tooltip="Removed a slide? Fix gaps in numbering" disabled>
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;">
-                  <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
-                  <path d="m9 12 2 2 4-4"/>
-                </svg>
-                Fix
-              </button>
-              </div>
-
-              <div style="display: flex; flex-direction: column; align-items: center; position: relative;">
-                <button class="primary-btn" id="add-slide-numbers" disabled>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:5px;flex-shrink:0;vertical-align:middle;">
-                  <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.582a.5.5 0 0 1 0 .963L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>
-                  <path d="M20 3v4"/><path d="M22 5h-4"/><path d="M4 17v2"/><path d="M5 18H3"/>
-                </svg>Add Slide Numbers
-              </button>
-                <div style="position: absolute; top: 100%; width: 200px; margin-top: 4px;">
-                  <div id="main-status-msg"
-                style="flex: 1; text-align: center; color: var(--text-main); font-size: 10px; font-weight: 600; line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 2; line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin: 0 4px;">
-              </div>
+                <div style="position: relative; display: inline-flex; align-items: center;">
+                  <button class="refresh-btn" id="refresh-numbers" data-tooltip="Removed a slide? Fix gaps in numbering" disabled>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:4px;">
+                      <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/>
+                      <path d="m9 12 2 2 4-4"/>
+                    </svg>
+                    Fix
+                  </button>
                 </div>
               </div>
 
@@ -1458,23 +1459,23 @@ window._emptyLottieData = {"v":"5.12.1","fr":60,"ip":0,"op":90,"w":430,"h":430,"
 
           <!-- TAB PANEL 2: TOC GENERATION -->
           <div class="tab-content-panel" id="panel-toc" style="gap:10px;">
-            <div id="toc-controls-area" style="background:rgba(0,0,0,0.15);border-radius:8px;padding:8px 12px;flex-shrink:0;">
-              <div id="toc-status-msg" style="font-size:0.9em;color:var(--primary);min-height:0;"></div>
-            </div>
+
             <div id="pro-tip-banner" style="font-size: 11px; color: #b0b3b8; padding: 8px 10px; display: flex; align-items: flex-start; gap: 8px; background: rgba(24, 160, 251, 0.08); border-left: 2px solid #18A0FB; border-radius: 4px; margin-bottom: -2px; position: relative;">
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#18A0FB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-top: 1px;">
                 <circle cx="12" cy="12" r="10"></circle>
                 <line x1="12" y1="16" x2="12" y2="12"></line>
                 <line x1="12" y1="8" x2="12.01" y2="8"></line>
               </svg>
-              <div style="line-height: 1.4; flex-grow: 1; padding-right: 12px;">
-                <strong>Pro Tip:</strong> Drag and drop items to nest them as sub-pages. Click any name to edit it!
+              <div style="line-height: 1.5; flex-grow: 1; padding-right: 12px; padding-bottom: 8px;">
+                <div style="margin-bottom: 4px; color: #E2E8F0;">
+                  Select an empty frame, then click <strong>Generate TOC</strong>.
+                </div>
+                <div>
+                  <strong>Pro Tip:</strong> Drag and drop items below to nest them as sub-pages. Click any name to edit its text!
+                </div>
               </div>
-              <button id="close-pro-tip" style="background: none; border: none; padding: 0; margin: 0; color: #b0b3b8; cursor: pointer; position: absolute; right: 8px; top: 8px; display: flex; align-items: center; justify-content: center;" title="Dismiss">
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <line x1="18" y1="6" x2="6" y2="18"></line>
-                  <line x1="6" y1="6" x2="18" y2="18"></line>
-                </svg>
+              <button id="close-pro-tip" style="background: none; border: none; padding: 0; margin: 0; color: #8b8e94; cursor: pointer; position: absolute; right: 8px; bottom: 8px; font-size: 9px; text-decoration: underline; opacity: 0.8;" title="Dismiss">
+                don't show again
               </button>
             </div>
             <script>
@@ -1496,6 +1497,10 @@ window._emptyLottieData = {"v":"5.12.1","fr":60,"ip":0,"op":90,"w":430,"h":430,"
               });
             </script>
             <div class="toc-editor" id="toc-editor" style="background:rgba(0,0,0,0.2);border-radius:8px;padding:8px 12px;"></div>
+            <div id="toc-controls-area" class="slide-controls" style="background:rgba(0,0,0,0.15); border-radius:8px; padding:8px 12px; margin-top: 12px; display: flex; flex-direction: column; position: relative;">
+              <div id="toc-status-msg" style="font-size:0.9em;color:var(--primary);min-height:0; text-align: left; margin-bottom: 8px;"></div>
+              <div id="toc-buttons-wrapper" style="display: flex; flex-direction: row; justify-content: space-between; align-items: center; width: 100%;"></div>
+            </div>
           </div>
 
           <script>
@@ -3418,10 +3423,10 @@ setTimeout(() => {
           supportStatus.textContent = '';
 
           const subject = currentType === 'bug'
-            ? '🐛 Bug Report — TOC Plugin'
+            ? '🐛 Bug Report — Live Numbering & Table of Contents'
             : currentType === 'support'
-              ? '👑 Premium Support — TOC Plugin'
-              : '💡 Suggestion — TOC Plugin';
+              ? '👑 Premium Support — Live Numbering & Table of Contents'
+              : '💡 Suggestion — Live Numbering & Table of Contents';
               
           let typeLabel = 'Suggestion';
           if (currentType === 'bug') typeLabel = 'Bug Report';
@@ -3964,6 +3969,8 @@ setTimeout(() => {
       }
 
       // --- Slides Preview Logic (Vertical List) ---
+      // Stable map: slideId -> user-given display name. Survives all reorders/refreshes.
+      window.slideDisplayNames = window.slideDisplayNames || {};
       const slidesList = document.getElementById('slides-list');
       const detectBtns = [
         document.getElementById('detect-z'),
@@ -4064,6 +4071,8 @@ setTimeout(() => {
         }
       }
 
+
+
       function renderSlides(slides, parentElement, hasNumbers) {
         if (hasNumbers === undefined) hasNumbers = window._hasNumbers || false;
         parentElement.innerHTML = '';
@@ -4110,15 +4119,21 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
         const topRescanBtn = document.getElementById('detect-refresh');
         if (topRescanBtn) topRescanBtn.style.display = '';
         parentElement.style.display = 'flex';
-        // Restore: simple list with inline name editing
+        // Simple list with inline name editing
+        // Numbers are always sequential (1, 2, 3...) regardless of Figma order
         slides.forEach((slide, idx) => {
           const row = document.createElement('div');
           row.className = 'slide-row';
           if (slide.isSkipped) row.classList.add('row-skipped');
+          // Always use sequential number based on position in the list
+          const seqNum = idx + 1;
           const hasNum = slide.number !== undefined && slide.number !== null && slide.number !== '';
+          // Retrieve the saved display name (survives reorders)
+          const savedName = window.slideDisplayNames && window.slideDisplayNames[slide.id];
+          const displayVal = savedName || slide.name || '';
           row.innerHTML = `
-            <span class='slide-number${hasNum ? '' : ' slide-number--grey'}'>${hasNum ? slide.number : '—'}</span>
-            <input class='slide-name-input' type='text' value="${slide.name}" data-slide-id="${slide.id}" style="font-size:1em;font-weight:600;background:transparent;border:none;color:#f3f4f8;width:70%;outline:none;" />
+            <span class='slide-number'>${seqNum}</span>
+            <input class='slide-name-input' type='text' value="${displayVal.replace(/"/g, '&quot;')}" data-slide-id="${slide.id}" placeholder="Slide Name" style="font-size:1em;font-weight:600;background:transparent;border:none;color:#f3f4f8;width:70%;outline:none;" />
             <button class='start-btn' data-frameid="${slide.id}">Start Numbering</button>
           `;
           // Add event for Start button
@@ -4130,9 +4145,13 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
           const input = row.querySelector('.slide-name-input');
           let lastValue = input.value;
           input.addEventListener('blur', (e) => {
-            if (e.target.value !== lastValue) {
-              updateSlideNameEverywhere(slide.id, e.target.value);
-              lastValue = e.target.value;
+            const newVal = e.target.value.trim();
+            if (newVal !== lastValue) {
+              // Persist in the stable ID-keyed map
+              if (!window.slideDisplayNames) window.slideDisplayNames = {};
+              window.slideDisplayNames[slide.id] = newVal;
+              updateSlideNameEverywhere(slide.id, newVal);
+              lastValue = newVal;
             }
           });
           input.addEventListener('keydown', (e) => {
@@ -4432,10 +4451,18 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
         }
       }
       function updateSlideNameEverywhere(slideId, newName) {
+        // Always persist in the stable ID-keyed map
+        if (!window.slideDisplayNames) window.slideDisplayNames = {};
+        window.slideDisplayNames[slideId] = newName;
+        // Sync to Figma layer
+        parent.postMessage({ pluginMessage: { type: 'update-slide-names', slides: [{ id: slideId, name: newName }] } }, '*');
         // Update in slides (TOC tree)
         function updateNameInTree(tree) {
           for (let s of tree) {
-            if (s.id === slideId) s.name = newName;
+            if (s.id === slideId) {
+              s.name = newName;
+              s.displayName = newName;
+            }
             if (s.children) updateNameInTree(s.children);
           }
         }
@@ -4443,17 +4470,33 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
         // Update in mainSlides (main section)
         if (window.mainSlides) {
           for (let s of window.mainSlides) {
-            if (s.id === slideId) s.name = newName;
+            if (s.id === slideId) {
+              s.name = newName;
+              s.displayName = newName;
+            }
             if (s.children) updateNameInTree(s.children);
+          }
+        }
+        // Update in allSlides (Numbering tab list)
+        if (window.allSlides || typeof allSlides !== 'undefined') {
+          const _allSlides = window.allSlides || allSlides;
+          for (let s of _allSlides) {
+            if (s.id === slideId) {
+              s.displayName = newName;
+            }
           }
         }
         // Send update to Figma backend (frame name)
         parent.postMessage({ pluginMessage: { type: 'update-slide-names', slides: [{ id: slideId, name: newName }] } }, '*');
-        // Send update to Figma backend (TOC text node)
-        parent.postMessage({ pluginMessage: { type: 'update-toc-text', slideId: slideId, newName: newName } }, '*');
+        
         renderTOCControls();
-        if (typeof renderSlides === 'function') renderSlides(window.mainSlides, document.getElementById('slides-list'));
-        onSlidesChanged();
+        // Re-render numbering list preserving names (don't call requestFrames - that would reset names)
+        const slideListEl = document.getElementById('slides-list');
+        if (slideListEl && typeof allSlides !== 'undefined' && allSlides.length > 0) {
+          renderSlides(allSlides, slideListEl, window._hasNumbers || false);
+        }
+        // Save the TOC structure (but DO NOT auto-regenerate TOC on rename)
+        parent.postMessage({ pluginMessage: { type: 'save-toc-structure', toc: slides } }, '*');
       }
       // Keep mainSlides and slides (TOC) in sync on mainSlides update
       function syncMainSlidesToTOC() {
@@ -4484,7 +4527,7 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
           for (const ms of window.mainSlides) {
             const existing = flatExisting[ms.id];
             newNodesMap[ms.id] = Object.assign({}, ms, {
-              displayName: existing ? existing.displayName : ms.name,
+              displayName: (window.slideDisplayNames && window.slideDisplayNames[ms.id]) || (existing ? existing.displayName : null) || ms.displayName || '',
               children: existing && existing.children ? existing.children.slice() : []
             });
           }
@@ -4521,7 +4564,7 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
       initializeTOC();
 
       // --- Render TOC Controls (Tree/Nesting) ---
-      function renderTOCTree(slidesArr, parentElem, depth = 0, parentArr = null, parentIdx = null) {
+      function renderTOCTree(slidesArr, parentElem, depth = 0, parentArr = null, parentIdx = null, ctx = { seq: 1 }) {
         slidesArr.forEach((slide, idx) => {
           // Drop zone above
           const dropZoneAbove = document.createElement('div');
@@ -4565,43 +4608,57 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
           row.className = 'notion-outline-row';
           row.style.display = 'flex';
           row.style.alignItems = 'center';
-          row.style.gap = '10px';
-          row.style.padding = '3px 12px 3px ' + (8 + depth * 32) + 'px';
+          row.style.gap = '12px';
+          row.style.padding = '10px 14px 10px ' + (14 + depth * 28) + 'px';
           row.style.fontWeight = depth === 0 ? '700' : '600';
-          row.style.fontSize = '1.08em';
-          row.style.background = depth > 0 ? 'rgba(37,99,235,0.08)' : 'transparent';
-          row.style.borderLeft = depth > 0 ? '3px solid #2563eb' : 'none';
+          row.style.fontSize = '0.95em';
+          row.style.background = depth > 0 ? 'rgba(37, 99, 235, 0.08)' : 'rgba(255, 255, 255, 0.03)';
+          row.style.border = depth > 0 ? '1px solid rgba(37, 99, 235, 0.15)' : '1px solid rgba(255, 255, 255, 0.05)';
+          row.style.borderLeft = depth > 0 ? '3px solid #2563eb' : '1px solid rgba(255, 255, 255, 0.05)';
+          row.style.borderRadius = '8px';
           row.style.color = '#fff';
           row.style.position = 'relative';
-          row.style.transition = 'background 0.18s, border 0.18s, padding 0.18s';
+          row.style.boxSizing = 'border-box';
+          row.style.transition = 'all 0.2s ease';
+
+          // Hover effects
+          row.onmouseenter = () => {
+            row.style.background = depth > 0 ? 'rgba(37, 99, 235, 0.15)' : 'rgba(255, 255, 255, 0.06)';
+            row.style.borderColor = depth > 0 ? 'rgba(37, 99, 235, 0.3)' : 'rgba(255, 255, 255, 0.1)';
+            if (depth > 0) row.style.borderLeft = '3px solid #3a86ff';
+          };
+          row.onmouseleave = () => {
+            row.style.background = depth > 0 ? 'rgba(37, 99, 235, 0.08)' : 'rgba(255, 255, 255, 0.03)';
+            row.style.borderColor = depth > 0 ? 'rgba(37, 99, 235, 0.15)' : 'rgba(255, 255, 255, 0.05)';
+            if (depth > 0) row.style.borderLeft = '3px solid #2563eb';
+          };
 
           // Remove button removed — rows use drag-to-reorder only
 
           // Drag handle
-          const dragHandle = document.createElement('span');
-          dragHandle.innerHTML = '&#9776;';
-          dragHandle.style.cursor = depth > 0 ? 'not-allowed' : 'grab';
-          dragHandle.style.opacity = depth > 0 ? '0.3' : '0.7';
-          dragHandle.style.fontSize = '1.1em';
-          dragHandle.style.userSelect = 'none';
-          dragHandle.draggable = depth === 0; // Only allow dragging for main slides
-          if (depth > 0) {
-            dragHandle.title = 'Sub-slides cannot be nested further';
+          if (depth === 0) {
+            const dragHandle = document.createElement('span');
+            dragHandle.innerHTML = '&#9776;';
+            dragHandle.style.cursor = 'grab';
+            dragHandle.style.opacity = '0.7';
+            dragHandle.style.fontSize = '1.1em';
+            dragHandle.style.userSelect = 'none';
+            dragHandle.draggable = true; // Only allow dragging for main slides
+            dragHandle.ondragstart = (e) => {
+              draggedSlideId = slide.id;
+              row.style.opacity = '0.6';
+              row.style.background = 'rgba(37,99,235,0.13)';
+              e.dataTransfer.effectAllowed = 'move';
+              e.dataTransfer.setData('text/plain', '');
+            };
+            dragHandle.ondragend = (e) => {
+              draggedSlideId = null;
+              row.style.opacity = '';
+              row.style.background = depth > 0 ? 'rgba(37, 99, 235, 0.08)' : 'rgba(255, 255, 255, 0.03)';
+              renderTOCControls();
+            };
+            row.appendChild(dragHandle);
           }
-          dragHandle.ondragstart = (e) => {
-            draggedSlideId = slide.id;
-            row.style.opacity = '0.6';
-            row.style.background = 'rgba(37,99,235,0.13)';
-            e.dataTransfer.effectAllowed = 'move';
-            e.dataTransfer.setData('text/plain', '');
-          };
-          dragHandle.ondragend = (e) => {
-            draggedSlideId = null;
-            row.style.opacity = '';
-            row.style.background = depth > 0 ? 'rgba(37,99,235,0.08)' : 'transparent';
-            renderTOCControls();
-          };
-          row.appendChild(dragHandle);
 
           // Outdent button for nested slides
           if (depth > 0) {
@@ -4658,7 +4715,9 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
           // Slide number
           const numSpan = document.createElement('span');
           numSpan.className = 'slide-number';
-          numSpan.textContent = (slide.number !== null && slide.number !== undefined) ? slide.number : '';
+          // Use sequential number
+          const seqNum = ctx.seq++;
+          numSpan.textContent = seqNum;
           numSpan.style.color = '#fff';
           numSpan.style.userSelect = 'none';
           row.appendChild(numSpan);
@@ -4667,7 +4726,10 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
           const nameInput = document.createElement('input');
           nameInput.className = 'slide-name-input';
           nameInput.type = 'text';
-          nameInput.value = slide.name;
+          // Use the stable display name from the ID-keyed map
+          const tocSavedName = window.slideDisplayNames && window.slideDisplayNames[slide.id];
+          nameInput.value = tocSavedName || slide.name || '';
+          nameInput.placeholder = 'Slide Name';
           nameInput.setAttribute('data-slide-id', slide.id);
           nameInput.style.fontSize = '1em';
           nameInput.style.fontWeight = depth === 0 ? '700' : '600';
@@ -4681,9 +4743,13 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
           nameInput.onmousedown = (e) => { e.stopPropagation(); };
           let lastTOCValue = nameInput.value;
           nameInput.addEventListener('blur', (e) => {
-            if (e.target.value !== lastTOCValue) {
-              updateSlideNameEverywhere(slide.id, e.target.value);
-              lastTOCValue = e.target.value;
+            const newTOCVal = e.target.value.trim();
+            if (newTOCVal !== lastTOCValue) {
+              // Persist in the stable ID-keyed map
+              if (!window.slideDisplayNames) window.slideDisplayNames = {};
+              window.slideDisplayNames[slide.id] = newTOCVal;
+              updateSlideNameEverywhere(slide.id, newTOCVal);
+              lastTOCValue = newTOCVal;
             }
           });
           nameInput.addEventListener('keydown', (e) => {
@@ -4700,7 +4766,9 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
             row.style.background = 'rgba(37,99,235,0.18)';
           };
           row.ondragleave = (e) => {
-            row.style.background = depth > 0 ? 'rgba(37,99,235,0.08)' : 'transparent';
+            row.style.background = depth > 0 ? 'rgba(37, 99, 235, 0.08)' : 'rgba(255, 255, 255, 0.03)';
+            row.style.borderColor = depth > 0 ? 'rgba(37, 99, 235, 0.15)' : 'rgba(255, 255, 255, 0.05)';
+            if (depth > 0) row.style.borderLeft = '3px solid #2563eb';
           };
           row.ondrop = (e) => {
             e.preventDefault();
@@ -4757,7 +4825,7 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
 
           // Recursively render children (but limit to depth 1 to prevent sub-sub-slides)
           if (slide.children && slide.children.length > 0 && depth === 0) {
-            renderTOCTree(slide.children, parentElem, depth + 1, slidesArr, idx);
+            renderTOCTree(slide.children, parentElem, depth + 1, slidesArr, idx, ctx);
           }
           // Drop zone below
           const dropZoneBelow = document.createElement('div');
@@ -4856,6 +4924,8 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
           if (slides && slides.length > 0) {
             console.log('Generating TOC with slides:', slides);
             showTOCStatus('Generating TOC...', '#18A0FB', false);
+            // Mark that user has generated TOC at least once (enables live updates from style/layout panels)
+            window._tocHasBeenGenerated = true;
             parent.postMessage({
               pluginMessage: {
                 type: 'generate-toc-autolayout',
@@ -4929,14 +4999,17 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
         };
         buttonRow.appendChild(refreshBtn);
 
+
+
         // Append buttonRow to controls area (separate dark section above list)
         const tocControlsArea = document.getElementById('toc-controls-area');
         if (tocControlsArea) {
-          // Clear only the button row area (keep status msg)
-          const existingBtnRow = tocControlsArea.querySelector('.toc-btn-row');
+          const wrapper = tocControlsArea.querySelector('#toc-buttons-wrapper') || tocControlsArea;
+          const existingBtnRow = wrapper.querySelector('.toc-btn-row');
           if (existingBtnRow) existingBtnRow.remove();
+          
           buttonRow.classList.add('toc-btn-row');
-          tocControlsArea.appendChild(buttonRow);
+          wrapper.appendChild(buttonRow);
         } else {
           tocEditor.appendChild(buttonRow);
         }
@@ -4967,6 +5040,12 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
         layoutPanel.style.padding = '16px 18px'; // Better breathing room
         layoutPanel.style.gap = '8px';
         layoutPanel.innerHTML = `
+          <style>
+            .info-icon { display: inline-flex; align-items: center; justify-content: center; width: 12px; height: 12px; border-radius: 50%; background: rgba(255,255,255,0.1); color: #888; font-size: 8.5px; font-weight: bold; cursor: help; margin-left: 4px; vertical-align: middle; position: relative; }
+            .info-icon:hover, .info-icon:active { background: rgba(255,255,255,0.2); color: #fff; }
+            .info-icon .tooltip { display: none; position: absolute; top: 100%; left: 0; transform: none; margin-top: 6px; padding: 4px 6px; background: #222; color: #eee; font-size: 10px; white-space: normal; min-width: 120px; text-align: left; border-radius: 4px; z-index: 10000; border: 1px solid #444; font-weight: normal; pointer-events: none; box-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+            .info-icon:hover .tooltip, .info-icon:active .tooltip { display: block; }
+          </style>
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
             <div class="modal-title" style="font-size:1.15em;margin:0;"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:8px;"><rect width="18" height="18" x="3" y="3" rx="2"></rect><path d="M9 3v18"></path><path d="M15 3v18"></path></svg>Layout</div>
             <div style="display:flex;gap:4px;">
@@ -4984,13 +5063,13 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
             <div style="border-bottom:1px solid rgba(255,255,255,0.05);padding-bottom:8px;">
               <div style="font-weight:700;font-size:12px;color:#888;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.03em;">Positioning</div>
               <div class="modal-row" style="margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;">
-                <label class="modal-label" style="margin:0;font-size:12px;flex:1;">Title Number</label>
+                <label class="modal-label" style="margin:0;font-size:12px;flex:1;">Title Number<span class="info-icon">!<span class="tooltip" style="left: auto; right: 0; text-align: right;">Position of title numbers</span></span></label>
                 <select id="title-number-pos-layout" class="modal-select" style="width:80px;height:24px;padding:2px 6px;font-size:11px;">
                   <option value="left">Left</option><option value="right">Right</option>
                 </select>
               </div>
               <div class="modal-row" style="display:flex;align-items:center;justify-content:space-between;">
-                <label class="modal-label" style="margin:0;font-size:12px;flex:1;">Sub Number</label>
+                <label class="modal-label" style="margin:0;font-size:12px;flex:1;">Sub Number<span class="info-icon">!<span class="tooltip" style="left: auto; right: 0; text-align: right;">Position of subtitle numbers</span></span></label>
                 <select id="subtitle-number-pos-layout" class="modal-select" style="width:80px;height:24px;padding:2px 6px;font-size:11px;">
                   <option value="left">Left</option><option value="right">Right</option>
                 </select>
@@ -5002,20 +5081,24 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
               <div style="font-weight:700;font-size:12px;color:#888;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.03em;">Spacing</div>
               <div style="display:grid;grid-template-columns: 1fr 1fr;gap:10px;">
                 <div style="display:flex;align-items:center;gap:6px;justify-content:space-between;">
-                  <span style="font-size:11px;color:#b0b3b8;">Group</span>
+                  <span style="font-size:11px;color:#b0b3b8;">Group<span class="info-icon">!<span class="tooltip">Spacing between slide groups</span></span></span>
                   <span style="display:flex;align-items:center;"><input id="group-spacing" class="modal-input" type="number" value="16" style="width:38px;height:24px;font-size:11px;padding:2px 4px;"><span style="font-size:10px;margin-left:2px;color:#666;">px</span></span>
                 </div>
                 <div style="display:flex;align-items:center;gap:6px;justify-content:space-between;">
-                  <span style="font-size:11px;color:#b0b3b8;">Gaps</span>
+                  <span style="font-size:11px;color:#b0b3b8;">Gaps<span class="info-icon">!<span class="tooltip">Spacing between columns</span></span></span>
                   <span style="display:flex;align-items:center;"><input id="column-spacing" class="modal-input" type="number" value="48" style="width:38px;height:24px;font-size:11px;padding:2px 4px;"><span style="font-size:10px;margin-left:2px;color:#666;">px</span></span>
                 </div>
                 <div style="display:flex;align-items:center;gap:6px;justify-content:space-between;">
-                  <span style="font-size:11px;color:#b0b3b8;">Sect</span>
+                  <span style="font-size:11px;color:#b0b3b8;">Sect<span class="info-icon">!<span class="tooltip">Padding inside each section</span></span></span>
                   <span style="display:flex;align-items:center;"><input id="group-padding" class="modal-input" type="number" value="12" style="width:38px;height:24px;font-size:11px;padding:2px 4px;"><span style="font-size:10px;margin-left:2px;color:#666;">px</span></span>
                 </div>
                 <div style="display:flex;align-items:center;gap:6px;justify-content:space-between;">
-                  <span style="font-size:11px;color:#b0b3b8;">Items</span>
+                  <span style="font-size:11px;color:#b0b3b8;">Items<span class="info-icon">!<span class="tooltip">Max items per column</span></span></span>
                   <span style="display:flex;align-items:center;"><input id="max-items-per-col" class="modal-input" type="number" value="10" style="width:38px;height:24px;font-size:11px;padding:2px 4px;"></span>
+                </div>
+                <div style="display:flex;align-items:center;gap:6px;justify-content:space-between;">
+                  <span style="font-size:11px;color:#b0b3b8;">Num Gap<span class="info-icon">!<span class="tooltip">Gap between number and text</span></span></span>
+                  <span style="display:flex;align-items:center;"><input id="number-text-gap" class="modal-input" type="number" value="16" style="width:38px;height:24px;font-size:11px;padding:2px 4px;"><span style="font-size:10px;margin-left:2px;color:#666;">px</span></span>
                 </div>
               </div>
             </div>
@@ -5025,16 +5108,16 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
               <div style="font-weight:700;font-size:12px;color:#888;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.03em;">Size & Align</div>
               <div style="display:grid;grid-template-columns: 1fr 1fr;gap:10px;margin-bottom:10px;">
                 <div style="display:flex;align-items:center;gap:6px;justify-content:space-between;">
-                  <span style="font-size:11px;color:#b0b3b8;">Max H</span>
+                  <span style="font-size:11px;color:#b0b3b8;">Max H<span class="info-icon">!<span class="tooltip">Maximum column height</span></span></span>
                   <span style="display:flex;align-items:center;"><input id="max-column-height" class="modal-input" type="number" value="800" style="width:40px;height:24px;font-size:11px;padding:2px 4px;"><span style="font-size:10px;margin-left:2px;color:#666;">px</span></span>
                 </div>
                 <div style="display:flex;align-items:center;gap:6px;justify-content:space-between;">
-                  <span style="font-size:11px;color:#b0b3b8;">Width</span>
+                  <span style="font-size:11px;color:#b0b3b8;">Width<span class="info-icon">!<span class="tooltip">Width of each column</span></span></span>
                   <span style="display:flex;align-items:center;"><input id="column-width" class="modal-input" type="number" value="350" style="width:40px;height:24px;font-size:11px;padding:2px 4px;"><span style="font-size:10px;margin-left:2px;color:#666;">px</span></span>
                 </div>
               </div>
               <div class="modal-row" style="display:flex;align-items:center;justify-content:space-between;">
-                <label class="modal-label" style="margin:0;font-size:12px;flex:1;">Row Align</label>
+                <label class="modal-label" style="margin:0;font-size:12px;flex:1;">Row Align<span class="info-icon">!<span class="tooltip">Vertical alignment in rows</span></span></label>
                 <select id="text-align-horizontal" class="modal-select" style="width:110px;height:24px;padding:2px 6px;font-size:11px;">
                   <option value="TOP">Up</option>
                   <option value="CENTER" selected>Middle</option>
@@ -5065,6 +5148,7 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
           layoutPanel.querySelector('#column-width'),
           layoutPanel.querySelector('#layout-mode'),
           layoutPanel.querySelector('#max-items-per-col'),
+          layoutPanel.querySelector('#number-text-gap'),
           layoutPanel.querySelector('#text-align-horizontal')
         ];
         function sendLiveLayoutUpdateInstant() {
@@ -5077,6 +5161,7 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
             maxColumnHeight: parseInt(layoutPanel.querySelector('#max-column-height').value, 10),
             columnWidth: parseInt(layoutPanel.querySelector('#column-width').value, 10),
             maxItemsPerCol: parseInt(layoutPanel.querySelector('#max-items-per-col').value, 10),
+            numberTextGap: parseInt(layoutPanel.querySelector('#number-text-gap').value, 10),
             framePaddingTop: 0,
             framePaddingBottom: 0,
             framePaddingLeft: 0,
@@ -5160,6 +5245,7 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
             textAlignHorizontal: 'CENTER',
             textAlignVertical: 'CENTER',
             maxItemsPerCol: 10,
+            numberTextGap: 16,
             framePaddingTop: 0,
             framePaddingBottom: 0,
             framePaddingLeft: 0,
@@ -5177,6 +5263,7 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
           layoutPanel.querySelector('#text-align-horizontal').value = defaultLayoutSettings.textAlignHorizontal;
 
           layoutPanel.querySelector('#max-items-per-col').value = defaultLayoutSettings.maxItemsPerCol;
+          layoutPanel.querySelector('#number-text-gap').value = defaultLayoutSettings.numberTextGap;
           layoutPanel.querySelector('#enable-grouping').checked = defaultLayoutSettings.enableGrouping;
           layoutPanel.querySelector('#group-standalone').checked = defaultLayoutSettings.groupStandalone;
 
@@ -5770,6 +5857,7 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
               const groupPaddingInput = layoutPanel.querySelector('#group-padding');
 
               const maxItemsPerColInput = layoutPanel.querySelector('#max-items-per-col');
+              const numberTextGapInput = layoutPanel.querySelector('#number-text-gap');
               const enableGroupingInput = layoutPanel.querySelector('#enable-grouping');
               const groupStandaloneInput = layoutPanel.querySelector('#group-standalone');
 
@@ -5788,6 +5876,7 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
               if (textAlignVerticalInput) textAlignVerticalInput.value = msg.settings.textAlignVertical || 'TOP';
 
               if (maxItemsPerColInput) maxItemsPerColInput.value = msg.settings.maxItemsPerCol || 10;
+              if (numberTextGapInput) numberTextGapInput.value = msg.settings.numberTextGap || 16;
               const framePaddingTopInput = layoutPanel.querySelector('#frame-padding-top');
               const framePaddingBottomInput = layoutPanel.querySelector('#frame-padding-bottom');
               const framePaddingLeftInput = layoutPanel.querySelector('#frame-padding-left');
