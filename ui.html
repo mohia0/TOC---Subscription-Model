@@ -5329,6 +5329,10 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
                   <span style="font-size:11px;color:#b0b3b8;">Num Gap<span class="info-icon">!<span class="tooltip">Gap between number and text</span></span></span>
                   <span style="display:flex;align-items:center;"><input id="number-text-gap" class="modal-input" type="number" value="16" style="width:38px;height:24px;font-size:11px;padding:2px 4px;"><span style="font-size:10px;margin-left:2px;color:#666;">px</span></span>
                 </div>
+                <div style="display:flex;align-items:center;gap:6px;justify-content:space-between;">
+                  <span style="font-size:11px;color:#b0b3b8;">Indent<span class="info-icon">!<span class="tooltip" style="left: auto; right: 0; text-align: right;">Indent of subtitle text</span></span></span>
+                  <span style="display:flex;align-items:center;"><input id="sub-indent" class="modal-input" type="number" value="24" style="width:38px;height:24px;font-size:11px;padding:2px 4px;"><span style="font-size:10px;margin-left:2px;color:#666;">px</span></span>
+                </div>
               </div>
             </div>
 
@@ -5375,9 +5379,9 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
           layoutPanel.querySelector('#group-padding'),
           layoutPanel.querySelector('#max-column-height'),
           layoutPanel.querySelector('#column-width'),
-          layoutPanel.querySelector('#layout-mode'),
           layoutPanel.querySelector('#max-items-per-col'),
           layoutPanel.querySelector('#number-text-gap'),
+          layoutPanel.querySelector('#sub-indent'),
           layoutPanel.querySelector('#text-align-horizontal')
         ];
         function sendLiveLayoutUpdateInstant() {
@@ -5391,6 +5395,7 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
             columnWidth: parseInt(layoutPanel.querySelector('#column-width').value, 10),
             maxItemsPerCol: parseInt(layoutPanel.querySelector('#max-items-per-col').value, 10),
             numberTextGap: parseInt(layoutPanel.querySelector('#number-text-gap').value, 10),
+            subIndent: parseInt(layoutPanel.querySelector('#sub-indent').value, 10),
             framePaddingTop: 0,
             framePaddingBottom: 0,
             framePaddingLeft: 0,
@@ -5458,6 +5463,7 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
 
         // Convert layout selects to segmented toggles AFTER event listeners are wired
         turnSelectsToToggles(layoutPanel);
+        initCustomSelects(layoutPanel);
 
         // Reset Layout to Default
         const resetLayoutBtn = layoutPanel.querySelector('#reset-toc-layout');
@@ -5475,6 +5481,7 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
             textAlignVertical: 'CENTER',
             maxItemsPerCol: 10,
             numberTextGap: 16,
+            subIndent: 24,
             framePaddingTop: 0,
             framePaddingBottom: 0,
             framePaddingLeft: 0,
@@ -5493,8 +5500,7 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
 
           layoutPanel.querySelector('#max-items-per-col').value = defaultLayoutSettings.maxItemsPerCol;
           layoutPanel.querySelector('#number-text-gap').value = defaultLayoutSettings.numberTextGap;
-          layoutPanel.querySelector('#enable-grouping').checked = defaultLayoutSettings.enableGrouping;
-          layoutPanel.querySelector('#group-standalone').checked = defaultLayoutSettings.groupStandalone;
+          layoutPanel.querySelector('#sub-indent').value = defaultLayoutSettings.subIndent;
 
           // Update tocSettings with default layout values
           tocSettings = Object.assign({}, tocSettings, defaultLayoutSettings);
@@ -5567,8 +5573,8 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
               <!-- Title > Text -->
               <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;">
                 <div style="display:flex;align-items:center;gap:8px;">
-                  <span style="font-size:11px;color:#888;min-width:32px;flex-shrink:0;">Text</span>
-                  <select id="hero-font-family" class="modal-select" style="flex:1;height:26px;font-size:11px;padding:2px 6px;"><option value="Inter">Inter</option><option value="Arial">Arial</option><option value="Fira Mono">Fira Mono</option><option value="Roboto">Roboto</option><option value="Montserrat">Montserrat</option><option value="Poppins">Poppins</option><option value="Open Sans">Open Sans</option><option value="Lato">Lato</option><option value="Fira Mono">Fira Mono</option><option value="Roboto">Roboto</option><option value="Montserrat">Montserrat</option><option value="Poppins">Poppins</option><option value="Open Sans">Open Sans</option><option value="Lato">Lato</option></select>
+                  <span style="font-size:11px;color:#888;min-width:32px;flex-shrink:0;">Font</span>
+                  <select id="hero-font-family" class="modal-select" style="flex:1;height:26px;font-size:11px;padding:2px 6px;"><option value="Inter">Inter</option><option value="Arial">Arial</option><option value="Fira Mono">Fira Mono</option><option value="Roboto">Roboto</option><option value="Montserrat">Montserrat</option><option value="Poppins">Poppins</option><option value="Open Sans">Open Sans</option><option value="Lato">Lato</option></select>
                 </div>
                 <div style="display:flex;align-items:center;gap:6px;margin-left:0px;flex-wrap:wrap;">
                   
@@ -5585,7 +5591,7 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
               <!-- Title > Num -->
               <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;">
                 <div style="display:flex;align-items:center;gap:8px;">
-                  <span style="font-size:11px;color:#888;min-width:32px;flex-shrink:0;">Num</span>
+                  <span style="font-size:11px;color:#888;min-width:32px;flex-shrink:0;">Font</span>
                   <select id="title-number-font" class="modal-select" style="flex:1;height:26px;font-size:11px;padding:2px 6px;"><option value="Inter">Inter</option><option value="Arial">Arial</option><option value="Fira Mono">Fira Mono</option><option value="Roboto">Roboto</option><option value="Montserrat">Montserrat</option><option value="Poppins">Poppins</option><option value="Open Sans">Open Sans</option><option value="Lato">Lato</option></select>
                 </div>
                 <div style="display:flex;align-items:center;gap:6px;margin-left:0px;flex-wrap:wrap;">
@@ -5609,7 +5615,7 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
               <!-- Sub > Text -->
               <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;">
                 <div style="display:flex;align-items:center;gap:8px;">
-                  <span style="font-size:11px;color:#888;min-width:32px;flex-shrink:0;">Text</span>
+                  <span style="font-size:11px;color:#888;min-width:32px;flex-shrink:0;">Font</span>
                   <select id="sub-title-font" class="modal-select" style="flex:1;height:26px;font-size:11px;padding:2px 6px;"><option value="Inter">Inter</option><option value="Arial">Arial</option><option value="Fira Mono">Fira Mono</option><option value="Roboto">Roboto</option><option value="Montserrat">Montserrat</option><option value="Poppins">Poppins</option><option value="Open Sans">Open Sans</option><option value="Lato">Lato</option></select>
                 </div>
                 <div style="display:flex;align-items:center;gap:6px;margin-left:0px;flex-wrap:wrap;">
@@ -5627,7 +5633,7 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
               <!-- Sub > Num -->
               <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;">
                 <div style="display:flex;align-items:center;gap:8px;">
-                  <span style="font-size:11px;color:#888;min-width:32px;flex-shrink:0;">Num</span>
+                  <span style="font-size:11px;color:#888;min-width:32px;flex-shrink:0;">Font</span>
                   <select id="sub-number-font" class="modal-select" style="flex:1;height:26px;font-size:11px;padding:2px 6px;"><option value="Inter">Inter</option><option value="Arial">Arial</option><option value="Fira Mono">Fira Mono</option><option value="Roboto">Roboto</option><option value="Montserrat">Montserrat</option><option value="Poppins">Poppins</option><option value="Open Sans">Open Sans</option><option value="Lato">Lato</option></select>
                 </div>
                 <div style="display:flex;align-items:center;gap:6px;margin-left:0px;flex-wrap:wrap;">
@@ -5643,12 +5649,6 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
                 </div>
               </div>
 
-              <!-- Indent -->
-              <div style="display:flex;align-items:center;gap:6px;">
-                <span style="font-size:11px;color:#888;">Indent</span>
-                <input id="sub-indent" class="modal-input" type="number" value="24" style="width:42px;height:26px;font-size:11px;padding:2px 4px;">
-                <span style="font-size:10px;color:#555;">px</span>
-              </div>
             </div>
 
           </div>
@@ -5670,7 +5670,7 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
         const subTitleSizeInput = advPanel.querySelector('#sub-title-size');
         const subTitleWeightInput = advPanel.querySelector('#sub-title-weight');
         const subTitleColorInput = advPanel.querySelector('#sub-title-color');
-        const subIndentInput = advPanel.querySelector('#sub-indent');
+        const subIndentInput = document.getElementById('sub-indent');
         const sectionSpacingInput = advPanel.querySelector('#section-spacing');
         const columnsInput = advPanel.querySelector('#toc-columns');
         // New: Title Slide Number controls
@@ -5774,7 +5774,7 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
           const sWeight = advPanel.querySelector('#sub-title-weight');
           const sColor = advPanel.querySelector('#sub-title-color');
           const sFont = advPanel.querySelector('#sub-title-font');
-          const sIndent = advPanel.querySelector('#sub-indent');
+          const sIndent = document.getElementById('sub-indent');
 
           // Update global tocSettings
           if (hSize) tocSettings.heroFontSize = parseInt(hSize.value, 10);
@@ -6057,7 +6057,7 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
               const subTitleSizeInput = advPanel.querySelector('#sub-title-size');
               const subTitleWeightInput = advPanel.querySelector('#sub-title-weight');
               const subTitleColorInput = advPanel.querySelector('#sub-title-color');
-              const subIndentInput = advPanel.querySelector('#sub-indent');
+              const subIndentInput = document.getElementById('sub-indent');
               const titleNumberFontInput = advPanel.querySelector('#title-number-font');
               const titleNumberSizeInput = advPanel.querySelector('#title-number-size');
               const titleNumberWeightInput = advPanel.querySelector('#title-number-weight');
@@ -6440,7 +6440,9 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
             optionDiv.className = 'custom-select-option';
             if (option.selected) optionDiv.classList.add('selected');
             optionDiv.textContent = option.text;
-            optionDiv.addEventListener('click', () => {
+            optionDiv.addEventListener('click', (e) => {
+              e.preventDefault();
+              e.stopPropagation();
               select.value = option.value;
               select.dispatchEvent(new Event('change', { bubbles: true }));
               select.dispatchEvent(new Event('input', { bubbles: true }));
@@ -6453,6 +6455,7 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
           });
 
           trigger.addEventListener('click', (e) => {
+            e.preventDefault();
             e.stopPropagation();
             document.querySelectorAll('.custom-select-wrapper').forEach(w => {
               if (w !== wrapper) w.classList.remove('open');
