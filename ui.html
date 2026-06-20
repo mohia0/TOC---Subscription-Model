@@ -1689,7 +1689,7 @@ window._emptyLottieData = {"v":"5.12.1","fr":60,"ip":0,"op":90,"w":430,"h":430,"
     <!-- Compact Trial Status Bar -->
     <div id="trial-status-bar"
       style="position:fixed;top:0;left:0;right:0;background:rgba(30,30,36,0.95);color:#94a3b8;padding:4px 12px;display:flex;justify-content:space-between;align-items:center;z-index:99999;font-family:'Inter',sans-serif;font-size:10px;font-weight:600;border-bottom:1px solid rgba(255,255,255,0.1);height:36px;backdrop-filter:blur(8px);">
-      <div style="display:flex;align-items:center;gap:8px;">
+      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;">
         <span id="trial-status-text" style="color:#e2e8f0;font-weight:700;">TRIAL ACTIVE</span>
         <span id="trial-countdown" style="color:#fbbf24;font-weight:600;">--d --h --m --s</span>
       </div>
@@ -1714,7 +1714,7 @@ window._emptyLottieData = {"v":"5.12.1","fr":60,"ip":0,"op":90,"w":430,"h":430,"
   <div id="support-modal-bg" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:200000;align-items:center;justify-content:center;">
     <div style="background:#1e1e2e;border-radius:16px;padding:22px 22px 18px;width:300px;display:flex;flex-direction:column;gap:14px;box-shadow:0 16px 48px rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.07);">
       <div style="display:flex;align-items:center;justify-content:space-between;">
-        <div style="display:flex;align-items:center;gap:8px;">
+        <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;">
           <span id="support-modal-icon" style="font-size:18px;">🐛</span>
           <span id="support-modal-title" style="font-size:14px;font-weight:700;color:#f3f4f8;">Submit Bug</span>
         </div>
@@ -4609,6 +4609,7 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
           row.style.display = 'flex';
           row.style.alignItems = 'center';
           row.style.gap = '12px';
+          row.style.marginTop = (depth === 0 && idx > 0) ? '4px' : '0px';
           row.style.padding = '10px 14px 10px ' + (14 + depth * 28) + 'px';
           row.style.fontWeight = depth === 0 ? '700' : '600';
           row.style.fontSize = '0.95em';
@@ -5043,7 +5044,7 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
           <style>
             .info-icon { display: inline-flex; align-items: center; justify-content: center; width: 12px; height: 12px; border-radius: 50%; background: rgba(255,255,255,0.1); color: #888; font-size: 8.5px; font-weight: bold; cursor: help; margin-left: 4px; vertical-align: middle; position: relative; }
             .info-icon:hover, .info-icon:active { background: rgba(255,255,255,0.2); color: #fff; }
-            .info-icon .tooltip { display: none; position: absolute; top: 100%; left: 0; transform: none; margin-top: 6px; padding: 4px 6px; background: #222; color: #eee; font-size: 10px; white-space: normal; min-width: 120px; text-align: left; border-radius: 4px; z-index: 10000; border: 1px solid #444; font-weight: normal; pointer-events: none; box-shadow: 0 2px 4px rgba(0,0,0,0.5); }
+            .info-icon .tooltip { display: none; position: absolute; top: 100%; left: 0; transform: none; margin-top: 6px; padding: 4px 6px; background: #222; color: #eee; font-size: 10px; white-space: nowrap; width: max-content; text-align: left; border-radius: 4px; z-index: 10000; border: 1px solid #444; font-weight: normal; pointer-events: none; box-shadow: 0 2px 4px rgba(0,0,0,0.5); }
             .info-icon:hover .tooltip, .info-icon:active .tooltip { display: block; }
           </style>
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
@@ -5117,7 +5118,7 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
                 </div>
               </div>
               <div class="modal-row" style="display:flex;align-items:center;justify-content:space-between;">
-                <label class="modal-label" style="margin:0;font-size:12px;flex:1;">Row Align<span class="info-icon">!<span class="tooltip">Vertical alignment in rows</span></span></label>
+                <label class="modal-label" style="margin:0;font-size:12px;flex:1;">Row Align<span class="info-icon">!<span class="tooltip" style="left: auto; right: 0; text-align: right;">Vertical alignment in rows</span></span></label>
                 <select id="text-align-horizontal" class="modal-select" style="width:110px;height:24px;padding:2px 6px;font-size:11px;">
                   <option value="TOP">Up</option>
                   <option value="CENTER" selected>Middle</option>
@@ -5310,9 +5311,10 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
         advPanel = document.createElement('div');
         advPanel.id = 'advanced-toc-style-popup';
         advPanel.className = 'modal';
-        advPanel.style.width = '570px';
-        advPanel.style.maxWidth = 'min(570px, calc(100vw - 40px))';
+        advPanel.style.width = '100%';
+        advPanel.style.maxWidth = 'calc(100vw - 40px)';
         advPanel.style.boxSizing = 'border-box';
+        advPanel.style.zoom = '0.92';
         advPanel.style.padding = '18px 20px';
         advPanel.style.gap = '8px';
         advPanel.innerHTML = `
@@ -5335,10 +5337,10 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
               <div style="font-weight:700;font-size:11px;color:var(--primary);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.05em;">Title</div>
 
               <!-- Title > Text -->
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+              <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:10px;">
                 <span style="font-size:11px;color:#888;min-width:32px;flex-shrink:0;">Text</span>
                 <select id="hero-font-family" class="modal-select" style="height:26px;font-size:11px;padding:2px 6px;"><option value="Inter">Inter</option><option value="Arial">Arial</option><option value="Fira Mono">Fira Mono</option></select>
-                <div style="margin-left:auto;display:flex;align-items:center;gap:6px;flex-shrink:0;">
+                <div style="margin-left:auto;display:flex;flex-wrap:wrap;align-items:center;gap:6px;flex-shrink:0;">
                   <span style="font-size:10px;color:#666;">Size</span>
                   <input id="hero-font-size" class="modal-input" type="number" value="32" style="width:42px;height:26px;font-size:11px;padding:2px 4px;">
                   <span style="font-size:10px;color:#666;">Color</span>
@@ -5349,10 +5351,10 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
               </div>
 
               <!-- Title > Num -->
-              <div style="display:flex;align-items:center;gap:8px;">
+              <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;">
                 <span style="font-size:11px;color:#888;min-width:32px;flex-shrink:0;">Num</span>
                 <select id="title-number-font" class="modal-select" style="height:26px;font-size:11px;padding:2px 6px;"><option value="Inter">Inter</option><option value="Arial">Arial</option></select>
-                <div style="margin-left:auto;display:flex;align-items:center;gap:6px;flex-shrink:0;">
+                <div style="margin-left:auto;display:flex;flex-wrap:wrap;align-items:center;gap:6px;flex-shrink:0;">
                   <span style="font-size:10px;color:#666;">Size</span>
                   <input id="title-number-size" class="modal-input" type="number" value="32" style="width:42px;height:26px;font-size:11px;padding:2px 4px;">
                   <span style="font-size:10px;color:#666;">Color</span>
@@ -5369,10 +5371,10 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
               <div style="font-weight:700;font-size:11px;color:var(--primary);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.05em;">Sub-Slide</div>
 
               <!-- Sub > Text -->
-              <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+              <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:10px;">
                 <span style="font-size:11px;color:#888;min-width:32px;flex-shrink:0;">Text</span>
                 <select id="sub-title-font" class="modal-select" style="height:26px;font-size:11px;padding:2px 6px;"><option value="Inter">Inter</option><option value="Arial">Arial</option></select>
-                <div style="margin-left:auto;display:flex;align-items:center;gap:6px;flex-shrink:0;">
+                <div style="margin-left:auto;display:flex;flex-wrap:wrap;align-items:center;gap:6px;flex-shrink:0;">
                   <span style="font-size:10px;color:#666;">Size</span>
                   <input id="sub-title-size" class="modal-input" type="number" value="18" style="width:42px;height:26px;font-size:11px;padding:2px 4px;">
                   <span style="font-size:10px;color:#666;">Color</span>
@@ -5386,7 +5388,7 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
               <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
                 <span style="font-size:11px;color:#888;min-width:32px;flex-shrink:0;">Num</span>
                 <select id="sub-number-font" class="modal-select" style="height:26px;font-size:11px;padding:2px 6px;"><option value="Inter">Inter</option><option value="Arial">Arial</option></select>
-                <div style="margin-left:auto;display:flex;align-items:center;gap:6px;flex-shrink:0;">
+                <div style="margin-left:auto;display:flex;flex-wrap:wrap;align-items:center;gap:6px;flex-shrink:0;">
                   <span style="font-size:10px;color:#666;">Size</span>
                   <input id="sub-number-size" class="modal-input" type="number" value="18" style="width:42px;height:26px;font-size:11px;padding:2px 4px;">
                   <span style="font-size:10px;color:#666;">Color</span>
