@@ -895,12 +895,19 @@
       background: transparent !important;
     }
 
-    .slide-row .start-btn {
+    .slide-row .action-buttons {
       display: none;
       position: absolute;
       right: 10px;
       top: 50%;
       transform: translateY(-50%);
+      gap: 6px;
+      z-index: 2;
+    }
+    .slide-row:hover .action-buttons {
+      display: flex;
+    }
+    .slide-row .start-btn, .slide-row .remove-btn {
       background: #2563eb;
       color: #fff;
       border: none;
@@ -909,13 +916,19 @@
       font-weight: 600;
       padding: 4px 14px;
       cursor: pointer;
-      opacity: 1;
+      white-space: nowrap;
       transition: background 0.13s;
-      z-index: 2;
     }
-
-    .slide-row:hover .start-btn {
-      display: block;
+    .slide-row .start-btn:hover {
+      background: #174bbd;
+    }
+    .slide-row .remove-btn {
+      background: rgba(239, 68, 68, 0.1);
+      color: #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+    .slide-row .remove-btn:hover {
+      background: rgba(239, 68, 68, 0.2);
     }
 
     /* Skipped rows: dim only number + name, NOT the start button */
@@ -4386,36 +4399,71 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
           const hasNum = slide.number !== undefined && slide.number !== null && slide.number !== '';
           // Retrieve the saved display name (survives reorders)
           const savedName = window.slideDisplayNames && window.slideDisplayNames[slide.id];
-          const displayVal = savedName || slide.displayName || '';
+          const displayVal = savedName || (slide.displayName === 'Name' ? slide.name : slide.displayName) || slide.name || '';
           row.innerHTML = `
             <span class='slide-number'>${seqNum}</span>
             <input class='slide-name-input' type='text' value="${displayVal.replace(/"/g, '&quot;')}" data-slide-id="${slide.id}" placeholder="Slide Name" style="font-size:1em;font-weight:600;background:transparent;border:none;color:#f3f4f8;width:70%;outline:none;" />
-            <button class='start-btn' data-frameid="${slide.id}">Start Numbering</button>
+            <div class="action-buttons">
+              ${hasNum ? `<button class='remove-btn' data-frameid="${slide.id}">Unnumber</button>` : ''}
+              <button class='start-btn' data-frameid="${slide.id}">Start Numbering</button>
+            </div>
           `;
           // Add event for Start button
-          row.querySelector('.start-btn').onclick = (e) => {
-            e.stopPropagation();
-            parent.postMessage({ pluginMessage: { type: 'start-numbering-from', frameId: slide.id, direction: currentDirection, numberStyle } }, '*');
-          };
-          // Add event for name editing (only on blur or Enter)
-          const input = row.querySelector('.slide-name-input');
-          let lastValue = input.value;
-          input.addEventListener('blur', (e) => {
-            const newVal = e.target.value.trim();
-            if (newVal !== lastValue) {
-              // Persist in the stable ID-keyed map
-              if (!window.slideDisplayNames) window.slideDisplayNames = {};
-              window.slideDisplayNames[slide.id] = newVal;
-              updateSlideNameEverywhere(slide.id, newVal);
-              lastValue = newVal;
+          const startBtn = row.querySelector('.start-btn');
+          if (startBtn) {
+            startBtn.onclick = (e) => {
+              e.stopPropagation();
+              parent.postMessage({ pluginMessage: { type: 'start-numbering-from', frameId: slide.id, direction: currentDirection, numberStyle } }, '*');
+            };
+          }
+          if (hasNum) {
+            const removeBtn = row.querySelector('.remove-btn');
+            if (removeBtn) {
+              removeBtn.onclick = (e) => {
+                e.stopPropagation();
+                parent.postMessage({ pluginMessage: { type: 'remove-slide-number', frameId: slide.id, direction: currentDirection, numberStyle } }, '*');
+              };
             }
-          });
-          input.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-              e.target.blur();
+
             }
-          });
-          slidesList.appendChild(row);
+
+            // Add event for name editing (only on blur or Enter)
+
+            const input = row.querySelector('.slide-name-input');
+
+            let lastValue = input.value;
+
+            input.addEventListener('blur', (e) => {
+
+              const newVal = e.target.value.trim();
+
+              if (newVal !== lastValue) {
+
+                // Persist in the stable ID-keyed map
+
+                if (!window.slideDisplayNames) window.slideDisplayNames = {};
+
+                window.slideDisplayNames[slide.id] = newVal;
+
+                updateSlideNameEverywhere(slide.id, newVal);
+
+                lastValue = newVal;
+
+              }
+
+            });
+
+            input.addEventListener('keydown', (e) => {
+
+              if (e.key === 'Enter') {
+
+                e.target.blur();
+
+              }
+
+            });
+
+            parentElement.appendChild(row);
         });
         updateFixButtonHighlight();
       }
@@ -4726,11 +4774,12 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
         renderTOCControls();
         // Re-render numbering list preserving names (don't call requestFrames - that would reset names)
         const slideListEl = document.getElementById('slides-list');
+        // Save the TOC structure and auto-regenerate TOC on rename to reflect live changes
+        parent.postMessage({ pluginMessage: { type: 'save-toc-structure', toc: slides } }, '*');
+        parent.postMessage({ pluginMessage: { type: 'regenerate-toc', slides: slides } }, '*');
         if (slideListEl && typeof allSlides !== 'undefined' && allSlides.length > 0) {
           renderSlides(allSlides, slideListEl, window._hasNumbers || false);
         }
-        // Save the TOC structure (but DO NOT auto-regenerate TOC on rename)
-        parent.postMessage({ pluginMessage: { type: 'save-toc-structure', toc: slides } }, '*');
       }
       // Keep mainSlides and slides (TOC) in sync on mainSlides update
       function syncMainSlidesToTOC() {
@@ -4761,7 +4810,7 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
           for (const ms of window.mainSlides) {
             const existing = flatExisting[ms.id];
             newNodesMap[ms.id] = Object.assign({}, ms, {
-              displayName: (window.slideDisplayNames && window.slideDisplayNames[ms.id]) || (existing ? existing.displayName : null) || ms.displayName || '',
+              displayName: (window.slideDisplayNames && window.slideDisplayNames[ms.id]) || (existing && existing.displayName !== 'Name' ? existing.displayName : null) || ms.displayName || ms.name || '',
               children: existing && existing.children ? existing.children.slice() : []
             });
           }
@@ -4962,7 +5011,7 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
           nameInput.type = 'text';
           // Use the stable display name from the ID-keyed map
           const tocSavedName = window.slideDisplayNames && window.slideDisplayNames[slide.id];
-          nameInput.value = tocSavedName || slide.displayName || '';
+          nameInput.value = tocSavedName || (slide.displayName === 'Name' ? slide.name : slide.displayName) || slide.name || '';
           nameInput.placeholder = 'Slide Name';
           nameInput.setAttribute('data-slide-id', slide.id);
           nameInput.style.fontSize = '1em';
@@ -5186,7 +5235,7 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
         const tocStyleBtn = document.createElement('button');
         tocStyleBtn.className = 'refresh-btn tooltip-bottom';
         tocStyleBtn.setAttribute('data-tooltip', 'Typography & colors');
-        const styleLabel = tocStyleDirty ? `Typography<span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:#6366f1;margin-left:4px;vertical-align:middle;"></span>` : 'Typography';
+        const styleLabel = 'Typography';
         tocStyleBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/>
         </svg>${styleLabel}`;
@@ -5203,7 +5252,7 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
         const tocLayoutBtn = document.createElement('button');
         tocLayoutBtn.className = 'refresh-btn tooltip-bottom';
         tocLayoutBtn.setAttribute('data-tooltip', 'Columns & spacing');
-        const layoutLabel = tocLayoutDirty ? `Layout<span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:#6366f1;margin-left:4px;vertical-align:middle;"></span>` : 'Layout';
+        const layoutLabel = 'Layout';
         tocLayoutBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 3h7a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-7m0-18H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h7m0-18v18"/>
         </svg>${layoutLabel}`;
@@ -5496,41 +5545,19 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
             }
           }, '*');
 
-          parent.postMessage({ pluginMessage: { type: 'update-toc-layout-live', layoutOptions } }, '*');
+          parent.postMessage({ pluginMessage: { type: 'regenerate-toc', slides: slides } }, '*');
         }
         layoutInputs.forEach(input => {
           if (input) {
             input.addEventListener('input', function () {
-              // Special handling for max-items-per-col - regenerate TOC
-              if (input.id === 'max-items-per-col') {
-                sendLiveLayoutUpdateInstant();
-                // Also regenerate the TOC structure
-                parent.postMessage({
-                  pluginMessage: {
-                    type: 'regenerate-toc',
-                    slides: slides
-                  }
-                }, '*');
-              } else {
-                sendLiveLayoutUpdateInstant();
-              }
+              tocLayoutDirty = true;
+              sendLiveLayoutUpdateInstant();
+              parent.postMessage({ pluginMessage: { type: 'regenerate-toc', slides: slides } }, '*');
             });
             input.addEventListener('change', function () {
-              // Special handling for max-items-per-col - regenerate TOC
-              if (input.id === 'max-items-per-col') {
-                tocLayoutDirty = true;
-                sendLiveLayoutUpdateInstant();
-                // Also regenerate the TOC structure
-                parent.postMessage({
-                  pluginMessage: {
-                    type: 'regenerate-toc',
-                    slides: slides
-                  }
-                }, '*');
-              } else {
-                tocLayoutDirty = true;
-                sendLiveLayoutUpdateInstant();
-              }
+              tocLayoutDirty = true;
+              sendLiveLayoutUpdateInstant();
+              parent.postMessage({ pluginMessage: { type: 'regenerate-toc', slides: slides } }, '*');
             });
             input.addEventListener('keydown', function (e) {
               // Allow typing in number inputs
@@ -5752,7 +5779,7 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
         const subTitleSizeInput = advPanel.querySelector('#sub-title-size');
         const subTitleWeightInput = advPanel.querySelector('#sub-title-weight');
         const subTitleColorInput = advPanel.querySelector('#sub-title-color');
-        const subIndentInput = advPanel.querySelector('#sub-indent');
+        const subIndentInput = document.getElementById('sub-indent');
         const sectionSpacingInput = advPanel.querySelector('#section-spacing');
         const columnsInput = advPanel.querySelector('#toc-columns');
         // New: Title Slide Number controls
@@ -5896,15 +5923,7 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
 
           // Request a single fresh regeneration of the TOC to cleanly apply all saved settings
           // Only if TOC was already generated by user
-          if (window._tocHasBeenGenerated) {
-            parent.postMessage({
-              pluginMessage: {
-                type: 'regenerate-toc',
-                options: tocSettings,
-                slides: slides
-              }
-            }, '*');
-          }
+          parent.postMessage({ pluginMessage: { type: 'regenerate-toc', options: tocSettings, slides: slides } }, '*');
         }
 
         // Show targeted update feedback
@@ -5963,6 +5982,14 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
             };
           }
 
+          // Also save global settings
+          parent.postMessage({
+            pluginMessage: {
+              type: 'save-toc-settings',
+              settings: tocSettings
+            }
+          }, '*');
+
           parent.postMessage({
             pluginMessage: {
               type: 'update-toc-style-targeted',
@@ -5972,13 +5999,7 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
             }
           }, '*');
 
-          // Also save global settings
-          parent.postMessage({
-            pluginMessage: {
-              type: 'save-toc-settings',
-              settings: tocSettings
-            }
-          }, '*');
+          parent.postMessage({ pluginMessage: { type: 'regenerate-toc', slides: slides } }, '*');
         }
 
         // Hero section controls
@@ -6118,8 +6139,27 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
         if (msg.type === 'custom-toc-loaded') {
           console.log('Received custom-toc-loaded:', msg.toc);
           if (msg.toc && msg.toc.length > 0) {
-            slides = msg.toc;
+                        slides = msg.toc;
+            
+            // Populate window.slideDisplayNames to sync with Numbering tab
+            if (!window.slideDisplayNames) window.slideDisplayNames = {};
+            function extractNames(tree) {
+              for (let s of tree) {
+                if (s.displayName && s.displayName !== 'Name') {
+                  window.slideDisplayNames[s.id] = s.displayName;
+                }
+                if (s.children) extractNames(s.children);
+              }
+            }
+            extractNames(slides);
+            
             renderTOCControls();
+            
+            // Re-render numbering list to sync
+            const slideListEl = document.getElementById('slides-list');
+            if (slideListEl && typeof allSlides !== 'undefined' && allSlides.length > 0) {
+              renderSlides(allSlides, slideListEl, window._hasNumbers || false);
+            }
             showTOCStatus('TOC structure loaded!', '#1aef7a', false);
           } else {
             // If no saved TOC, initialize with current slides

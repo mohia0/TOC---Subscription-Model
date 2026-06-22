@@ -11,5 +11,36 @@
   },
   "devDependencies": {
     "chokidar": "^3.6.0"
-  }
+  },
+  "main": "code.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "dependencies": {
+    "acorn": "^8.17.0",
+    "anymatch": "^3.1.3",
+    "binary-extensions": "^2.3.0",
+    "braces": "^3.0.3",
+    "fill-range": "^7.1.1",
+    "glob-parent": "^5.1.2",
+    "is-binary-path": "^2.1.0",
+    "is-extglob": "^2.1.1",
+    "is-glob": "^4.0.3",
+    "is-number": "^7.0.0",
+    "normalize-path": "^3.0.0",
+    "picomatch": "^2.3.2",
+    "readdirp": "^3.6.0",
+    "to-regex-range": "^5.0.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mohia0/TOC---Subscription-Model.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mohia0/TOC---Subscription-Model/issues"
+  },
+  "homepage": "https://github.com/mohia0/TOC---Subscription-Model#readme"
 }

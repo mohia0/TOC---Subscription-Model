@@ -565,11 +565,6 @@ function getRemainingTrialDays() {
 function scanFrames(node) {
   if (node.type !== 'PAGE') return [];
   const slides = node.findAll(n => n.type === 'SLIDE');
-  for (const slide of slides) {
-    if (/^\d+$/.test(slide.name.trim())) {
-      slide.name = 'Name';
-    }
-  }
   return slides.map(s => ({
     id: s.id,
     name: s.name,
@@ -656,11 +651,6 @@ async function ensureFont(fontWeight) {
 // Helper: Get all presentation slides on the current page
 function getFramesOnCurrentPage() {
   const allSlides = figma.currentPage.findAll(n => n.type === 'SLIDE');
-  for (const slide of allSlides) {
-    if (/^\d+$/.test(slide.name.trim())) {
-      slide.name = 'Name';
-    }
-  }
   console.log('Found presentation slides on current page:', allSlides.length);
   if (allSlides.length > 0) {
     console.log('Slide names:', allSlides.map(f => f.name));
@@ -1963,39 +1953,35 @@ figma.ui.onmessage = async (msg) => {
     }
   }
   if (msg.type === 'fix-slide-numbers') {
-    // Check trial status
     if (!canUsePremiumFeatures()) {
       figma.ui.postMessage({ type: 'slide-numbers-error', error: 'Trial expired. Please upgrade.' });
       return;
     }
-    // Fix: re-sequence ONLY frames that already have a slide number node.
-    // Frames without numbers (e.g. slides before "Start Numbering from") are left untouched.
     if (msg.direction) currentSelectedDirection = msg.direction;
     const frames = getFramesOnCurrentPage();
     const allVisible = frames.filter(f => !f.locked && f.visible !== false);
     const orderedAll = orderFrames(allVisible, msg.direction);
     const style = msg.numberStyle || { font: 'Inter', size: 16, weight: 'Regular', color: '#111111', pos: 'top-left', leadingZero: true };
 
-    // Detect only frames that currently carry a __SLIDE_NUMBER__ node
-    const numberedFrames = orderedAll.filter(frame =>
+    const firstNumberedIdx = orderedAll.findIndex(frame =>
       frame.findOne && frame.findOne(n => n.type === 'TEXT' && /^__SLIDE_NUMBER__\d+$/.test(n.name))
     );
 
-    if (!numberedFrames.length) {
+    if (firstNumberedIdx === -1) {
       figma.ui.postMessage({ type: 'slide-numbers-error', error: 'No numbered slides found to fix.' });
       return;
     }
 
-    // Remove old number nodes ONLY from the numbered frames (not all frames)
-    for (const frame of numberedFrames) {
+    const framesToNumber = orderedAll.slice(firstNumberedIdx).filter(f => f.getPluginData('skipNumbering') !== 'true');
+
+    for (const frame of framesToNumber) {
       const existing = frame.findOne(n => n.type === 'TEXT' && /^__SLIDE_NUMBER__\d+$/.test(n.name));
       if (existing) { try { existing.remove(); } catch (e) {} }
     }
 
     let added = 0;
-    // Re-sequence those frames 01, 02, 03… preserving style
-    for (let i = 0; i < numberedFrames.length; i++) {
-      const frame = numberedFrames[i];
+    for (let i = 0; i < framesToNumber.length; i++) {
+      const frame = framesToNumber[i];
       try {
         let fontStyle = style.weight;
         if (fontStyle !== 'Regular' && fontStyle !== 'Bold') fontStyle = 'Regular';
@@ -2028,6 +2014,54 @@ figma.ui.onmessage = async (msg) => {
       figma.ui.postMessage({ type: 'slide-numbers-fixed', count: added });
     }
   }
+  
+  if (msg.type === 'remove-slide-number') {
+    if (!canUsePremiumFeatures()) {
+      figma.ui.postMessage({ type: 'slide-numbers-error', error: 'Trial expired.' });
+      return;
+    }
+    const frames = getFramesOnCurrentPage();
+    const frame = frames.find(f => f.id === msg.frameId);
+    if (frame && frame.findOne) {
+      const existing = frame.findOne(n => n.type === 'TEXT' && /^__SLIDE_NUMBER__\d+$/.test(n.name));
+      if (existing) {
+        try { existing.remove(); } catch (e) {}
+      }
+    }
+    
+    const direction = currentSelectedDirection || 'z';
+    const allVisible = frames.filter(f => !f.locked && f.visible !== false);
+    const orderedAll = orderFrames(allVisible, direction);
+    const style = msg.numberStyle || { font: 'Inter', size: 16, weight: 'Regular', color: '#111111', pos: 'top-left', leadingZero: true };
+
+    const numberedFrames = orderedAll.filter(f =>
+      f.findOne && f.findOne(n => n.type === 'TEXT' && /^__SLIDE_NUMBER__\d+$/.test(n.name))
+    );
+
+    for (let i = 0; i < numberedFrames.length; i++) {
+      const f = numberedFrames[i];
+      const existing = f.findOne(n => n.type === 'TEXT' && /^__SLIDE_NUMBER__\d+$/.test(n.name));
+      if (existing) {
+        try {
+          if (existing.fontName !== figma.mixed) {
+            await figma.loadFontAsync(existing.fontName);
+          } else {
+            await figma.loadFontAsync({ family: 'Inter', style: 'Regular' });
+          }
+          let numStr = String(i + 1);
+          let numLeadingZero = style.leadingZero !== false;
+          numStr = numLeadingZero && numStr.length < 2 ? '0' + numStr : String(numStr);
+          existing.name = `__SLIDE_NUMBER__${i + 1}`;
+          existing.characters = numStr;
+        } catch (e) {
+          console.error("Failed to update sequence for frame", f.name, e);
+        }
+      }
+    }
+
+    figma.ui.postMessage({ type: 'slide-numbers-added' });
+  }
+
   if (msg.type === 'remove-all-numbers') {
     // Check trial status
     if (!canUsePremiumFeatures()) {
@@ -2825,4 +2859,4 @@ async function updateSpecificTOCStyles(parentNode, styleSection, styleOptions = 
 // if (tocRoot) {
 //   await updateTextNodesStyle(tocRoot, { fontSize: 24, fontFamily: 'Inter', fontWeight: 'Bold', color: { r: 0, g: 0, b: 0 } });
 // } 
-// } 
+// }
