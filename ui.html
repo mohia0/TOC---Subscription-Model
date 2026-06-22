@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -1568,22 +1568,26 @@ window._emptyLottieData = {"v":"5.12.1","fr":60,"ip":0,"op":90,"w":430,"h":430,"
               </button>
             </div>
             <script>
-              document.addEventListener('DOMContentLoaded', () => {
+              (function() {
                 const tipBanner = document.getElementById('pro-tip-banner');
-                const closeBtn = document.getElementById('close-pro-tip');
-                try {
-                  if (localStorage.getItem('tocProTipDismissed') === 'true') {
+                const closeBtn  = document.getElementById('close-pro-tip');
+
+                // Hide banner when code.js confirms it was dismissed in a previous session
+                window.addEventListener('message', function(event) {
+                  const msg = event.data && event.data.pluginMessage;
+                  if (msg && msg.type === 'pro-tip-dismissed') {
                     if (tipBanner) tipBanner.style.display = 'none';
                   }
-                } catch(e){}
-                
+                });
+
+                // On click: hide immediately + tell code.js to persist via clientStorage
                 if (closeBtn) {
-                  closeBtn.onclick = () => {
+                  closeBtn.onclick = function() {
                     if (tipBanner) tipBanner.style.display = 'none';
-                    try { localStorage.setItem('tocProTipDismissed', 'true'); } catch(e){}
+                    parent.postMessage({ pluginMessage: { type: 'dismiss-pro-tip' } }, '*');
                   };
                 }
-              });
+              })();
             </script>
             <div class="toc-editor" id="toc-editor" style="background:rgba(0,0,0,0.2);border-radius:8px;padding:8px 12px;"></div>
             <div id="toc-controls-area" class="slide-controls" style="background:rgba(0,0,0,0.15); border-radius:8px; padding:8px 12px; margin-top: 12px; display: flex; flex-direction: column; position: relative;">

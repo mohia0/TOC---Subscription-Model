@@ -1853,6 +1853,11 @@ figma.ui.onmessage = async (msg) => {
     figma.clientStorage.deleteAsync('customTOC');
     figma.ui.postMessage({ type: 'toc-data-cleared' });
   }
+
+  if (msg.type === 'dismiss-pro-tip') {
+    // Persist "don't show again" across plugin sessions
+    figma.clientStorage.setAsync('tocProTipDismissed', true);
+  }
   if (msg.type === 'generate-toc') {
     if (!canUsePremiumFeatures()) {
       figma.ui.postMessage({ type: 'toc-error', error: 'Trial expired.' });
@@ -2510,6 +2515,10 @@ figma.ui.onmessage = async (msg) => {
 try {
   sendFramesToUI('z');
   sendSavedTOCToUI();
+  // Send pro-tip dismissed state so the banner stays hidden if user dismissed it before
+  figma.clientStorage.getAsync('tocProTipDismissed').then(dismissed => {
+    if (dismissed) figma.ui.postMessage({ type: 'pro-tip-dismissed' });
+  }).catch(() => {});
 } catch (error) {
   console.error('Error sending initial data to UI:', error);
 }
