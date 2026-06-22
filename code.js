@@ -728,23 +728,22 @@ function sendFramesToUI(direction = 'z', filterForTOC = false) {
   console.log('sendFramesToUI called with filterForTOC:', filterForTOC, 'frames found:', frames.length);
 
   if (filterForTOC) {
-    const frameData = ordered.map(function (frame, idx) {
-      let extractedNum = idx + 1;
-      if (frame.findOne) {
-        const numNode = frame.findOne(n => n.type === 'TEXT' && /^__SLIDE_NUMBER__\d+$/.test(n.name));
-        if (numNode) {
-          const match = numNode.characters.match(/^\d+/);
-          if (match) extractedNum = parseInt(match[0], 10);
-        }
-      }
-      return {
+    // Only include frames that have an actual slide number node
+    const frameData = ordered.reduce(function (acc, frame) {
+      if (!frame.findOne) return acc;
+      const numNode = frame.findOne(n => n.type === 'TEXT' && /^__SLIDE_NUMBER__\d+$/.test(n.name));
+      if (!numNode) return acc; // skip frames without a slide number
+      const match = numNode.characters.match(/^\d+/);
+      const extractedNum = match ? parseInt(match[0], 10) : (acc.length + 1);
+      acc.push({
         id: frame.id,
         name: frame.name,
         number: extractedNum,
         children: []
-      };
-    });
-    console.log('Sending toc-frames-list with', frameData.length, 'frames');
+      });
+      return acc;
+    }, []);
+    console.log('Sending toc-frames-list with', frameData.length, 'frames (numbered slides only)');
     figma.ui.postMessage({ type: 'toc-frames-list', frames: frameData });
   } else {
     // Check if any frame has a number node

@@ -895,12 +895,19 @@
       background: transparent !important;
     }
 
-    .slide-row .start-btn {
+    .slide-row .action-buttons {
       display: none;
       position: absolute;
       right: 10px;
       top: 50%;
       transform: translateY(-50%);
+      gap: 6px;
+      z-index: 2;
+    }
+    .slide-row:hover .action-buttons {
+      display: flex;
+    }
+    .slide-row .start-btn, .slide-row .remove-btn {
       background: #2563eb;
       color: #fff;
       border: none;
@@ -909,13 +916,19 @@
       font-weight: 600;
       padding: 4px 14px;
       cursor: pointer;
-      opacity: 1;
+      white-space: nowrap;
       transition: background 0.13s;
-      z-index: 2;
     }
-
-    .slide-row:hover .start-btn {
-      display: block;
+    .slide-row .start-btn:hover {
+      background: #174bbd;
+    }
+    .slide-row .remove-btn {
+      background: rgba(239, 68, 68, 0.1);
+      color: #ef4444;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+    .slide-row .remove-btn:hover {
+      background: rgba(239, 68, 68, 0.2);
     }
 
     /* Skipped rows: dim only number + name, NOT the start button */
@@ -4286,13 +4299,28 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
           row.innerHTML = `
             <span class='slide-number'>${seqNum}</span>
             <input class='slide-name-input' type='text' value="${displayVal.replace(/"/g, '&quot;')}" data-slide-id="${slide.id}" placeholder="Slide Name" style="font-size:1em;font-weight:600;background:transparent;border:none;color:#f3f4f8;width:70%;outline:none;" />
-            <button class='start-btn' data-frameid="${slide.id}">Start Numbering</button>
+            <div class="action-buttons">
+              ${hasNum ? `<button class='remove-btn' data-frameid="${slide.id}">Unnumber</button>` : ''}
+              <button class='start-btn' data-frameid="${slide.id}">Start Numbering</button>
+            </div>
           `;
           // Add event for Start button
-          row.querySelector('.start-btn').onclick = (e) => {
-            e.stopPropagation();
-            parent.postMessage({ pluginMessage: { type: 'start-numbering-from', frameId: slide.id, direction: currentDirection, numberStyle } }, '*');
-          };
+          const startBtn = row.querySelector('.start-btn');
+          if (startBtn) {
+            startBtn.onclick = (e) => {
+              e.stopPropagation();
+              parent.postMessage({ pluginMessage: { type: 'start-numbering-from', frameId: slide.id, direction: currentDirection, numberStyle } }, '*');
+            };
+          }
+          if (hasNum) {
+            const removeBtn = row.querySelector('.remove-btn');
+            if (removeBtn) {
+              removeBtn.onclick = (e) => {
+                e.stopPropagation();
+                parent.postMessage({ pluginMessage: { type: 'remove-slide-number', frameId: slide.id, direction: currentDirection, numberStyle } }, '*');
+              };
+            }
+          }
           // Add event for name editing (only on blur or Enter)
           const input = row.querySelector('.slide-name-input');
           let lastValue = input.value;
@@ -5105,7 +5133,7 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
         const tocStyleBtn = document.createElement('button');
         tocStyleBtn.className = 'refresh-btn tooltip-bottom';
         tocStyleBtn.setAttribute('data-tooltip', 'Typography & colors');
-        const styleLabel = tocStyleDirty ? `Typography<span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:#6366f1;margin-left:4px;vertical-align:middle;"></span>` : 'Typography';
+        const styleLabel = 'Typography';
         tocStyleBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M4 7V4h16v3"/><path d="M9 20h6"/><path d="M12 4v16"/>
         </svg>${styleLabel}`;
@@ -5122,7 +5150,7 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
         const tocLayoutBtn = document.createElement('button');
         tocLayoutBtn.className = 'refresh-btn tooltip-bottom';
         tocLayoutBtn.setAttribute('data-tooltip', 'Columns & spacing');
-        const layoutLabel = tocLayoutDirty ? `Layout<span style="display:inline-block;width:5px;height:5px;border-radius:50%;background:#6366f1;margin-left:4px;vertical-align:middle;"></span>` : 'Layout';
+        const layoutLabel = 'Layout';
         tocLayoutBtn.innerHTML = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 3h7a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-7m0-18H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h7m0-18v18"/>
         </svg>${layoutLabel}`;
