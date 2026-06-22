@@ -2288,7 +2288,7 @@ window._emptyLottieData = {"v":"5.12.1","fr":60,"ip":0,"op":90,"w":430,"h":430,"
       subTitleWeight: 'Regular',
       subTitleFont: 'Inter',
       subTitleColor: '#000000',
-      subIndent: 24,
+      subIndent: 0,
       // Title slide number
       titleNumberFont: 'Inter',
       titleNumberSize: 32,
@@ -2316,7 +2316,7 @@ window._emptyLottieData = {"v":"5.12.1","fr":60,"ip":0,"op":90,"w":430,"h":430,"
       maxItemsPerCol: 10,
       maxColumnHeight: 800,
       columnWidth: 350,
-      textAlignHorizontal: 'CENTER',
+      textAlignHorizontal: 'TOP',
       textAlignVertical: 'TOP',
       framePaddingTop: 0,
       framePaddingBottom: 0,
@@ -5359,11 +5359,11 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
                 </div>
                 <div style="display:flex;align-items:center;gap:6px;justify-content:space-between;">
                   <span style="font-size:11px;color:#b0b3b8;">Num Gap<span class="info-icon">!<span class="tooltip">Gap between number and text</span></span></span>
-                  <span style="display:flex;align-items:center;"><input id="number-text-gap" class="modal-input" type="number" value="16" style="width:38px;height:24px;font-size:11px;padding:2px 4px;"><span style="font-size:10px;margin-left:2px;color:#666;">px</span></span>
+                  <span style="display:flex;align-items:center;"><input id="number-text-gap" class="modal-input" type="number" value="22" style="width:38px;height:24px;font-size:11px;padding:2px 4px;"><span style="font-size:10px;margin-left:2px;color:#666;">px</span></span>
                 </div>
                 <div style="display:flex;align-items:center;gap:6px;justify-content:space-between;">
                   <span style="font-size:11px;color:#b0b3b8;">Indent<span class="info-icon">!<span class="tooltip" style="left: auto; right: 0; text-align: right;">Indent of subtitle text</span></span></span>
-                  <span style="display:flex;align-items:center;"><input id="sub-indent" class="modal-input" type="number" value="24" style="width:38px;height:24px;font-size:11px;padding:2px 4px;"><span style="font-size:10px;margin-left:2px;color:#666;">px</span></span>
+                  <span style="display:flex;align-items:center;"><input id="sub-indent" class="modal-input" type="number" value="0" style="width:38px;height:24px;font-size:11px;padding:2px 4px;"><span style="font-size:10px;margin-left:2px;color:#666;">px</span></span>
                 </div>
               </div>
             </div>
@@ -5384,8 +5384,8 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
               <div class="modal-row" style="display:flex;align-items:center;justify-content:space-between;">
                 <label class="modal-label" style="margin:0;font-size:12px;flex:1;">Row Align<span class="info-icon">!<span class="tooltip" style="left: auto; right: 0; text-align: right;">Vertical alignment in rows</span></span></label>
                 <select id="text-align-horizontal" class="modal-select" style="width:110px;height:24px;padding:2px 6px;font-size:11px;">
-                  <option value="TOP">Up</option>
-                  <option value="CENTER" selected>Middle</option>
+                  <option value="TOP" selected>Up</option>
+                  <option value="CENTER">Middle</option>
                   <option value="BOTTOM">Down</option>
                 </select>
               </div>
@@ -5509,11 +5509,11 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
             groupPadding: 12,
             maxColumnHeight: 800,
             columnWidth: 350,
-            textAlignHorizontal: 'CENTER',
+            textAlignHorizontal: 'TOP',
             textAlignVertical: 'CENTER',
             maxItemsPerCol: 10,
-            numberTextGap: 16,
-            subIndent: 24,
+            numberTextGap: 22,
+            subIndent: 0,
             framePaddingTop: 0,
             framePaddingBottom: 0,
             framePaddingLeft: 0,
@@ -5987,7 +5987,7 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
             subTitleWeight: 'Regular',
             subTitleColor: '#000000',
             subTitleFont: 'Inter',
-            subIndent: 24,
+            subIndent: 0,
             titleNumberFont: 'Inter',
             titleNumberSize: 32,
             titleNumberWeight: 'Bold',
@@ -6237,11 +6237,32 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
             </div>
           </div>
           <div style="display:flex;gap:18px;justify-content:flex-end;margin-top:6px;">
-            <button id="styling-apply" style="background:#3a86ff;color:#fff;font-weight:700;padding:7px 18px;border:none;border-radius:7px;">Apply</button>
+            <button id="styling-apply" style="background:#353545;color:#888;font-weight:700;padding:7px 18px;border:none;border-radius:7px;cursor:not-allowed;transition:background 0.2s,color 0.2s;" disabled>Apply</button>
             <button id="styling-cancel" style="background:#353545;color:#fff;font-weight:700;padding:7px 18px;border:none;border-radius:7px;">Cancel</button>
           </div>
         `;
         document.body.appendChild(popup);
+
+        // Grey -> accent when any input changes
+        (function() {
+          const applyBtn = document.getElementById('styling-apply');
+          const watchIds = ['hero-font-size', 'hero-font-weight', 'hero-font-color',
+                            'nested-font-size', 'nested-font-weight', 'nested-font-color'];
+          function enableApply() {
+            applyBtn.disabled = false;
+            applyBtn.style.background = '#18A0FB';
+            applyBtn.style.color = '#fff';
+            applyBtn.style.cursor = 'pointer';
+          }
+          watchIds.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) {
+              el.addEventListener('input', enableApply);
+              el.addEventListener('change', enableApply);
+            }
+          });
+        })();
+
         document.getElementById('styling-cancel').onclick = () => popup.remove();
         document.getElementById('styling-apply').onclick = () => {
           heroFontSize = document.getElementById('hero-font-size').value;
@@ -6261,6 +6282,14 @@ if (lottieContainer && !lottieContainer.hasChildNodes()) {
           // Do NOT close the popup here
           // popup.remove();
           renderTOCControls();
+          // Reset Apply button back to grey after applying
+          const _applyBtn = document.getElementById('styling-apply');
+          if (_applyBtn) {
+            _applyBtn.disabled = true;
+            _applyBtn.style.background = '#353545';
+            _applyBtn.style.color = '#888';
+            _applyBtn.style.cursor = 'not-allowed';
+          }
         };
       }
 

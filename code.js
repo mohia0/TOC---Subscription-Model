@@ -1,4 +1,4 @@
-// Main Figma plugin code for Table of Contents Generator
+﻿// Main Figma plugin code for Table of Contents Generator
 figma.showUI(__html__, { width: 550, height: 800 });
 
 // --- PROFESSIONAL TRIAL AND SUBSCRIPTION MANAGEMENT ---
@@ -1181,13 +1181,13 @@ async function generateTOCFrame(slides, options, startFrameId) {
           titleRow.layoutMode = 'HORIZONTAL';
           titleRow.primaryAxisSizingMode = 'AUTO';
           titleRow.counterAxisSizingMode = 'AUTO';
-          titleRow.itemSpacing = tocStyle.numberTextGap !== undefined ? tocStyle.numberTextGap : 16;
+          titleRow.itemSpacing = tocStyle.numberTextGap !== undefined ? tocStyle.numberTextGap : 22;
           titleRow.fills = [];
 
           // Apply row alignment settings
           if (tocStyle.textAlignHorizontal) {
             titleRow.counterAxisAlignItems = tocStyle.textAlignHorizontal === 'TOP' ? 'MIN' :
-              tocStyle.textAlignHorizontal === 'BOTTOM' ? 'MAX' : 'CENTER';
+              tocStyle.textAlignHorizontal === 'BOTTOM' ? 'MAX' : 'MIN';
           }
           // Default horizontal positioning to Left
           titleRow.primaryAxisAlignItems = 'MIN';
@@ -1246,14 +1246,14 @@ async function generateTOCFrame(slides, options, startFrameId) {
             subRow.layoutMode = 'HORIZONTAL';
             subRow.primaryAxisSizingMode = 'AUTO';
             subRow.counterAxisSizingMode = 'AUTO';
-            subRow.itemSpacing = tocStyle.numberTextGap !== undefined ? tocStyle.numberTextGap : 16;
+            subRow.itemSpacing = tocStyle.numberTextGap !== undefined ? tocStyle.numberTextGap : 22;
             subRow.fills = [];
-            subRow.paddingLeft = tocStyle.subIndent || 24;
+            subRow.paddingLeft = tocStyle.subIndent !== undefined ? tocStyle.subIndent : 0;
 
             // Apply row alignment settings
             if (tocStyle.textAlignHorizontal) {
               subRow.counterAxisAlignItems = tocStyle.textAlignHorizontal === 'TOP' ? 'MIN' :
-                tocStyle.textAlignHorizontal === 'BOTTOM' ? 'MAX' : 'CENTER';
+                tocStyle.textAlignHorizontal === 'BOTTOM' ? 'MAX' : 'MIN';
             }
             // Default horizontal positioning to Left
             subRow.primaryAxisAlignItems = 'MIN';
@@ -1314,7 +1314,7 @@ async function generateTOCFrame(slides, options, startFrameId) {
           row.layoutMode = 'HORIZONTAL';
           row.primaryAxisSizingMode = 'AUTO';
           row.counterAxisSizingMode = 'AUTO';
-          row.itemSpacing = tocStyle.numberTextGap !== undefined ? tocStyle.numberTextGap : 16;
+          row.itemSpacing = tocStyle.numberTextGap !== undefined ? tocStyle.numberTextGap : 22;
           row.fills = [];
           row.paddingTop = 0; // Space above single items
           row.paddingBottom = 0; // Space below single items
@@ -1322,7 +1322,7 @@ async function generateTOCFrame(slides, options, startFrameId) {
           // Apply row alignment settings
           if (tocStyle.textAlignHorizontal) {
             row.counterAxisAlignItems = tocStyle.textAlignHorizontal === 'TOP' ? 'MIN' :
-              tocStyle.textAlignHorizontal === 'BOTTOM' ? 'MAX' : 'CENTER';
+              tocStyle.textAlignHorizontal === 'BOTTOM' ? 'MAX' : 'MIN';
           }
           // Default horizontal positioning to Left
           row.primaryAxisAlignItems = 'MIN';
@@ -2424,7 +2424,7 @@ figma.ui.onmessage = async (msg) => {
         if (node.type === 'FRAME' && node.layoutMode === 'HORIZONTAL') {
           // New "Row Alignment" controls vertical positioning (counter-axis)
           node.counterAxisAlignItems = msg.layoutOptions.textAlignHorizontal === 'TOP' ? 'MIN' :
-            msg.layoutOptions.textAlignHorizontal === 'BOTTOM' ? 'MAX' : 'CENTER';
+            msg.layoutOptions.textAlignHorizontal === 'BOTTOM' ? 'MAX' : 'MIN';
           // Fixed horizontal positioning (primary-axis)
           node.primaryAxisAlignItems = 'MIN';
         }
